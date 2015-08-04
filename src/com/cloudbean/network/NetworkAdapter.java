@@ -5,11 +5,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
+import com.cloudbean.model.Login;
 import com.cloudbean.packet.ByteHexUtil;
 import com.cloudbean.packet.DPacketParser;
 import com.cloudbean.trackerUtil.MsgEventHandler;
 
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 
 public class NetworkAdapter extends Thread {
 	public static Socket socket;
@@ -62,17 +65,14 @@ public class NetworkAdapter extends Thread {
 					 DPacketParser dp = new DPacketParser(Arrays.copyOfRange(recieveBuffer,0,len));
 					 switch (dp.pktSignal){
 					 case DPacketParser.SIGNAL_RE_LOGIN:
-						 int userid = MsgEventHandler.rLogin(dp);
-						 if(userid>0){
-							 
-							 System.out.println("");
-							 System.out.println("登录成功？"+dp.dataTable.table[0][0]);
-							 System.out.println("用户id："+userid);
-							 System.out.println("GPRS地址："+dp.dataTable.table[0][2]);
-							 System.out.println("GPRS端口："+dp.dataTable.table[0][3]);
-							 handler.sendEmptyMessage(0);
-							 
-						 }
+						 
+						 Login l = MsgEventHandler.rLogin(dp);
+						 Message msg = handler.obtainMessage(); 
+						 Bundle b = new Bundle();
+						 b.putParcelable("login", l);
+						 msg.setData(b);
+						 handler.sendMessage(msg);
+						
 						 break;
 					 case DPacketParser.SIGNAL_RE_HEARTBEAT:
 						 System.out.println("heart beat");

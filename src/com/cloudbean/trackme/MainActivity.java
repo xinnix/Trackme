@@ -1,5 +1,6 @@
 package com.cloudbean.trackme;
 
+import com.cloudbean.model.Login;
 import com.cloudbean.trackerUtil.MsgEventHandler;
 import com.cloudbean.trackme.TrackApp;
 import android.app.Activity;
@@ -93,21 +94,30 @@ public class MainActivity extends Activity {
 	 private  Handler handler = new Handler() {  
 	        @Override  
 	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-	            switch (msg.what){
-	            case 0:
-	            	pd.dismiss();// 关闭ProgressDialog
+	         
+	        	Bundle b = msg.getData();
+	        	Login l = (Login) b.get("login");
+	        	
+	        	if(l.isLogin==1){
+	        		pd.dismiss();// 关闭ProgressDialog
+	            	Toast.makeText(getApplicationContext(), "登录成功",Toast.LENGTH_SHORT).show();
 		            Intent intent = new Intent();
 					intent.setClass(MainActivity.this, MapActivity.class);
 					startActivity(intent);
-					break;
-	            case 1:
+	        	}else{
+	        		pd.dismiss();// 关闭ProgressDialog
 	            	Toast.makeText(getApplicationContext(), "登录失败",Toast.LENGTH_SHORT).show();
+	        	}
+	            	
+					
+	          
+	            	
 	            	
 	            
-	            }
+	         }
 	        	
-	        }  
-	 };  
+	 };
+ 
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

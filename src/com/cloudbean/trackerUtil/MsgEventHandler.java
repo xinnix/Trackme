@@ -7,6 +7,7 @@ import com.cloudbean.model.Car;
 import com.cloudbean.model.CarGroup;
 import com.cloudbean.model.CarState;
 import com.cloudbean.model.Fail;
+import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.model.User;
 import com.cloudbean.network.CNetworkAdapter;
@@ -38,12 +39,16 @@ public class MsgEventHandler {
 		
 	}
 	
-	public static int rLogin(DPacketParser dp){
+	public static Login rLogin(DPacketParser dp){
 		
-		Integer userid =(Integer) (dp.dataTable.table[0][1]);
+		Login l =new Login((Integer) (dp.dataTable.table[0][0]),
+				(Integer) (dp.dataTable.table[0][1]),
+				(String) (dp.dataTable.table[0][2]),
+				(String) (dp.dataTable.table[0][3]),
+				(Integer) (dp.dataTable.table[0][4]));
 	
 		
-		return userid.intValue();
+		return l;
 		
 	}
 	
