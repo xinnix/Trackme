@@ -1,5 +1,6 @@
 package com.cloudbean.trackme;
 import com.cloudbean.network.CNetworkAdapter;
+import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.MsgEventHandler;
 
@@ -10,6 +11,7 @@ public class TrackApp extends Application{
 	
 	public static NetworkAdapter na = null;
 	public static CNetworkAdapter nac = null;
+	HeartBeat hb = null;
 	
 	public void onCreate()
     {
@@ -18,7 +20,7 @@ public class TrackApp extends Application{
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects().detectLeakedClosableObjects().penaltyLog().penaltyDeath().build());
         na = new NetworkAdapter("61.145.122.143",4519);
     	nac = new CNetworkAdapter("61.145.122.143",4508);
-    	
+    	hb = new HeartBeat();
 		MsgEventHandler.config(na, nac);
         
     }

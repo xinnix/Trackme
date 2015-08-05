@@ -4,6 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Login implements Parcelable {
+	
+	
+	public static int LOGIN_SUCCESS=1;
+	public static int LOGIN_FAILURE=0;
 
 	public int isLogin;
 	public int userid;

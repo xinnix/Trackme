@@ -1,6 +1,7 @@
 package com.cloudbean.trackme;
 
 import com.cloudbean.model.Login;
+import com.cloudbean.network.HeartBeat;
 import com.cloudbean.trackerUtil.MsgEventHandler;
 import com.cloudbean.trackme.TrackApp;
 import android.app.Activity;
@@ -27,7 +28,7 @@ public class MainActivity extends Activity {
 	private Button btLogin = null;
 	private Button btExit = null;
 	private ProgressDialog pd = null;
-	
+	private TrackApp ta=null;
 	
 
 	
@@ -48,7 +49,7 @@ public class MainActivity extends Activity {
 		btExit = (Button)findViewById(R.id.exit);
 		
 		
-		TrackApp ta = (TrackApp)getApplication();
+		ta = (TrackApp)getApplication();
 		ta.na.setHandler(handler);
 		ta.nac.setHandler(handler);
 		ta.na.start();
@@ -98,11 +99,14 @@ public class MainActivity extends Activity {
 	        	Bundle b = msg.getData();
 	        	Login l = (Login) b.get("login");
 	        	
-	        	if(l.isLogin==1){
+	        	if(l.isLogin==Login.LOGIN_SUCCESS){
 	        		pd.dismiss();// 关闭ProgressDialog
 	            	Toast.makeText(getApplicationContext(), "登录成功",Toast.LENGTH_SHORT).show();
+	            	ta.hb.start();
 		            Intent intent = new Intent();
+		            
 					intent.setClass(MainActivity.this, MapActivity.class);
+					intent.putExtras(b);
 					startActivity(intent);
 	        	}else{
 	        		pd.dismiss();// 关闭ProgressDialog

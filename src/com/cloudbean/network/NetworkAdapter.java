@@ -67,6 +67,7 @@ public class NetworkAdapter extends Thread {
 					 case DPacketParser.SIGNAL_RE_LOGIN:
 						 
 						 Login l = MsgEventHandler.rLogin(dp);
+						 Thread.sleep(3000);
 						 Message msg = handler.obtainMessage(); 
 						 Bundle b = new Bundle();
 						 b.putParcelable("login", l);
