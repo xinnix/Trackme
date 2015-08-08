@@ -4,8 +4,8 @@ import com.cloudbean.trackerUtil.MsgEventHandler;
 
 public class HeartBeat extends Thread{
 
-	NetworkAdapter na;
-	final long timeInterval = 10000;
+	
+	final long timeInterval = 50000;
 	
 	
 	@Override

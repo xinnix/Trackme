@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
+import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
 import com.cloudbean.packet.ByteHexUtil;
 import com.cloudbean.packet.DPacketParser;
@@ -21,6 +22,9 @@ public class NetworkAdapter extends Thread {
 	public byte[] sendBuffer;
 	public byte[] recieveBuffer = new byte[4096];
 	public Handler handler = null;
+	
+	public Message msg = null;
+	public Bundle bundle =null;
 	
 	 public NetworkAdapter(String serverIP,int port){
 		 super();
@@ -56,7 +60,8 @@ public class NetworkAdapter extends Thread {
 	 
 	 public void run(){
 		 while(true){
-			 try{		  			 			 
+			 try{
+				 
 				 int len = inputStream.read(recieveBuffer);
 				// System.out.println(len);
 				// System.out.println(ByteHexUtil.bytesToHexString(Arrays.copyOfRange(recieveBuffer,0,len)));
@@ -67,11 +72,11 @@ public class NetworkAdapter extends Thread {
 					 case DPacketParser.SIGNAL_RE_LOGIN:
 						 
 						 Login l = MsgEventHandler.rLogin(dp);
-						 Thread.sleep(3000);
-						 Message msg = handler.obtainMessage(); 
-						 Bundle b = new Bundle();
-						 b.putParcelable("login", l);
-						 msg.setData(b);
+						
+						 msg = handler.obtainMessage(); 
+						 bundle = new Bundle();
+						 bundle.putParcelable("login", l);
+						 msg.setData(bundle);
 						 handler.sendMessage(msg);
 						
 						 break;
@@ -85,7 +90,13 @@ public class NetworkAdapter extends Thread {
 						 MsgEventHandler.rGetUserInfo(dp);
 						 break;
 					 case DPacketParser.SIGNAL_RE_GETCARINFO:
-						 MsgEventHandler.rGetCarInfo(dp);
+						 Car[] carList=MsgEventHandler.rGetCarInfo(dp);						
+						
+						 msg = handler.obtainMessage(); 
+						 bundle = new Bundle();
+						 bundle.putParcelableArray("carList", carList);
+						 msg.setData(bundle);
+						 handler.sendMessage(msg);
 						 break;
 					 case DPacketParser.SIGNAL_RE_GETCARTRACK:
 						 MsgEventHandler.rGetCarTrack(dp);

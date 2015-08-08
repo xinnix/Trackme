@@ -17,6 +17,8 @@ import com.cloudbean.packet.CPacketParser;
 import com.cloudbean.packet.DPacketParser;
 import com.cloudbean.packet.MsgGPRSParser;
 
+import android.util.Log;
+
 public class MsgEventHandler {
 	public static NetworkAdapter na;
 	public static CNetworkAdapter cna;
@@ -170,6 +172,7 @@ public class MsgEventHandler {
 		System.arraycopy(bdate, 0, pktData, buserid.length, bdate.length*2);
 		
 		DPacketParser dp = new DPacketParser(DPacketParser.SIGNAL_GETCARINFO,1,2,pktDataColumnType, pktDataColumnLength, pktData);	
+		Log.i("test",ByteHexUtil.bytesToHexString(dp.pktBuffer));
 		na.sendPacket(dp.pktBuffer);
 		
 	}

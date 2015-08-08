@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,23 +38,15 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		
-		if (android.os.Build.VERSION.SDK_INT > 9) {
-		    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		    StrictMode.setThreadPolicy(policy);
-		}
+
 		etUsername = (EditText)findViewById(R.id.username);
 		etPassword = (EditText)findViewById(R.id.password);
 		btLogin = (Button)findViewById(R.id.login);
 		btExit = (Button)findViewById(R.id.exit);
 		
 		
-		ta = (TrackApp)getApplication();
-		ta.na.setHandler(handler);
-		ta.nac.setHandler(handler);
-		ta.na.start();
-		ta.nac.start();
+		 ta = (TrackApp)getApplication();
+		 ta.setHandler(handler);
 		
 		
 		btExit.setOnClickListener(new OnClickListener(){
@@ -102,12 +95,16 @@ public class MainActivity extends Activity {
 	        	if(l.isLogin==Login.LOGIN_SUCCESS){
 	        		pd.dismiss();// ¹Ø±ÕProgressDialog
 	            	Toast.makeText(getApplicationContext(), "µÇÂ¼³É¹¦",Toast.LENGTH_SHORT).show();
-	            	ta.hb.start();
+	            	if (!ta.hb.isAlive()){
+	            		ta.hb.start();
+	            	}
+	            	
 		            Intent intent = new Intent();
 		            
-					intent.setClass(MainActivity.this, MapActivity.class);
+					intent.setClass(MainActivity.this, CarListActivity.class);
 					intent.putExtras(b);
 					startActivity(intent);
+					
 	        	}else{
 	        		pd.dismiss();// ¹Ø±ÕProgressDialog
 	            	Toast.makeText(getApplicationContext(), "µÇÂ¼Ê§°Ü",Toast.LENGTH_SHORT).show();
@@ -121,6 +118,9 @@ public class MainActivity extends Activity {
 	         }
 	        	
 	 };
+	 
+	
+	
  
 
 	@Override

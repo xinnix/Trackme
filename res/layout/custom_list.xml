@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/carImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="false"
+        android:src="@drawable/car" />
+
+    <TextView
+        android:id="@+id/carId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/carImg"
+        android:layout_alignLeft="@+id/carName"
+        android:layout_marginBottom="22dp"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/carName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/carId"
+        android:layout_toRightOf="@+id/carImg"
+        android:text="TextView" />
+
+</RelativeLayout>
