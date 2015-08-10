@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
+import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.MsgEventHandler;
 
 import android.app.Activity;
@@ -48,6 +49,12 @@ public class CarListActivity extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				// TODO Auto-generated method stub
 				Toast.makeText(getApplicationContext(), "你单击了"+carid[position], Toast.LENGTH_SHORT).show(); 
+				Intent intent = new Intent();
+				intent.setClass(CarListActivity.this,TimeChooseActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putInt("carid", Integer.parseInt(carid[position]));
+				intent.putExtras(bundle);
+				startActivity(intent);
 			}
 			
 		});
@@ -57,10 +64,10 @@ public class CarListActivity extends ListActivity {
 		
 		
 		Intent intent = this.getIntent();
-		Bundle bundle = intent.getExtras();
-		Login l = bundle.getParcelable("login");
 		
-		MsgEventHandler.sGetCarInfo(l.userid, "");
+		int userId = intent.getIntExtra("userId", 0);
+		
+		MsgEventHandler.sGetCarInfo(userId, "");
 		
 		pd = new ProgressDialog(CarListActivity.this);
 		pd.setMessage("用户车辆列表获取...");
@@ -78,41 +85,45 @@ public class CarListActivity extends ListActivity {
 	private  Handler handler = new Handler() {  
         @Override  
         public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-        	System.out.println("im here:");
-         
-        	Bundle b = msg.getData();
-        	Car[] carList = (Car[]) b.getParcelableArray("carList");
-        	
-        	if(carList.length>0){
-        		
-        		carid = new String[carList.length];
-        		for(int ii=0;ii<carList.length;ii++){
-        			carid[ii] = carList[ii].id;
-        		}
-        		
-        		List<Map<String,Object>> listItems = new ArrayList<Map<String,Object>>();
-        		
-        		for (int i = 0; i < carList.length; i++) {
-        			Map<String,Object> listItem = new HashMap<String,Object>();
-        			listItem.put("img", R.drawable.car);
-        			listItem.put("carId", carList[i].id);
-        			listItem.put("name", carList[i].ipAddress);	
-        			listItems.add(listItem);
-        		}
-        		
-        		SimpleAdapter adapter = new SimpleAdapter(CarListActivity.this, listItems, R.layout.custom_list, 
-        				new String[]{"img","carId","name"}, 
-        				new int[]{R.id.carImg,R.id.carId ,R.id.carName});
-        		
-        		
-        		//ArrayAdapter<String> aa=new ArrayAdapter<String>(CarListActivity.this,android.R.layout.simple_list_item_1,data);
-        		setListAdapter(adapter);  
-        		pd.dismiss();// 关闭ProgressDialog
+        	if(msg.what==NetworkAdapter.MSG_SUCCESS){
+        		Bundle b = msg.getData();
+            	Car[] carList = (Car[]) b.getParcelableArray("carList");
             	
+            	if(carList.length>0){
+            		
+            		carid = new String[carList.length];
+            		for(int ii=0;ii<carList.length;ii++){
+            			carid[ii] = carList[ii].id;
+            		}
+            		
+            		List<Map<String,Object>> listItems = new ArrayList<Map<String,Object>>();
+            		
+            		for (int i = 0; i < carList.length; i++) {
+            			Map<String,Object> listItem = new HashMap<String,Object>();
+            			listItem.put("img", R.drawable.car);
+            			listItem.put("carId", carList[i].id);
+            			listItem.put("name", carList[i].ipAddress);	
+            			listItems.add(listItem);
+            		}
+            		
+            		SimpleAdapter adapter = new SimpleAdapter(CarListActivity.this, listItems, R.layout.custom_list, 
+            				new String[]{"img","carId","name"}, 
+            				new int[]{R.id.carImg,R.id.carId ,R.id.carName});
+            		
+            		
+            		//ArrayAdapter<String> aa=new ArrayAdapter<String>(CarListActivity.this,android.R.layout.simple_list_item_1,data);
+            		setListAdapter(adapter);  
+            		pd.dismiss();// 关闭ProgressDialog
+                	
+            	}else{
+            		
+                	Toast.makeText(getApplicationContext(), "获取失败",Toast.LENGTH_SHORT).show();
+            	}
         	}else{
-        		
-            	Toast.makeText(getApplicationContext(), "获取失败",Toast.LENGTH_SHORT).show();
+        		Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
         	}
+         
+        	
             	
 				
           

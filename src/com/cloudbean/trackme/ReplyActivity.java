@@ -1,19 +1,20 @@
 package com.cloudbean.trackme;
 
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.Marker;
-import com.amap.api.maps2d.model.MarkerOptions;
-import com.amap.api.maps2d.model.Polyline;
-import com.amap.api.maps2d.model.PolylineOptions;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.maps.model.Polyline;
+import com.amap.api.maps.model.PolylineOptions;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
+import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.MsgEventHandler;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -34,8 +35,9 @@ public class ReplyActivity extends Activity {
 	private Marker mMoveMarker;
 	private ProgressDialog pd = null;
 	// 通过设置间隔时间和距离可以控制速度和图标移动的距离
-	private static final int TIME_INTERVAL = 80;
+	private static final int TIME_INTERVAL = 20;
 	private static final double DISTANCE = 0.0001;
+	private Track[] trackList = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,26 +49,39 @@ public class ReplyActivity extends Activity {
 		mAmap = mMapView.getMap();
 		//mAmap.setPointToCenter((int) (22.90923 * 1E6), (int) (116.397428 * 1E6));
 		
-		MsgEventHandler.sGetCarTrack(3,"2015-07-05 10:11:11","2015-07-05 10:17:00");
+		Intent intent = this.getIntent();
+		int carId = intent.getIntExtra("carId", 0);
+		String startDate = intent.getStringExtra("startDate");
+		String endDate = intent.getStringExtra("endDate");
+		
+		MsgEventHandler.sGetCarTrack(carId,startDate,endDate);
 		
 		pd = new ProgressDialog(ReplyActivity.this);
 		pd.setMessage("历史轨距获取中...");
 		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		pd.show();
+		
+		
 		//mAmap.moveCamera(CameraUpdateFactory.zoomTo(10));
 		
 	}
 	
-	 private  Handler handler = new Handler() {  
+
+	private  Handler handler = new Handler() {  
 	        @Override  
 	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-	         
-	        	Bundle b = msg.getData();
-	        	Track[] trackList = (Track[]) b.getParcelableArray("trackList");
-	        	initRoadData(trackList);
-	    		moveLooper();
-	    		pd.dismiss();// 关闭ProgressDialog
+	         if(msg.what==NetworkAdapter.MSG_SUCCESS){
+	        	 Bundle b = msg.getData();
+		        	Track[] trackList = (Track[]) b.getParcelableArray("trackList");
+		        	initRoadData(trackList);
+		    		moveLooper();
+		    		pd.dismiss();// 关闭ProgressDialog
+	         }else{
+	        	 pd.dismiss();// 关闭ProgressDialog
+	        	 Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
 	         }
+	        	
+	        }
 	        	
 	 };
 	private void initRoadData(Track[] tracklist) {
@@ -102,30 +117,18 @@ public class ReplyActivity extends Activity {
 				 polylineOptions.add(new LatLng(tracklist[i].latitude, tracklist[i].longitude));
 			}
 			
-//			 polylineOptions.add(new LatLng(socket9.weidu.get(0), socket9.jingdu.get(0)));
-//			 polylineOptions.add(new LatLng(socket9.weidu.get(1), socket9.jingdu.get(1)));
-//			 polylineOptions.add(new LatLng(socket9.weidu.get(2), socket9.jingdu.get(2)));
-//			 polylineOptions.add(new LatLng(39.919324, 116.379367));
-//			 polylineOptions.add(new LatLng(39.951704, 116.356708));
-//			
-//			
-//			
-//			
-//			 polylineOptions.add(new LatLng(39.970914, 116.408206));
-//			
-//			 polylineOptions.add(new LatLng(40.005899, 116.467601));
-//			 polylineOptions.add(new LatLng(39.954368, 116.478038));
+
 			polylineOptions.width(10);
 			polylineOptions.color(Color.RED);
 			mVirtureRoad = mAmap.addPolyline(polylineOptions);
 			MarkerOptions markerOptions = new MarkerOptions();
-			//markerOptions.setFlat(true);
 			markerOptions.anchor(0.5f, 0.5f);
-			markerOptions.icon(BitmapDescriptorFactory
-					.fromResource(R.drawable.marker));
+			markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
 			markerOptions.position(polylineOptions.getPoints().get(0));
 			mMoveMarker = mAmap.addMarker(markerOptions);
 			mMoveMarker.setRotateAngle((float) getAngle(0));
+		}else{
+			Toast.makeText(this,"没有轨迹记录", Toast.LENGTH_SHORT).show();
 		}
 		
 
@@ -259,8 +262,7 @@ public class ReplyActivity extends Activity {
 						
 						LatLng startPoint = mVirtureRoad.getPoints().get(i);
 						LatLng endPoint = mVirtureRoad.getPoints().get(i + 1);
-						mMoveMarker
-						.setPosition(startPoint);
+						mMoveMarker.setPosition(startPoint);
 
 						mMoveMarker.setRotateAngle((float) getAngle(startPoint,
 								endPoint));
@@ -287,6 +289,8 @@ public class ReplyActivity extends Activity {
 								latLng = new LatLng(j, startPoint.longitude);
 							}
 							mMoveMarker.setPosition(latLng);
+							
+							
 							try {
 								Thread.sleep(TIME_INTERVAL);
 							} catch (InterruptedException e) {
@@ -303,22 +307,5 @@ public class ReplyActivity extends Activity {
 
 
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.reply, menu);
-		return true;
-	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 }

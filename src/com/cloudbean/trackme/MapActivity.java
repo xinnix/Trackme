@@ -1,7 +1,7 @@
 package com.cloudbean.trackme;
 
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.MapView;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.MapView;
 
 import android.app.Activity;
 import android.os.Bundle;

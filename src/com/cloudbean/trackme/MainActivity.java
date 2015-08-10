@@ -2,6 +2,7 @@ package com.cloudbean.trackme;
 
 import com.cloudbean.model.Login;
 import com.cloudbean.network.HeartBeat;
+import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.MsgEventHandler;
 import com.cloudbean.trackme.TrackApp;
 import android.app.Activity;
@@ -45,8 +46,7 @@ public class MainActivity extends Activity {
 		btExit = (Button)findViewById(R.id.exit);
 		
 		
-		 ta = (TrackApp)getApplication();
-		 ta.setHandler(handler);
+	
 		
 		
 		btExit.setOnClickListener(new OnClickListener(){
@@ -85,30 +85,38 @@ public class MainActivity extends Activity {
 	}
 	
 	
+	
+	
 	 private  Handler handler = new Handler() {  
 	        @Override  
 	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
 	         
-	        	Bundle b = msg.getData();
-	        	Login l = (Login) b.get("login");
-	        	
-	        	if(l.isLogin==Login.LOGIN_SUCCESS){
-	        		pd.dismiss();// 关闭ProgressDialog
-	            	Toast.makeText(getApplicationContext(), "登录成功",Toast.LENGTH_SHORT).show();
-	            	/*if (!ta.hb.isAlive()){
-	            		ta.hb.start();
-	            	}*/
-	            	
-		            Intent intent = new Intent();
-		            
-					intent.setClass(MainActivity.this, ReplyActivity.class);
-					intent.putExtras(b);
-					startActivity(intent);
-					
+	        	if( msg.what==NetworkAdapter.MSG_SUCCESS){
+	        		Bundle b = msg.getData();
+		        	Login l = (Login) b.get("login");
+		        	
+		        	if(l.isLogin==Login.LOGIN_SUCCESS){
+		        		pd.dismiss();// 关闭ProgressDialog
+		            	Toast.makeText(getApplicationContext(), "登录成功",Toast.LENGTH_SHORT).show();
+		            	if (!ta.hb.isAlive()){
+		            		ta.hb.start();
+		            	}
+		            	
+			            Intent intent = new Intent();
+			            
+						intent.setClass(MainActivity.this, CarListActivity.class);
+						intent.putExtra("userId",l.userid);
+						startActivity(intent);
+						
+		        	}else{
+		        		pd.dismiss();// 关闭ProgressDialog
+		            	Toast.makeText(getApplicationContext(), "登录失败",Toast.LENGTH_SHORT).show();
+		        	}
 	        	}else{
 	        		pd.dismiss();// 关闭ProgressDialog
-	            	Toast.makeText(getApplicationContext(), "登录失败",Toast.LENGTH_SHORT).show();
+	        		Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
 	        	}
+	        	
 	            	
 					
 	          
@@ -140,6 +148,14 @@ public class MainActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		 ta = (TrackApp)getApplication();
+		 ta.setHandler(handler);
 	}
 	
 	

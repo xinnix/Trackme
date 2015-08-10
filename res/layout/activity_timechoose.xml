@@ -8,7 +8,7 @@
         android:id="@+id/tvDateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="请选择日期" />
+        android:text="请选择开始时间" />
 
     <EditText
         android:id="@+id/etDateText"
@@ -24,7 +24,7 @@
         android:id="@+id/tvPeriodText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="请选择时段" />
+        android:text="请选择结束时间" />
 
     <EditText
         android:id="@+id/etPeriodText"

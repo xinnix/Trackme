@@ -27,6 +27,9 @@ public class NetworkAdapter extends Thread {
 	public Message msg = null;
 	public Bundle bundle =null;
 	
+	public static int MSG_SUCCESS = 0;
+	public static int MSG_FAIL = 1;
+	
 	 public NetworkAdapter(String serverIP,int port){
 		 super();
 		 try{
@@ -90,12 +93,12 @@ public class NetworkAdapter extends Thread {
 					 switch (dp.pktSignal){
 					 case DPacketParser.SIGNAL_RE_LOGIN:
 						 
-						 Login l = MsgEventHandler.rLogin(dp);
-						
+						 Login l = MsgEventHandler.rLogin(dp);	
 						 msg = handler.obtainMessage(); 
 						 bundle = new Bundle();
 						 bundle.putParcelable("login", l);
 						 msg.setData(bundle);
+						 msg.what = MSG_SUCCESS;
 						 handler.sendMessage(msg);
 						
 						 break;
@@ -109,13 +112,14 @@ public class NetworkAdapter extends Thread {
 						 MsgEventHandler.rGetUserInfo(dp);
 						 break;
 					 case DPacketParser.SIGNAL_RE_GETCARINFO:
-						 Car[] carList=MsgEventHandler.rGetCarInfo(dp);						
-						
+						 Car[] carList=MsgEventHandler.rGetCarInfo(dp);
 						 msg = handler.obtainMessage(); 
 						 bundle = new Bundle();
 						 bundle.putParcelableArray("carList", carList);
 						 msg.setData(bundle);
+						 msg.what = MSG_SUCCESS;
 						 handler.sendMessage(msg);
+						 
 						 break;
 					 case DPacketParser.SIGNAL_RE_GETCARTRACK:
 						 Track[] trackList = MsgEventHandler.rGetCarTrack(dp);	
@@ -123,10 +127,13 @@ public class NetworkAdapter extends Thread {
 						 bundle = new Bundle();
 						 bundle.putParcelableArray("trackList", trackList);
 						 msg.setData(bundle);
+						 msg.what = MSG_SUCCESS;
 						 handler.sendMessage(msg);
 						 break;	 
 					 case DPacketParser.SIGNAL_FAIL:
 						 MsgEventHandler.rFail(dp);
+						 msg = handler.obtainMessage(); 
+						 handler.sendEmptyMessage(MSG_FAIL);
 						 break;
 					 
 					 }
