@@ -95,13 +95,13 @@ public class MainActivity extends Activity {
 	        	if(l.isLogin==Login.LOGIN_SUCCESS){
 	        		pd.dismiss();// ¹Ø±ÕProgressDialog
 	            	Toast.makeText(getApplicationContext(), "µÇÂ¼³É¹¦",Toast.LENGTH_SHORT).show();
-	            	if (!ta.hb.isAlive()){
+	            	/*if (!ta.hb.isAlive()){
 	            		ta.hb.start();
-	            	}
+	            	}*/
 	            	
 		            Intent intent = new Intent();
 		            
-					intent.setClass(MainActivity.this, CarListActivity.class);
+					intent.setClass(MainActivity.this, ReplyActivity.class);
 					intent.putExtras(b);
 					startActivity(intent);
 					

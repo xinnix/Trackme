@@ -45,6 +45,17 @@
         <activity
             android:name=".MapActivity"
             android:label="@string/title_activity_map" >
+            
+        </activity>
+        <activity
+            android:name=".TimeChooseActivity"
+            android:label="@string/title_activity_map" >
+            
+        </activity>
+        <activity
+            android:name=".ReplyActivity"
+            android:label="@string/title_activity_reply" >
+            
         </activity>
     </application>
 

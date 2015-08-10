@@ -7,20 +7,38 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class MapActivity extends Activity {
 	
 	private MapView mapView;
     private AMap aMap;
-	
+	private Button btHisTrack = null;
+	private Button btPostionNow = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 		mapView = (MapView) findViewById(R.id.map);
+		
+		btHisTrack = (Button)findViewById(R.id.hisTrack);
+		
 	    mapView.onCreate(savedInstanceState);// ±ØÐëÒªÐ´
 	    aMap = mapView.getMap();
+	    
+	    
+	    btHisTrack.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+	    	
+	    });
 	}
 
 	@Override

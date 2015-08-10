@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
+import com.cloudbean.model.Track;
 import com.cloudbean.packet.ByteHexUtil;
 import com.cloudbean.packet.DPacketParser;
 import com.cloudbean.trackerUtil.MsgEventHandler;
@@ -20,7 +21,7 @@ public class NetworkAdapter extends Thread {
 	public static OutputStream outputStream;
 	public static InputStream inputStream;
 	public byte[] sendBuffer;
-	public byte[] recieveBuffer = new byte[4096];
+	public byte[] recieveBuffer = new byte[100000];
 	public Handler handler = null;
 	
 	public Message msg = null;
@@ -57,17 +58,35 @@ public class NetworkAdapter extends Thread {
 	 public void setHandler(Handler hd){
 		 handler = hd;
 	 }
-	 
+	 public byte[] preParser(InputStream inputStream){
+		 DataInputStream dis = new DataInputStream((new BufferedInputStream(inputStream)));
+		 ByteArrayOutputStream  bos = new ByteArrayOutputStream();
+		 try{
+			 int header = dis.readInt();
+			 int datalen = dis.readInt();
+			 byte[] packet = new byte[datalen-8];
+			 dis.readFully(packet);
+			 bos.write(ByteHexUtil.intToByte(header));
+			 bos.write(ByteHexUtil.intToByte(datalen));
+			 bos.write(packet);
+			 
+			 
+		 }catch(Exception e){
+			 e.printStackTrace();
+		 }
+		 return bos.toByteArray();
+	 }
 	 public void run(){
 		 while(true){
 			 try{
 				 
-				 int len = inputStream.read(recieveBuffer);
+				 byte[] packetByte  = preParser(inputStream);
+				 
 				// System.out.println(len);
 				// System.out.println(ByteHexUtil.bytesToHexString(Arrays.copyOfRange(recieveBuffer,0,len)));
-				 if(len>0){
+				 
 					 
-					 DPacketParser dp = new DPacketParser(Arrays.copyOfRange(recieveBuffer,0,len));
+					 DPacketParser dp = new DPacketParser(packetByte);
 					 switch (dp.pktSignal){
 					 case DPacketParser.SIGNAL_RE_LOGIN:
 						 
@@ -99,7 +118,12 @@ public class NetworkAdapter extends Thread {
 						 handler.sendMessage(msg);
 						 break;
 					 case DPacketParser.SIGNAL_RE_GETCARTRACK:
-						 MsgEventHandler.rGetCarTrack(dp);
+						 Track[] trackList = MsgEventHandler.rGetCarTrack(dp);	
+						 msg = handler.obtainMessage(); 
+						 bundle = new Bundle();
+						 bundle.putParcelableArray("trackList", trackList);
+						 msg.setData(bundle);
+						 handler.sendMessage(msg);
 						 break;	 
 					 case DPacketParser.SIGNAL_FAIL:
 						 MsgEventHandler.rFail(dp);
@@ -107,8 +131,6 @@ public class NetworkAdapter extends Thread {
 					 
 					 }
 				
-				 
-				 }
 				 
 
 			 }catch(Exception e ){

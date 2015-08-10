@@ -1,6 +1,9 @@
 package com.cloudbean.model;
 
-public class Track {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Track implements Parcelable{
 	
 	public int carId;
 	public double longitude;
@@ -22,10 +25,59 @@ public class Track {
 		this.direction = direction;
 		this.speed = speed;
 		this.alarm = alarm;
-		this.distant = distant;
-		this.status = status;
+		this.distant = distant.trim();
+		this.status = status.trim();
 		this.isLocated = isLocated;
-		this.sdate = date;
+		this.sdate = date.trim();
 	}
+
+	public Track() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel out, int flag) {
+		// TODO Auto-generated method stub
+		out.writeInt(carId);
+		out.writeDouble(longitude);
+		out.writeDouble(latitude);
+		out.writeInt(direction);
+		out.writeInt(speed);
+		out.writeByte((byte) (alarm ? 1 : 0));
+		out.writeString(distant);
+		out.writeString(status);
+		out.writeByte((byte) (isLocated ? 1 : 0));
+		out.writeString(sdate);
+	}
+	public static final Parcelable.Creator<Track> CREATOR = 
+			  new Parcelable.Creator<Track>()
+			  { 
+			   public Track createFromParcel(Parcel in) 
+			   {
+				   Track msg = new Track();
+				   msg.carId = in.readInt();
+				   msg.longitude = in.readDouble(); 
+				   msg.latitude = in.readDouble(); 
+				   msg.direction =  in.readInt();
+				   msg.speed = in.readInt();
+				   msg.alarm = in.readByte() != 0; 
+				   msg.distant = in.readString();
+				   msg.status = in.readString();
+				   msg.isLocated = in.readByte() != 0; 
+				   msg.sdate = in.readString();
+				   return msg;
+			   }
+			   public Track[] newArray(int size) 
+			   { 
+			    return new Track[size];
+			   }
+			  };
+
 
 }
