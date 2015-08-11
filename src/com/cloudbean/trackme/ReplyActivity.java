@@ -273,10 +273,18 @@ public class ReplyActivity extends Activity {
 	 * 计算x方向每次移动的距离
 	 */
 	private double getXMoveDistance(double slope) {
+		double dis=0;
 		if (slope == Double.MAX_VALUE) {
-			return DISTANCE;
+			dis=DISTANCE;
+		}else{
+			dis = Math.abs((DISTANCE * slope) / Math.sqrt(1 + slope * slope));
+			if(dis == 0){
+				dis=DISTANCE;
+			}
 		}
-		return Math.abs((DISTANCE * slope) / Math.sqrt(1 + slope * slope));
+		
+		
+		return dis;
 	}
 
 	/**
@@ -308,11 +316,7 @@ public class ReplyActivity extends Activity {
 									: -1 * getXMoveDistance(slope);
 
 							
-							for (double j = startPoint.latitude;
-									!((j > endPoint.latitude)^ isReverse);
-									
-									j = j
-									- xMoveDistance) {
+							for (double j = startPoint.latitude;!((j > endPoint.latitude)^ isReverse);j = j-xMoveDistance) {
 								LatLng latLng = null;
 								if (slope != Double.MAX_VALUE) {
 									latLng = new LatLng(j, (j - intercept) / slope);
@@ -322,9 +326,12 @@ public class ReplyActivity extends Activity {
 								mMoveMarker.setPosition(latLng);
 								
 								
+								
 								try {
 									Thread.sleep(TIME_INTERVAL);
 								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}catch(Exception e){
 									e.printStackTrace();
 								}
 							}
