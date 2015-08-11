@@ -8,12 +8,16 @@ public class Car  implements Parcelable {
 	public String id;
 	public String deviceId;
 	public String ipAddress;
+	public String cph;
+	public String deCph;
 	
-	public Car(String id, String deviceId, String ipAddress) {
+	public Car(String id, String deviceId, String ipAddress,String cph,String deCph) {
 		super();
 		this.id = id.trim();
 		this.deviceId = deviceId.trim();
 		this.ipAddress = ipAddress.trim();
+		this.cph =cph.trim();
+		this.deCph = deCph.trim();
 	}
 
 	public Car() {
@@ -32,6 +36,8 @@ public class Car  implements Parcelable {
 		out.writeString(id);
 		out.writeString(deviceId);
 		out.writeString(ipAddress);
+		out.writeString(cph);
+		out.writeString(deCph);
 		
 	}
 	
@@ -45,6 +51,8 @@ public class Car  implements Parcelable {
 				   msg.id = in.readString();
 				   msg.deviceId = in.readString(); 
 				   msg.ipAddress = in.readString(); 
+				   msg.cph = in.readString(); 
+				   msg.deCph = in.readString(); 
 
 				   return msg;
 			   }

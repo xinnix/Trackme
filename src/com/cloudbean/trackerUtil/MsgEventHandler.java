@@ -184,7 +184,9 @@ public class MsgEventHandler {
 		for (int ii=0;ii<cars.length;ii++){
 			cars[ii] = new Car((String)dp.dataTable.table[ii][0],
 					(String)dp.dataTable.table[ii][1],
-					(String)dp.dataTable.table[ii][2]
+					(String)dp.dataTable.table[ii][2],
+					(String)dp.dataTable.table[ii][3],
+					(String)dp.dataTable.table[ii][4]
 					);
 		}
 		

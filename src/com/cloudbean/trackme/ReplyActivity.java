@@ -55,10 +55,10 @@ public class ReplyActivity extends Activity {
 		String startDate = intent.getStringExtra("startDate");
 		String endDate = intent.getStringExtra("endDate");
 		
-		MsgEventHandler.sGetCarTrack(carId,startDate,endDate);
+		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
 		
 		pd = new ProgressDialog(ReplyActivity.this);
-		pd.setMessage("历史轨距获取中...");
+		pd.setMessage("历史轨迹获取中...");
 		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		pd.show();
 		
@@ -76,10 +76,10 @@ public class ReplyActivity extends Activity {
 		        	Track[] trackList = (Track[]) b.getParcelableArray("trackList");
 		        	initRoadData(trackList);
 		        	pd.dismiss();// 关闭ProgressDialog
-		        	if (mVirtureRoad.getPoints().size()>0){
+		        	if (mVirtureRoad.getPoints().size()>1){
 		        		moveLooper();
 		        	}else{
-		        		Toast.makeText(getApplicationContext(), "无数据或处于停车状态",Toast.LENGTH_SHORT).show();
+		        		Toast.makeText(getApplicationContext(), "这段时间处于停车状态",Toast.LENGTH_SHORT).show();
 		        	}
 		    		
 	         }else{
