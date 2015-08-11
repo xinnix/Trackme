@@ -13,6 +13,7 @@ import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackerUtil.GpsCorrect;
 import com.cloudbean.trackerUtil.MsgEventHandler;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -35,7 +36,7 @@ public class ReplyActivity extends Activity {
 	private Marker mMoveMarker;
 	private ProgressDialog pd = null;
 	// 通过设置间隔时间和距离可以控制速度和图标移动的距离
-	private static final int TIME_INTERVAL = 20;
+	private static final int TIME_INTERVAL = 80;
 	private static final double DISTANCE = 0.0001;
 	private Track[] trackList = null;
 
@@ -74,8 +75,13 @@ public class ReplyActivity extends Activity {
 	        	 Bundle b = msg.getData();
 		        	Track[] trackList = (Track[]) b.getParcelableArray("trackList");
 		        	initRoadData(trackList);
-		    		moveLooper();
-		    		pd.dismiss();// 关闭ProgressDialog
+		        	pd.dismiss();// 关闭ProgressDialog
+		        	if (mVirtureRoad.getPoints().size()>0){
+		        		moveLooper();
+		        	}else{
+		        		Toast.makeText(getApplicationContext(), "无数据或处于停车状态",Toast.LENGTH_SHORT).show();
+		        	}
+		    		
 	         }else{
 	        	 pd.dismiss();// 关闭ProgressDialog
 	        	 Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
@@ -89,16 +95,18 @@ public class ReplyActivity extends Activity {
 	//	double centerLatitude = 39.916049;
 	//	double centerLontitude = 116.399792;
 		if (tracklist.length>0){
-			mAmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(tracklist[0].latitude, tracklist[0].longitude), 14));
+			double[] correctCoordinate = new double[2];
+			GpsCorrect.transform(tracklist[0].latitude, tracklist[0].longitude, correctCoordinate);
+			mAmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]), 14));
 			int num=tracklist.length;
 //			if(num>10)
 //			{
 //				
 //			}
-			double centerLatitude = tracklist[0].latitude;
-			double centerLontitude = tracklist[0].longitude;
-			double deltaAngle = Math.PI / 180 * 5;
-			double radius = 0.02;
+//			double centerLatitude = correctCoordinate[0];
+//			double centerLontitude = correctCoordinate[1];
+//			double deltaAngle = Math.PI / 180 * 5;
+//			double radius = 0.02;
 	    	PolylineOptions polylineOptions = new PolylineOptions();
 //			for (double i = 0; i < Math.PI * 2; i = i + deltaAngle) {
 //				float latitude = (float) (-Math.cos(i) * radius + centerLatitude);
@@ -108,25 +116,47 @@ public class ReplyActivity extends Activity {
 //					deltaAngle = Math.PI / 180 * 30;
 //				}
 //			}
-			float latitude = (float) (-Math.cos(0) * radius + centerLatitude);
-			float longtitude = (float) (Math.sin(0) * radius + centerLontitude);
-			polylineOptions.add(new LatLng(latitude, longtitude));
+//			float latitude = (float) (-Math.cos(0) * radius + centerLatitude);
+//			float longtitude = (float) (Math.sin(0) * radius + centerLontitude);
+//			polylineOptions.add(new LatLng(latitude, longtitude));
 	    	//new LatLng(socket9.weidu.get(0),socket9.jingdu.get(0))
-			for(int i=0;i<num;i++)
+			int stopFlag = 1;
+	    	for(int i=0;i<num;i++)
 			{
-				 polylineOptions.add(new LatLng(tracklist[i].latitude, tracklist[i].longitude));
+				if(tracklist[i].status.equals(Track.ACC_SHUTDOWN)&&tracklist[i].isLocated&&(stopFlag==1)){
+					GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+					 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+					 MarkerOptions markerOptions = new MarkerOptions();
+					 markerOptions.anchor(0.5f, 0.5f);
+					 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.carstop));
+					 int last = polylineOptions.getPoints().size()-1;
+					 markerOptions.position(polylineOptions.getPoints().get(last));
+					 mAmap.addMarker(markerOptions);
+					 stopFlag=0;
+				}
+				if (tracklist[i].status.equals(Track.ACC_START)&&tracklist[i].isLocated){
+					GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+					 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+					 stopFlag=1;
+				}
+				
 			}
 			
 
-			polylineOptions.width(10);
+			polylineOptions.width(8);
 			polylineOptions.color(Color.RED);
 			mVirtureRoad = mAmap.addPolyline(polylineOptions);
+			Log.i("track", ""+mVirtureRoad.getPoints().size());
 			MarkerOptions markerOptions = new MarkerOptions();
 			markerOptions.anchor(0.5f, 0.5f);
 			markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
-			markerOptions.position(polylineOptions.getPoints().get(0));
+			
+			//markerOptions.position(polylineOptions.getPoints().get(0));
 			mMoveMarker = mAmap.addMarker(markerOptions);
-			mMoveMarker.setRotateAngle((float) getAngle(0));
+			if(polylineOptions.getPoints().size()>1){
+				mMoveMarker.setRotateAngle((float) getAngle(0));
+			}
+			
 		}else{
 			Toast.makeText(this,"没有轨迹记录", Toast.LENGTH_SHORT).show();
 		}
@@ -257,50 +287,53 @@ public class ReplyActivity extends Activity {
 
 			public void run() {
 				while (true) {
-					for (int i = 0; i < mVirtureRoad.getPoints().size() - 1; i++) {
+					
+						for (int i = 0; i < mVirtureRoad.getPoints().size() - 1; i++) {
 
-						
-						LatLng startPoint = mVirtureRoad.getPoints().get(i);
-						LatLng endPoint = mVirtureRoad.getPoints().get(i + 1);
-						mMoveMarker.setPosition(startPoint);
+							
+							LatLng startPoint = mVirtureRoad.getPoints().get(i);
+							LatLng endPoint = mVirtureRoad.getPoints().get(i + 1);
+							mMoveMarker.setPosition(startPoint);
 
-						mMoveMarker.setRotateAngle((float) getAngle(startPoint,
-								endPoint));
+							mMoveMarker.setRotateAngle((float) getAngle(startPoint,
+									endPoint));
 
-						double slope = getSlope(startPoint, endPoint);
-						//是不是正向的标示（向上设为正向）
-						boolean isReverse = (startPoint.latitude > endPoint.latitude);
+							double slope = getSlope(startPoint, endPoint);
+							//是不是正向的标示（向上设为正向）
+							boolean isReverse = (startPoint.latitude > endPoint.latitude);
 
-						double intercept = getInterception(slope, startPoint);
+							double intercept = getInterception(slope, startPoint);
 
-						double xMoveDistance = isReverse ? getXMoveDistance(slope)
-								: -1 * getXMoveDistance(slope);
+							double xMoveDistance = isReverse ? getXMoveDistance(slope)
+									: -1 * getXMoveDistance(slope);
 
-						
-						for (double j = startPoint.latitude;
-								!((j > endPoint.latitude)^ isReverse);
+							
+							for (double j = startPoint.latitude;
+									!((j > endPoint.latitude)^ isReverse);
+									
+									j = j
+									- xMoveDistance) {
+								LatLng latLng = null;
+								if (slope != Double.MAX_VALUE) {
+									latLng = new LatLng(j, (j - intercept) / slope);
+								} else {
+									latLng = new LatLng(j, startPoint.longitude);
+								}
+								mMoveMarker.setPosition(latLng);
 								
-								j = j
-								- xMoveDistance) {
-							LatLng latLng = null;
-							if (slope != Double.MAX_VALUE) {
-								latLng = new LatLng(j, (j - intercept) / slope);
-							} else {
-								latLng = new LatLng(j, startPoint.longitude);
-							}
-							mMoveMarker.setPosition(latLng);
-							
-							
-							try {
-								Thread.sleep(TIME_INTERVAL);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
+								
+								try {
+									Thread.sleep(TIME_INTERVAL);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
 							}
 						}
+					
 
 					}
 				}
-			}
+			
 
 		}.start();
 	}

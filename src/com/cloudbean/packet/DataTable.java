@@ -1,5 +1,6 @@
 package com.cloudbean.packet;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class DataTable{
@@ -12,7 +13,13 @@ public class DataTable{
 			for (int jj=0;jj<dataColumn;jj++){
 				switch (dataColumnType[jj]){
 				case DPacketParser.DATA_TYPE_STRING:
-					table[ii][jj]=new String(Arrays.copyOfRange(data,head,head+=dataColumnLength[jj]));
+					try {
+						table[ii][jj]=new String(Arrays.copyOfRange(data,head,head+=dataColumnLength[jj]),"gbk");
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						new String(Arrays.copyOfRange(data,head,head+=dataColumnLength[jj]));
+					}
 					break;
 				case DPacketParser.DATA_TYPE_INTEGER:
 					table[ii][jj]=(int)ByteHexUtil.bytesToInt(Arrays.copyOfRange(data,head,head+=dataColumnLength[jj]));

@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Track implements Parcelable{
+	public static String ACC_START = "ACC¿ª";
+	public static String ACC_SHUTDOWN = "ACC¹Ø";
 	
 	public int carId;
 	public double longitude;
