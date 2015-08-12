@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
 		            	
 			            Intent intent = new Intent();
 			            
-						intent.setClass(MainActivity.this, CarListActivity.class);
+						intent.setClass(MainActivity.this, CarGroupListActivity.class);
 						intent.putExtra("userId",l.userid);
 						startActivity(intent);
 						

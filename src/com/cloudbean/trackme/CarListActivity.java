@@ -101,8 +101,8 @@ public class CarListActivity extends ListActivity {
             		for (int i = 0; i < carList.length; i++) {
             			Map<String,Object> listItem = new HashMap<String,Object>();
             			listItem.put("img", R.drawable.car);
-            			listItem.put("carId", carList[i].deCph);
-            			listItem.put("name", carList[i].ipAddress);	
+            			listItem.put("name", carList[i].name);
+            			listItem.put("carId", carList[i].id);	
             			listItems.add(listItem);
             		}
             		

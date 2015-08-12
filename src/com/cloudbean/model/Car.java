@@ -5,20 +5,24 @@ import android.os.Parcelable;
 
 public class Car  implements Parcelable {
 	
-	public String id;
-	public String deviceId;
+	public String id;	
 	public String ipAddress;
-	public String cph;
-	public String deCph;
+	public String name;
+	public String devId;
+	public String devtype;
+	public String carGroupId;
 	
-	public Car(String id, String deviceId, String ipAddress,String cph,String deCph) {
+	public Car(String id, String ipAddress, String name, String devId, String devtype, String carGroupId) {
 		super();
 		this.id = id.trim();
-		this.deviceId = deviceId.trim();
 		this.ipAddress = ipAddress.trim();
-		this.cph =cph.trim();
-		this.deCph = deCph.trim();
+		this.name = name.trim();
+		this.devId = devId.trim();
+		this.devtype = devtype.trim();
+		this.carGroupId = carGroupId.trim();
 	}
+
+
 
 	public Car() {
 		// TODO Auto-generated constructor stub
@@ -34,10 +38,11 @@ public class Car  implements Parcelable {
 	public void writeToParcel(Parcel out, int flag) {
 		// TODO Auto-generated method stub
 		out.writeString(id);
-		out.writeString(deviceId);
 		out.writeString(ipAddress);
-		out.writeString(cph);
-		out.writeString(deCph);
+		out.writeString(name);
+		out.writeString(devId);
+		out.writeString(devtype);
+		out.writeString(carGroupId);
 		
 	}
 	
@@ -49,11 +54,11 @@ public class Car  implements Parcelable {
 			   {
 				   Car msg = new Car();
 				   msg.id = in.readString();
-				   msg.deviceId = in.readString(); 
 				   msg.ipAddress = in.readString(); 
-				   msg.cph = in.readString(); 
-				   msg.deCph = in.readString(); 
-
+				   msg.name = in.readString(); 
+				   msg.devId = in.readString(); 
+				   msg.devtype = in.readString(); 
+				   msg.carGroupId = in.readString(); 
 				   return msg;
 			   }
 			   public Car[] newArray(int size) 

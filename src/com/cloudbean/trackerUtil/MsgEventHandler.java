@@ -86,7 +86,7 @@ public class MsgEventHandler {
 		System.arraycopy(buserid, 0, pktData, 0, buserid.length);
 		System.arraycopy(bdate, 0, pktData, buserid.length, bdate.length*2);
 		
-		DPacketParser dp = new DPacketParser(DPacketParser.SIGNAL_GETUSERCARGROUP,1,2,pktDataColumnType, pktDataColumnLength, pktData);	
+		DPacketParser dp = new DPacketParser(DPacketParser.SIGNAL_GETCARGROUP,1,2,pktDataColumnType, pktDataColumnLength, pktData);	
 		na.sendPacket(dp.pktBuffer);
 		
 	}
@@ -183,18 +183,19 @@ public class MsgEventHandler {
 		Car[] cars = new Car[dp.dataTable.table.length];
 		for (int ii=0;ii<cars.length;ii++){
 			cars[ii] = new Car((String)dp.dataTable.table[ii][0],
-					(String)dp.dataTable.table[ii][1],
-					(String)dp.dataTable.table[ii][2],
 					(String)dp.dataTable.table[ii][3],
-					(String)dp.dataTable.table[ii][4]
+					(String)dp.dataTable.table[ii][4],
+					(String)dp.dataTable.table[ii][8],
+					(String)dp.dataTable.table[ii][14],
+					(String)dp.dataTable.table[ii][64]
 					);
 		}
 		
 		
-		for (int ii=0;ii<cars.length;ii++){
-			System.out.print(""+cars[ii].id.trim()+'#'+cars[ii].deviceId.trim()+"$"+cars[ii].ipAddress.trim());
-			System.out.println("");	
-		}
+//		for (int ii=0;ii<cars.length;ii++){
+//			System.out.print(""+cars[ii].id.trim()+'#'+cars[ii].deviceId.trim()+"$"+cars[ii].ipAddress.trim());
+//			System.out.println("");	
+//		}
 		
 		return cars;
 		

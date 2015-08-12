@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import com.cloudbean.model.Car;
+import com.cloudbean.model.CarGroup;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.packet.ByteHexUtil;
@@ -26,6 +27,10 @@ public class NetworkAdapter extends Thread {
 	
 	public Message msg = null;
 	public Bundle bundle =null;
+	
+	
+	public static int MSG_SUCCESS_CARINFO = 3;
+	public static int MSG_SUCCESS_CARGROUPINFO = 4;
 	
 	public static int MSG_SUCCESS = 0;
 	public static int MSG_FAIL = 1;
@@ -105,8 +110,14 @@ public class NetworkAdapter extends Thread {
 					 case DPacketParser.SIGNAL_RE_HEARTBEAT:
 						 System.out.println("heart beat");
 						 break;
-					 case DPacketParser.SIGNAL_RE_GETUSERCARGROUP:
-						 MsgEventHandler.rGetCarGroup(dp);
+					 case DPacketParser.SIGNAL_RE_GETCARGROUP:
+						 CarGroup[] carGroupList = MsgEventHandler.rGetCarGroup(dp);
+						 msg = handler.obtainMessage(); 
+						 bundle = new Bundle();
+						 bundle.putParcelableArray("carGroupList", carGroupList);
+						 msg.setData(bundle);
+						 msg.what = MSG_SUCCESS_CARGROUPINFO;
+						 handler.sendMessage(msg);
 						 break;
 					 case DPacketParser.SIGNAL_RE_GETUSERINFO:
 						 MsgEventHandler.rGetUserInfo(dp);
@@ -117,7 +128,7 @@ public class NetworkAdapter extends Thread {
 						 bundle = new Bundle();
 						 bundle.putParcelableArray("carList", carList);
 						 msg.setData(bundle);
-						 msg.what = MSG_SUCCESS;
+						 msg.what = MSG_SUCCESS_CARINFO;
 						 handler.sendMessage(msg);
 						 
 						 break;
