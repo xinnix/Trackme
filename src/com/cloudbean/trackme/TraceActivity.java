@@ -9,10 +9,10 @@ import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.cloudbean.model.Track;
 import com.cloudbean.network.CNetworkAdapter;
+import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
-import com.cloudbean.packet.ByteHexUtil;
+import com.cloudbean.trackerUtil.ByteHexUtil;
 import com.cloudbean.trackerUtil.GpsCorrect;
-import com.cloudbean.trackerUtil.MsgEventHandler;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -58,13 +58,9 @@ public class TraceActivity extends Activity {
 		ta = (TrackApp)getApplication();
 	    ta.setHandler(handler);
 	    mapView.onResume();
-		String devid = ta.currentCar.devId;
-		for(int i = (14-devid.length());i>0;i--){
-			devid=devid.concat("f");
-		}
-		int fakeip = ByteHexUtil.bytesToInt(ipToBytesByReg(ta.currentCar.ipAddress));
 		
-		MsgEventHandler.c_sGetCarPosition(devid,fakeip);
+		
+		MsgEventHandler.c_sGetCarPosition(ta.currentCar);
 		
 		pd = new ProgressDialog(TraceActivity.this);
 		pd.setMessage("定位中...");
@@ -72,32 +68,13 @@ public class TraceActivity extends Activity {
 		pd.show();
 	
 	    
-	   
 	}
 	
-	 /**
-     * 把IP地址转化为int
-     * @param ipAddr
-     * @return int
-     */
-    public static byte[] ipToBytesByReg(String ipAddr) {
-        byte[] ret = new byte[4];
-        try {
-            String[] ipArr = ipAddr.split("\\.");
-            ret[0] = (byte) (Integer.parseInt(ipArr[0]) & 0xFF);
-            ret[1] = (byte) (Integer.parseInt(ipArr[1]) & 0xFF);
-            ret[2] = (byte) (Integer.parseInt(ipArr[2]) & 0xFF);
-            ret[3] = (byte) (Integer.parseInt(ipArr[3]) & 0xFF);
-            return ret;
-        } catch (Exception e) {
-            throw new IllegalArgumentException(ipAddr + " is invalid IP");
-        }
-
-    }
+	 
     private  Handler handler = new Handler() {  
         @Override  
         public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-         if(msg.what==CNetworkAdapter.MSG_SUCCESS_LOCATE){
+         if(msg.what==CNetworkAdapter.MSG_POSITION){
         	 Bundle b = msg.getData();
         	 
 			 String devid = b.getString("devid");
@@ -119,9 +96,9 @@ public class TraceActivity extends Activity {
 				 
 			 }
 					
-         }else{
-        	 pd.dismiss();// 关闭ProgressDialog
-        	 Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+         }else if (msg.what==NetworkAdapter.MSG_FAIL){
+        	 pd.dismiss();
+        	 Toast.makeText(TraceActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
          }
         	
         }

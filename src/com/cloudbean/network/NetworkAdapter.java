@@ -9,9 +9,8 @@ import com.cloudbean.model.Car;
 import com.cloudbean.model.CarGroup;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
-import com.cloudbean.packet.ByteHexUtil;
 import com.cloudbean.packet.DPacketParser;
-import com.cloudbean.trackerUtil.MsgEventHandler;
+import com.cloudbean.trackerUtil.ByteHexUtil;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,11 +28,14 @@ public class NetworkAdapter extends Thread {
 	public Bundle bundle =null;
 	
 	
-	public static int MSG_SUCCESS_CARINFO = 3;
-	public static int MSG_SUCCESS_CARGROUPINFO = 4;
 	
-	public static int MSG_SUCCESS = 0;
-	public static int MSG_FAIL = 1;
+	
+
+	public static int MSG_FAIL = 0x1000;
+	public static int MSG_LOGIN = 0x1001;
+	public static int MSG_CARINFO = 0x1002;
+	public static int MSG_CARGROUPINFO = 0x1003;
+	public static int MSG_TRACK = 0x1004;
 	
 	 public NetworkAdapter(String serverIP,int port){
 		 super();
@@ -103,7 +105,7 @@ public class NetworkAdapter extends Thread {
 						 bundle = new Bundle();
 						 bundle.putParcelable("login", l);
 						 msg.setData(bundle);
-						 msg.what = MSG_SUCCESS;
+						 msg.what = MSG_LOGIN;
 						 handler.sendMessage(msg);
 						
 						 break;
@@ -116,7 +118,7 @@ public class NetworkAdapter extends Thread {
 						 bundle = new Bundle();
 						 bundle.putParcelableArray("carGroupList", carGroupList);
 						 msg.setData(bundle);
-						 msg.what = MSG_SUCCESS_CARGROUPINFO;
+						 msg.what = MSG_CARGROUPINFO;
 						 handler.sendMessage(msg);
 						 break;
 					 case DPacketParser.SIGNAL_RE_GETUSERINFO:
@@ -128,7 +130,7 @@ public class NetworkAdapter extends Thread {
 						 bundle = new Bundle();
 						 bundle.putParcelableArray("carList", carList);
 						 msg.setData(bundle);
-						 msg.what = MSG_SUCCESS_CARINFO;
+						 msg.what = MSG_CARINFO;
 						 handler.sendMessage(msg);
 						 
 						 break;
@@ -138,7 +140,7 @@ public class NetworkAdapter extends Thread {
 						 bundle = new Bundle();
 						 bundle.putParcelableArray("trackList", trackList);
 						 msg.setData(bundle);
-						 msg.what = MSG_SUCCESS;
+						 msg.what = MSG_TRACK;
 						 handler.sendMessage(msg);
 						 break;	 
 					 case DPacketParser.SIGNAL_FAIL:

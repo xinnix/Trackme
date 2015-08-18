@@ -1,7 +1,5 @@
 package com.cloudbean.network;
 
-import com.cloudbean.trackerUtil.MsgEventHandler;
-
 public class HeartBeat extends Thread{
 
 	

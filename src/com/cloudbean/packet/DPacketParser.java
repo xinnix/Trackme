@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
+import com.cloudbean.trackerUtil.ByteHexUtil;
+import com.cloudbean.trackerUtil.JzilbHelp;
+
 public class DPacketParser {
 	public static final int DATA_TYPE_STRING = 0x00000001;
 	public static final int DATA_TYPE_INTEGER = 0x00000002;

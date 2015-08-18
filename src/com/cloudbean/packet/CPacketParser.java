@@ -3,6 +3,8 @@ package com.cloudbean.packet;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
+import com.cloudbean.trackerUtil.ByteHexUtil;
+
 public class CPacketParser {
 	
 	
@@ -13,7 +15,7 @@ public class CPacketParser {
 	
 	public final static byte SIGNAL_LOGIN = (byte)0xa3; 
 	public final static byte SIGNAL_RE_LOGIN = (byte)0xe3; 
-	public final static byte SIGNAL_RE_LOCATE = (byte)0xaa; 
+
 	public final static byte SIGNAL_RELAY = (byte)0xaa; 
 	
 	public short pktHead=0x2929;

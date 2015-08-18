@@ -9,8 +9,8 @@ import java.util.Map;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.CarGroup;
+import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
-import com.cloudbean.trackerUtil.MsgEventHandler;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -288,12 +288,13 @@ public class CarGroupListActivity extends Activity{
 	
 	
 	private  Handler handler = new Handler() {  
-        @Override  
+		int flag = 0;//防止其他消息导致数据重复刷新
+		@Override  
         public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
         	
         	
         	
-        	if(msg.what==NetworkAdapter.MSG_SUCCESS_CARINFO){
+        	if(msg.what==NetworkAdapter.MSG_CARINFO){
         		Bundle b = msg.getData();
             	carList = (Car[]) b.getParcelableArray("carList");
             	
@@ -301,32 +302,31 @@ public class CarGroupListActivity extends Activity{
             	
             	if(carList.length>0){
             		// 为列表绑定数据源
-            		
+            		flag=0;
                 	
             	}else{
             		
-                	Toast.makeText(getApplicationContext(), "获取失败",Toast.LENGTH_SHORT).show();
+                	Toast.makeText(CarGroupListActivity.this, "获取失败",Toast.LENGTH_SHORT).show();
                 	return;
             	}
-        	}else if(msg.what==NetworkAdapter.MSG_SUCCESS_CARGROUPINFO){
+        	}else if(msg.what==NetworkAdapter.MSG_CARGROUPINFO){
         		Bundle b = msg.getData();
             	carGroupList = (CarGroup[]) b.getParcelableArray("carGroupList");
             	
             	if(carGroupList.length>0){
             		// 为列表绑定数据源
-            		
+            		flag=0;
                 	
             	}else{
             		
-                	Toast.makeText(getApplicationContext(), "获取失败",Toast.LENGTH_SHORT).show();
+                	Toast.makeText(CarGroupListActivity.this, "获取失败",Toast.LENGTH_SHORT).show();
                 	return;
             	}
-        	}else{
-        		Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+//            	Toast.makeText(CarGroupListActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
         	}
         	
         	
-        	if((carList!=null)&&(carGroupList!=null)){
+        	if((carList!=null)&&(carGroupList!=null)&&(flag==0)){
         		
         		for (int ii=0; ii<carGroupList.length;ii++){
         			carGroupArry.add(carGroupList[ii]);
@@ -345,7 +345,8 @@ public class CarGroupListActivity extends Activity{
         			
         			carTable.add(tempCarList);
         		}
-        		expandableListView.setAdapter(adapter);  
+        		expandableListView.setAdapter(adapter);
+        		flag=1;
         		pd.dismiss();// 关闭ProgressDialog
         	}
        	

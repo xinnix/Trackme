@@ -12,9 +12,10 @@ import com.amap.api.maps.model.PolylineOptions;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
+import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.GpsCorrect;
-import com.cloudbean.trackerUtil.MsgEventHandler;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -71,7 +72,8 @@ public class ReplayActivity extends Activity {
 	private  Handler handler = new Handler() {  
 	        @Override  
 	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-	         if(msg.what==NetworkAdapter.MSG_SUCCESS){
+	         if(msg.what==NetworkAdapter.MSG_TRACK){
+	        	 pd.dismiss();
 	        	 Bundle b = msg.getData();
 		        	Track[] trackList = (Track[]) b.getParcelableArray("trackList");
 		        	initRoadData(trackList);
@@ -79,14 +81,15 @@ public class ReplayActivity extends Activity {
 		        	if (mVirtureRoad.getPoints().size()>1){
 		        		moveLooper();
 		        	}else{
-		        		Toast.makeText(getApplicationContext(), "这段时间处于停车状态",Toast.LENGTH_SHORT).show();
+		        		Toast.makeText(ReplayActivity.this, "这段时间处于停车状态",Toast.LENGTH_SHORT).show();
+		        		return;
 		        	}
+		    		// 关闭ProgressDialog
 		    		
-	         }else{
-	        	 pd.dismiss();// 关闭ProgressDialog
-	        	 Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+	         }else if (msg.what==NetworkAdapter.MSG_FAIL){
+	        	 pd.dismiss();
+	        	 Toast.makeText(ReplayActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
 	         }
-	        	
 	        }
 	        	
 	 };
@@ -324,7 +327,7 @@ public class ReplayActivity extends Activity {
 									latLng = new LatLng(j, startPoint.longitude);
 								}
 								mMoveMarker.setPosition(latLng);
-								
+								mAmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
 								
 								
 								try {

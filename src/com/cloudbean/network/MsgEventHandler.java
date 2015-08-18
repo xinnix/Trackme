@@ -1,4 +1,4 @@
-package com.cloudbean.trackerUtil;
+package com.cloudbean.network;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
@@ -10,12 +10,10 @@ import com.cloudbean.model.Fail;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.model.User;
-import com.cloudbean.network.CNetworkAdapter;
-import com.cloudbean.network.NetworkAdapter;
-import com.cloudbean.packet.ByteHexUtil;
 import com.cloudbean.packet.CPacketParser;
 import com.cloudbean.packet.DPacketParser;
 import com.cloudbean.packet.MsgGPRSParser;
+import com.cloudbean.trackerUtil.ByteHexUtil;
 
 import android.util.Log;
 
@@ -318,11 +316,19 @@ public class MsgEventHandler {
 	}
 	
 	
-	public static void c_sGetCarPosition(String devid,int fakeip){
+	public static void c_sGetCarPosition(Car car){
+		String devid = car.devId;
+		for(int i = (14-devid.length());i>0;i--){
+			devid=devid.concat("f");
+		}
+		int fakeip = ByteHexUtil.bytesToInt(ipToBytesByReg(car.ipAddress));
+		
+		
+		
 		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
 		bis.write(0x0b);
 		
-		MsgGPRSParser mgp = new MsgGPRSParser(devid, MsgGPRSParser.MSG__TYPE_GETPOSITION, "");
+		MsgGPRSParser mgp = new MsgGPRSParser(devid, MsgGPRSParser.MSG_TYPE_GETPOSITION, "");
 		try{
 			bis.write(mgp.msgByteBuf);
 		}catch(Exception e){
@@ -338,10 +344,8 @@ public class MsgEventHandler {
 	}
 	
 	
-	public static CarState c_rGetCarPosition(CPacketParser cp){
-		
-		MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
-		
+	public static CarState c_rGetCarPosition(MsgGPRSParser mgp){
+
 		CarState cs = new CarState(mgp.msgData);
 		int i  = mgp.msgTermID.indexOf("f");	
 		cs.setDevid(mgp.msgTermID.substring(0, i));
@@ -350,5 +354,52 @@ public class MsgEventHandler {
 			
 	}
 	
+	
+	public static void c_sSetDef(Car car,String set){
+		String devid = car.devId;
+		for(int i = (14-devid.length());i>0;i--){
+			devid=devid.concat("f");
+		}
+		int fakeip = ByteHexUtil.bytesToInt(ipToBytesByReg(car.ipAddress));
+		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
+		bis.write(0x0b);
+		MsgGPRSParser mgp = new MsgGPRSParser(devid, MsgGPRSParser.MSG_TYPE_SETDEF, set);
+		try{
+			bis.write(mgp.msgByteBuf);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		CPacketParser cp = new CPacketParser(CPacketParser.SIGNAL_RELAY, fakeip, bis.toByteArray());
+		String test = ByteHexUtil.bytesToHexString(cp.pktBuffer);
+		Log.i("centre", ByteHexUtil.bytesToHexString(cp.pktBuffer));
+		cna.sendPacket(cp.pktBuffer);
+		
+			
+	}
+	
+	
+	
+	
+	
+	/**
+     * 把IP地址转化为int
+     * @param ipAddr
+     * @return int
+     */
+    private static byte[] ipToBytesByReg(String ipAddr) {
+        byte[] ret = new byte[4];
+        try {
+            String[] ipArr = ipAddr.split("\\.");
+            ret[0] = (byte) (Integer.parseInt(ipArr[0]) & 0xFF);
+            ret[1] = (byte) (Integer.parseInt(ipArr[1]) & 0xFF);
+            ret[2] = (byte) (Integer.parseInt(ipArr[2]) & 0xFF);
+            ret[3] = (byte) (Integer.parseInt(ipArr[3]) & 0xFF);
+            return ret;
+        } catch (Exception e) {
+            throw new IllegalArgumentException(ipAddr + " is invalid IP");
+        }
+
+    }
 
 }

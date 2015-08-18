@@ -2,8 +2,8 @@ package com.cloudbean.trackme;
 
 import com.cloudbean.model.Login;
 import com.cloudbean.network.HeartBeat;
+import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
-import com.cloudbean.trackerUtil.MsgEventHandler;
 import com.cloudbean.trackme.TrackApp;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -92,14 +92,14 @@ public class MainActivity extends Activity {
 	        @Override  
 	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
 	         
-	        	if( msg.what==NetworkAdapter.MSG_SUCCESS){
+	        	if( msg.what==NetworkAdapter.MSG_LOGIN){
 	        		Bundle b = msg.getData();
 		        	Login l = (Login) b.get("login");
 		        	
 		        	if(l.isLogin==Login.LOGIN_SUCCESS){
 		        		ta.login = l;
 		        		pd.dismiss();// 关闭ProgressDialog
-		            	Toast.makeText(getApplicationContext(), "登录成功",Toast.LENGTH_SHORT).show();
+		            	Toast.makeText(MainActivity.this, "登录成功",Toast.LENGTH_SHORT).show();
 		            	if (!ta.hb.isAlive()){
 		            		ta.hb.start();
 		            	}
@@ -112,11 +112,11 @@ public class MainActivity extends Activity {
 						
 		        	}else{
 		        		pd.dismiss();// 关闭ProgressDialog
-		            	Toast.makeText(getApplicationContext(), "登录失败",Toast.LENGTH_SHORT).show();
+		            	Toast.makeText(MainActivity.this, "登录失败",Toast.LENGTH_SHORT).show();
+		            	return;
 		        	}
-	        	}else{
-	        		pd.dismiss();// 关闭ProgressDialog
-	        		Toast.makeText(getApplicationContext(), "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+		        	pd.dismiss();// 关闭ProgressDialog
+	        		//Toast.makeText(MainActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
 	        	}
 	        	
 	            	

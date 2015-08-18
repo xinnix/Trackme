@@ -4,8 +4,8 @@ import com.cloudbean.model.Login;
 import com.cloudbean.model.User;
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.HeartBeat;
+import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
-import com.cloudbean.trackerUtil.MsgEventHandler;
 
 import android.app.Application;
 import android.os.Handler;

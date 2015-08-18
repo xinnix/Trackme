@@ -10,10 +10,10 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import com.cloudbean.model.CarState;
-import com.cloudbean.packet.ByteHexUtil;
 import com.cloudbean.packet.CPacketParser;
 import com.cloudbean.packet.DPacketParser;
-import com.cloudbean.trackerUtil.MsgEventHandler;
+import com.cloudbean.packet.MsgGPRSParser;
+import com.cloudbean.trackerUtil.ByteHexUtil;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +29,10 @@ public class CNetworkAdapter extends Thread {
 	
 	public Handler handler = null;
 	
-	public static int MSG_SUCCESS_LOCATE = 0x77;
+	public static int MSG_FAIL = 0x2000;
+	public static int MSG_LOGIN = 0x2001;
+	public static int MSG_POSITION = 0x2002;
+	public static int MSG_DEF = 0x2003;
 	
 	
 	 public CNetworkAdapter(String serverIP,int port){
@@ -92,28 +95,42 @@ public class CNetworkAdapter extends Thread {
 		 while(true){
 			 try{		  			 			 
 				 	byte[] packetByte  = preParser(inputStream);
-				
-					 CPacketParser cp = new CPacketParser(packetByte);
+				 	Message msg = handler.obtainMessage();
+				 	Bundle b = new Bundle();
+					CPacketParser cp = new CPacketParser(packetByte);
 					 switch (cp.pktSignal){
 					 case CPacketParser.SIGNAL_RE_LOGIN:
-						 MsgEventHandler.c_rLogin(cp);	
+						 MsgEventHandler.c_rLogin(cp);
+						 msg.what =MSG_LOGIN;
 						 break;
-					 case CPacketParser.SIGNAL_RE_LOCATE:
+					 case CPacketParser.SIGNAL_RELAY:
+						 MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
 						 
-						 CarState cs =MsgEventHandler.c_rGetCarPosition(cp);
-						 
-						 Message msg = handler.obtainMessage();
-						 Bundle b = new Bundle();
-						 
-						 b.putDouble("lat", cs.gprmc.latitude);
-						 b.putDouble("lon", cs.gprmc.longitude);
-						 b.putString("speed", cs.gprmc.speed);
-						 b.putString("ditant", cs.distant);
-						 b.putString("date", cs.gprmc.date);
-						 b.putString("devid", cs.devid);
-						 msg.setData(b);
-						 msg.what = MSG_SUCCESS_LOCATE;
-						 handler.sendMessage(msg);
+						 switch(mgp.msgType){
+						 case MsgGPRSParser.MSG_TYPE_DEF:
+							 String test = ByteHexUtil.bytesToHexString(mgp.msgByteBuf);
+							 b.putString("devid", mgp.msgTermID);
+							 b.putString("res", mgp.msgData);
+							 msg.what =MSG_DEF;
+							 msg.setData(b);
+							 handler.sendMessage(msg);
+							 break;
+						 case MsgGPRSParser.MSG_TYPE_POSITION:
+							 CarState cs =MsgEventHandler.c_rGetCarPosition(mgp);
+							 b.putDouble("lat", cs.gprmc.latitude);
+							 b.putDouble("lon", cs.gprmc.longitude);
+							 b.putString("speed", cs.gprmc.speed);
+							 b.putString("ditant", cs.distant);
+							 b.putString("date", cs.gprmc.date);
+							 b.putString("devid", cs.devid);
+							 msg.setData(b);
+							 msg.what = MSG_POSITION;
+							 handler.sendMessage(msg);
+							 break;
+						 }
+						
+						 break;
+					
 						
 	
 				 }

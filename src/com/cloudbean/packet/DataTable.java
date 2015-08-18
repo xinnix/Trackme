@@ -3,6 +3,8 @@ package com.cloudbean.packet;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
+import com.cloudbean.trackerUtil.ByteHexUtil;
+
 public class DataTable{
 	public Object[][] table;
 	
