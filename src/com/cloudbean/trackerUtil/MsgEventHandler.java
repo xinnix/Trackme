@@ -253,7 +253,7 @@ public class MsgEventHandler {
 	 */
 	
 	
-	public static void c_slogin(String username,String password){
+	public static void c_sLogin(String username,String password){
 		byte signal = (byte)0xa3;
 		int fakeip = 0;
 		byte[] busername = username.getBytes();
@@ -266,19 +266,19 @@ public class MsgEventHandler {
 		System.arraycopy(busername, 0, data, 0, busername.length);
 		System.arraycopy(bpassword, 0, data, 20, bpassword.length);
 		
-		CPacketParser cp = new CPacketParser(signal, data);
+		CPacketParser cp = new CPacketParser(signal,fakeip, data);
 		System.out.println(ByteHexUtil.bytesToHexString(cp.pktBuffer));
 		cna.sendPacket(cp.pktBuffer);
 			
 	}
 	
-	public static int c_rlogin(CPacketParser cp){
+	public static int c_rLogin(CPacketParser cp){
 		
 		byte sig = ByteHexUtil.intToByte(cp.pktFakeIP)[0];
 		
 		if (sig==(byte)0x01){
 			System.out.println("login complete");
-			c_sGetCarPosition();
+			//c_sGetAllCarPosition();
 			return 0;
 		}else{
 			return 1;
@@ -287,7 +287,7 @@ public class MsgEventHandler {
 	}
 	
 	
-	public static void c_sGetCarPosition(){
+	public static void c_sGetAllCarPosition(){
 		String hexPacket  = "2929a400000000";
 		String end = "0d";
 		byte[] packet = ByteHexUtil.hexStringToBytes(hexPacket);
@@ -310,11 +310,44 @@ public class MsgEventHandler {
 	}
 	
 	
-	public static CarState c_rGetCarPosition(CPacketParser cp){
+	public static CarState c_rGetAllCarPosition(CPacketParser cp){
 		MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
 		CarState cs = new CarState(mgp.msgData);
 		return cs;
 		
+	}
+	
+	
+	public static void c_sGetCarPosition(String devid,int fakeip){
+		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
+		bis.write(0x0b);
+		
+		MsgGPRSParser mgp = new MsgGPRSParser(devid, MsgGPRSParser.MSG__TYPE_GETPOSITION, "");
+		try{
+			bis.write(mgp.msgByteBuf);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		CPacketParser cp = new CPacketParser(CPacketParser.SIGNAL_RELAY, fakeip, bis.toByteArray());
+	
+		Log.i("centre", ByteHexUtil.bytesToHexString(cp.pktBuffer));
+		cna.sendPacket(cp.pktBuffer);
+		
+			
+	}
+	
+	
+	public static CarState c_rGetCarPosition(CPacketParser cp){
+		
+		MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
+		
+		CarState cs = new CarState(mgp.msgData);
+		int i  = mgp.msgTermID.indexOf("f");	
+		cs.setDevid(mgp.msgTermID.substring(0, i));
+		return cs;
+		
+			
 	}
 	
 

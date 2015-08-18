@@ -6,10 +6,15 @@ import java.util.Arrays;
 public class CPacketParser {
 	
 	
+	public final static short PACKET_HEADER = 0x2929; 
+	public final static byte PACKET_END = (byte)0x0d; 
+	
+	
+	
 	public final static byte SIGNAL_LOGIN = (byte)0xa3; 
 	public final static byte SIGNAL_RE_LOGIN = (byte)0xe3; 
 	public final static byte SIGNAL_RE_LOCATE = (byte)0xaa; 
-	
+	public final static byte SIGNAL_RELAY = (byte)0xaa; 
 	
 	public short pktHead=0x2929;
 	public byte pktSignal;
@@ -25,7 +30,7 @@ public class CPacketParser {
 	/*
 	 * 发送时指定包类型
 	 */
-	public CPacketParser(byte pktSignal,byte[] data){
+	public CPacketParser(byte pktSignal,int pktFakeIP,byte[] data){
 		
 		
 		
@@ -35,7 +40,7 @@ public class CPacketParser {
 		this.pktSignal = pktSignal;
 		this.pktData = data;
 		this.pktLength = (short)(6+data.length);
-		this.pktFakeIP = 0;
+		this.pktFakeIP = pktFakeIP;
 		
 		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
 		

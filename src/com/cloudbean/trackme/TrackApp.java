@@ -1,4 +1,7 @@
 package com.cloudbean.trackme;
+import com.cloudbean.model.Car;
+import com.cloudbean.model.Login;
+import com.cloudbean.model.User;
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.NetworkAdapter;
@@ -14,6 +17,12 @@ public class TrackApp extends Application{
 	public static CNetworkAdapter nac = null;
 	public HeartBeat hb = null;
 	public Handler handler = null;
+	
+	public static User  user = null;
+	public static Login  login = null;
+	public static Car[] carList = null;
+	
+	public static Car currentCar = null;
 	
 	
 	public Handler getHandler() {

@@ -37,7 +37,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
         </activity>
         <activity
             android:name=".CarListActivity"
@@ -48,19 +47,28 @@
             android:label="@string/title_activity_car_list" >
         </activity>
         <activity
-            android:name=".MapActivity"
+            android:name=".TraceActivity"
             android:label="@string/title_activity_map" >
-            
         </activity>
         <activity
             android:name=".TimeChooseActivity"
             android:label="@string/title_activity_map" >
-            
         </activity>
         <activity
-            android:name=".ReplyActivity"
+            android:name=".ReplayActivity"
             android:label="@string/title_activity_reply" >
-            
+        </activity>
+        <activity
+            android:name=".MenuActivity"
+            android:label="@string/title_activity_menu" >
+        </activity>
+        <activity
+            android:name=".AlarmListActivity"
+            android:label="@string/title_activity_alarm_list" >
+        </activity>
+        <activity
+            android:name=".SetCommandActivity"
+            android:label="@string/title_activity_set_command" >
         </activity>
     </application>
 

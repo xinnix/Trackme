@@ -96,7 +96,7 @@ public class TimeChooseActivity extends Activity{
 				int carId = TimeChooseActivity.this.carId;
 				
 				Intent intent = new Intent();
-				intent.setClass(TimeChooseActivity.this, ReplyActivity.class);
+				intent.setClass(TimeChooseActivity.this, ReplayActivity.class);
 				intent.putExtra("startDate", startDate);
 				intent.putExtra("endDate", endDate);
 				intent.putExtra("carId", carId);

@@ -68,6 +68,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				
 				MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
+				MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
 				pd = new ProgressDialog(MainActivity.this);
 				pd.setMessage("查询中...");
 				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -96,6 +97,7 @@ public class MainActivity extends Activity {
 		        	Login l = (Login) b.get("login");
 		        	
 		        	if(l.isLogin==Login.LOGIN_SUCCESS){
+		        		ta.login = l;
 		        		pd.dismiss();// 关闭ProgressDialog
 		            	Toast.makeText(getApplicationContext(), "登录成功",Toast.LENGTH_SHORT).show();
 		            	if (!ta.hb.isAlive()){

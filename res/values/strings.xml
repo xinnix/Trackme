@@ -7,5 +7,8 @@
     <string name="title_activity_car_list">CarListActivity</string>
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_reply">ReplyActivity</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_alarm_list">AlarmListActivity</string>
+    <string name="title_activity_set_command">SetCommandActivity</string>
 
 </resources>

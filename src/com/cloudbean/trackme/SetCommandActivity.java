@@ -1,50 +1,22 @@
 package com.cloudbean.trackme;
 
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.MapView;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
-public class MapActivity extends Activity {
-	
-	private MapView mapView;
-    private AMap aMap;
-	private Button btHisTrack = null;
-	private Button btPostionNow = null;
+public class SetCommandActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_map);
-		mapView = (MapView) findViewById(R.id.map);
-		
-		btHisTrack = (Button)findViewById(R.id.hisTrack);
-		
-	    mapView.onCreate(savedInstanceState);// ±ØÐëÒªÐ´
-	    aMap = mapView.getMap();
-	    
-	    
-	    btHisTrack.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
-			}
-	    	
-	    });
+		setContentView(R.layout.activity_set_command);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.map, menu);
+		getMenuInflater().inflate(R.menu.set_command, menu);
 		return true;
 	}
 

@@ -25,7 +25,7 @@ public class Util {
 		//MsgEventHandler.sGetCarInfo(9, "");
 		
 		//MsgEventHandler.sGetCarTrack(1,"2015-07-28 13:23:00","2015-07-28 13:50:00");
-		MsgEventHandler.c_slogin("lkk", "lkk");
+		//MsgEventHandler.c_slogin("lkk", "lkk");
 		//MsgEventHandler.sGetUserInfo(2);
 		
 		

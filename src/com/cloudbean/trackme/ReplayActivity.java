@@ -28,7 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class ReplyActivity extends Activity {
+public class ReplayActivity extends Activity {
 	private TrackApp ta = null ;
 	private MapView mMapView;
 	private AMap mAmap;
@@ -57,7 +57,7 @@ public class ReplyActivity extends Activity {
 		
 		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
 		
-		pd = new ProgressDialog(ReplyActivity.this);
+		pd = new ProgressDialog(ReplayActivity.this);
 		pd.setMessage("历史轨迹获取中...");
 		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		pd.show();

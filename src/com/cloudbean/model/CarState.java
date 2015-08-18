@@ -24,9 +24,9 @@ public class CarState {
 			String org[] = orgString.split(",");
 			this.utc = org[0];
 			this.locateState = org[1];
-			this.latitude = Double.parseDouble(org[2]);
+			this.latitude = decodeLat(org[2]);
 			this.NorS = org[3];
-			this.longitude = Double.parseDouble(org[4]);
+			this.longitude = decodeLon(org[4]);
 			this.EorW = org[5];
 			this.speed = org[6];
 			this.direction = org[7];
@@ -39,6 +39,7 @@ public class CarState {
 		}
 		
 	}
+	public String devid;
 	
 	public GPRMC gprmc;
 	public String posAccuracy;
@@ -49,7 +50,14 @@ public class CarState {
 	public String gsmStrength;
 	public String distant;
 	
-	
+	public void setDevid(String devid){
+		
+
+		this.devid = devid;
+	}
+	public String getDevid(){
+		return this.devid;
+	}
 	
 	public CarState(String orgString){
 		String[] org = orgString.split("\\|");
@@ -66,7 +74,17 @@ public class CarState {
 	}
 	
 	
+	private double decodeLat(String lat){
+		int a = Integer.parseInt(lat.substring(0, 2));
+		double b = Double.parseDouble(lat.substring(2, lat.length()))/60;
+		return a+b;
+	}
 	
+	private double decodeLon(String lat){
+		int a = Integer.parseInt(lat.substring(0, 3));
+		double b = Double.parseDouble(lat.substring(3, lat.length()))/60;
+		return a+b;
+	}
 	
 	
 	

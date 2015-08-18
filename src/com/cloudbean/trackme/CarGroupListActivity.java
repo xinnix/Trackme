@@ -88,7 +88,20 @@ public class CarGroupListActivity extends Activity{
 				// 将被点击的一丶二级标签的位置记录下来
 				child_groupId = groupPosition;
 				child_childId = childPosition;
+				
+				
+				Intent intent = new Intent();
+				intent.setClass(CarGroupListActivity.this,MenuActivity.class);
+				Bundle bundle = new Bundle();
+				Car car  = carTable.get(child_groupId).get(child_childId);
+				
+				ta.currentCar = car;
+				bundle.putInt("carid", Integer.parseInt(car.id));
+				intent.putExtras(bundle);
+				startActivity(intent);
 				// 刷新界面
+				
+				
 				((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
 				return false;
 			}
@@ -122,16 +135,7 @@ public class CarGroupListActivity extends Activity{
 	final ExpandableListAdapter adapter = new BaseExpandableListAdapter() {
 		
 		//private String[] carGroupTitleArry = null;
-		private String[][] carTitleArry = null;
-		// 一级标签上的logo图片数据源
-		// 一级标签上的标题数据源
-		private String[] group_title_arry = new String[] { "颈椎测试", "腰部测试" };
-		// 子视图显示文字
-		private String[][] child_text_array = new String[][] {
-				{ "是否经常感到左臂疼痛？", "是否经常熬夜？", "您的踝关节有刺痛的现象吗？", "是否经常用凉水洗头？" },
-				{ "是否经常感到左臂疼痛？", "是否经常熬夜？", "您的踝关节有刺痛的现象吗？", "是否经常用凉水洗头？" },
-				{ "是否经常感到左臂疼痛？", "是否经常熬夜？", "您的踝关节有刺痛的现象吗？", "是否经常用凉水洗头？" },
-				{ "是否经常感到左臂疼痛？", "是否经常熬夜？", "您的踝关节有刺痛的现象吗？", "是否经常用凉水洗头？" } };
+	
 		// 一级标签上的状态图片数据源
 		int[] group_state_array = new int[] { R.drawable.group_down,R.drawable.group_up };
 
@@ -292,6 +296,8 @@ public class CarGroupListActivity extends Activity{
         	if(msg.what==NetworkAdapter.MSG_SUCCESS_CARINFO){
         		Bundle b = msg.getData();
             	carList = (Car[]) b.getParcelableArray("carList");
+            	
+            	ta.carList = carList;
             	
             	if(carList.length>0){
             		// 为列表绑定数据源
