@@ -18,7 +18,7 @@ import android.widget.Toast;
  
 public class MenuActivity extends Activity {
 	
-	public String[] menuItems={"实时定位","历史轨迹","报警列表","指令下发"};
+	public String[] menuItems={"实时定位","历史轨迹","报警列表","指令下发","注销"};
 	Intent intent = null;
     /** Called when the activity is first created. */
     @Override
@@ -55,6 +55,7 @@ public class MenuActivity extends Activity {
                         	
                         	switch (position){
                         	case 0:
+                        		
                         		intent.setClass(MenuActivity.this, TraceActivity.class);
                         		break;
                         	case 1:
@@ -65,6 +66,11 @@ public class MenuActivity extends Activity {
                         		break;
                         	case 3:
                         		intent.setClass(MenuActivity.this, SetCommandActivity.class);
+                        		break;
+                        	case 4:
+                        		intent.setClass(MenuActivity.this, MainActivity.class);
+                        		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
+                        		
                         		break;
                         		
                         	}

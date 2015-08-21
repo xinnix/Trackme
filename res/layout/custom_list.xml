@@ -3,28 +3,85 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ImageView
-        android:id="@+id/carImg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="false"
-        android:src="@drawable/car" />
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        
+        android:columnCount="2"
+        android:rowCount="1" >
 
-    <TextView
-        android:id="@+id/carId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/carImg"
-        android:layout_alignLeft="@+id/carName"
-        android:layout_marginBottom="22dp"
-        android:text="TextView" />
+        <GridLayout
+            
+            android:layout_gravity="left|top"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_marginTop="12dp"
+            android:columnCount="4"
+       		android:rowCount="2" >
+          
+            
+             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_row="0"
+           		android:layout_column="0" 
+                android:text="车辆名称" />
+            <TextView
+                android:id="@+id/carName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_row="0"
+           		android:layout_column="1" 
+                android:text="TextView" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"   
+                android:layout_row="0"
+           		android:layout_column="2" 
+                android:text="设备ID：" />
+            <TextView
+                android:id="@+id/carDevId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_row="0"
+           		android:layout_column="3"     
+                android:text="TextView" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"    
+                android:layout_row="1"
+           		android:layout_column="0" 
+                android:text="设备类型：" />
+            <TextView
+                android:id="@+id/carDevType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_row="1"
+           		android:layout_column="1"     
+                android:text="TextView" />
 
-    <TextView
-        android:id="@+id/carName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/carId"
-        android:layout_toRightOf="@+id/carImg"
-        android:text="TextView" />
+            
+
+            
+        </GridLayout>
+
+        <ImageView
+            android:id="@+id/carImg"
+            android:layout_width="57dp"
+            android:layout_height="57dp"
+            android:layout_column="0"
+            android:layout_gravity="left|top"
+            android:layout_row="0"
+            android:adjustViewBounds="false"
+            android:src="@drawable/car" />
+    </GridLayout>
 
 </RelativeLayout>

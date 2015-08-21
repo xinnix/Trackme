@@ -1,5 +1,8 @@
 package com.cloudbean.trackme;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.cloudbean.model.Login;
 import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.MsgEventHandler;
@@ -31,7 +34,9 @@ public class MainActivity extends Activity {
 	private Button btExit = null;
 	private ProgressDialog pd = null;
 	private TrackApp ta=null;
-	
+	//超时相关控制
+	private Timer timer = null;
+	private static final int TIME_LIMIT = 8000;
 
 	
 
@@ -54,7 +59,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				System.exit(0);
+				finish();
 	
 			}
 			
@@ -73,7 +78,15 @@ public class MainActivity extends Activity {
 				pd.setMessage("查询中...");
 				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				pd.show();
-				
+				timer = new Timer();
+				timer.schedule(new TimerTask(){
+
+					@Override
+					public void run() {
+						handler.sendEmptyMessage(TIME_LIMIT);	
+					}
+					
+				}, TIME_LIMIT);
 				
 				
 				
@@ -99,6 +112,7 @@ public class MainActivity extends Activity {
 		        	if(l.isLogin==Login.LOGIN_SUCCESS){
 		        		ta.login = l;
 		        		pd.dismiss();// 关闭ProgressDialog
+		        		timer.cancel();
 		            	Toast.makeText(MainActivity.this, "登录成功",Toast.LENGTH_SHORT).show();
 		            	if (!ta.hb.isAlive()){
 		            		ta.hb.start();
@@ -112,12 +126,17 @@ public class MainActivity extends Activity {
 						
 		        	}else{
 		        		pd.dismiss();// 关闭ProgressDialog
+		        		timer.cancel();
 		            	Toast.makeText(MainActivity.this, "登录失败",Toast.LENGTH_SHORT).show();
 		            	return;
 		        	}
 		        	pd.dismiss();// 关闭ProgressDialog
 	        		//Toast.makeText(MainActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
-	        	}
+	        	}else if (msg.what==TIME_LIMIT){
+	           	 pd.dismiss();
+	        	 Toast.makeText(MainActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
+	        	 return;
+	         }
 	        	
 	            	
 					

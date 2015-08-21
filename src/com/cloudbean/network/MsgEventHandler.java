@@ -3,6 +3,7 @@ package com.cloudbean.network;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
+import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.CarGroup;
 import com.cloudbean.model.CarState;
@@ -246,6 +247,50 @@ public class MsgEventHandler {
 	
 	
 	
+	
+	public static void sGetAlarmList(String carid,String startdate,String enddate,String alarmType){
+		int[] pktDataColumnType  = {DPacketParser.DATA_TYPE_STRING,DPacketParser.DATA_TYPE_STRING,DPacketParser.DATA_TYPE_STRING,DPacketParser.DATA_TYPE_STRING};
+		int[] pktDataColumnLength = {startdate.length()*2,enddate.length()*2,carid.length()*2,alarmType.length()*2};
+		byte[] pktData = new byte[startdate.length()*2+enddate.length()*2+carid.length()*2+alarmType.length()*2];
+		
+		byte[] bstartdate = startdate.getBytes();
+		byte[] benddate = enddate.getBytes();
+		byte[] bcarid = carid.getBytes();
+		byte[] balarmtype = alarmType.getBytes();
+		
+		System.arraycopy(bstartdate, 0, pktData, 0, bstartdate.length);
+		System.arraycopy(benddate, 0, pktData, bstartdate.length*2,benddate.length);
+		System.arraycopy(bcarid, 0, pktData,bstartdate.length*2+benddate.length*2 , bcarid.length);
+		System.arraycopy(balarmtype, 0, pktData,bstartdate.length*2+benddate.length*2+bcarid.length*2 , balarmtype.length);
+		
+		
+		DPacketParser dp = new DPacketParser(DPacketParser.SIGNAL_GETALARMLIST,1,4,pktDataColumnType, pktDataColumnLength, pktData);
+		
+		String test =  ByteHexUtil.bytesToHexString(dp.pktBuffer);
+		na.sendPacket(dp.pktBuffer);
+		
+	}
+	
+	public static Alarm[] rGetAlarmList(DPacketParser dp){
+		 
+		Alarm[] al = new Alarm[dp.dataTable.table.length];
+		for (int ii=0;ii<al.length;ii++){
+			al[ii] = new Alarm((Integer)dp.dataTable.table[ii][0],
+					(String)dp.dataTable.table[ii][1],
+					(String)dp.dataTable.table[ii][2],
+					(Double)dp.dataTable.table[ii][3],
+					(Double)dp.dataTable.table[ii][4],
+					(Integer)dp.dataTable.table[ii][5],
+					(Integer)dp.dataTable.table[ii][6],
+					(String)dp.dataTable.table[ii][7]);
+		}
+
+		return al;
+		
+	}
+	
+	
+	
 	/*
 	 * 以下是中心报文相关控制函数
 	 */
@@ -317,29 +362,8 @@ public class MsgEventHandler {
 	
 	
 	public static void c_sGetCarPosition(Car car){
-		String devid = car.devId;
-		for(int i = (14-devid.length());i>0;i--){
-			devid=devid.concat("f");
-		}
-		int fakeip = ByteHexUtil.bytesToInt(ipToBytesByReg(car.ipAddress));
 		
-		
-		
-		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
-		bis.write(0x0b);
-		
-		MsgGPRSParser mgp = new MsgGPRSParser(devid, MsgGPRSParser.MSG_TYPE_GETPOSITION, "");
-		try{
-			bis.write(mgp.msgByteBuf);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-		CPacketParser cp = new CPacketParser(CPacketParser.SIGNAL_RELAY, fakeip, bis.toByteArray());
-	
-		Log.i("centre", ByteHexUtil.bytesToHexString(cp.pktBuffer));
-		cna.sendPacket(cp.pktBuffer);
-		
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_GETPOSITION,"");
 			
 	}
 	
@@ -355,7 +379,16 @@ public class MsgEventHandler {
 	}
 	
 	
-	public static void c_sSetDef(Car car,String set){
+	public static void c_sSetDef(Car car,String data){
+		
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_DEF,data);
+			
+	}
+	public static void c_sSetCircuit(Car car,String data){	
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_CIRCUIT,data);
+	}
+	
+	public static void c_sCommand(Car car,short commandType,String data){
 		String devid = car.devId;
 		for(int i = (14-devid.length());i>0;i--){
 			devid=devid.concat("f");
@@ -363,7 +396,7 @@ public class MsgEventHandler {
 		int fakeip = ByteHexUtil.bytesToInt(ipToBytesByReg(car.ipAddress));
 		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
 		bis.write(0x0b);
-		MsgGPRSParser mgp = new MsgGPRSParser(devid, MsgGPRSParser.MSG_TYPE_SETDEF, set);
+		MsgGPRSParser mgp = new MsgGPRSParser(devid, commandType, data);
 		try{
 			bis.write(mgp.msgByteBuf);
 		}catch(Exception e){
@@ -374,12 +407,7 @@ public class MsgEventHandler {
 		String test = ByteHexUtil.bytesToHexString(cp.pktBuffer);
 		Log.i("centre", ByteHexUtil.bytesToHexString(cp.pktBuffer));
 		cna.sendPacket(cp.pktBuffer);
-		
-			
 	}
-	
-	
-	
 	
 	
 	/**

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.cloudbean.model.Car;
@@ -58,13 +60,15 @@ public class CarGroupListActivity extends Activity{
 	private int child_groupId = -1;
 	private int child_childId = -1;
 	
+	private Timer timer = null;
+	private static final int TIME_LIMIT = 8000;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_cargroup);
 		expandableListView = (ExpandableListView) findViewById(R.id.grouplist);
 		// 设置默认图标为不显示状态
-		expandableListView.setGroupIndicator(null);
+		//expandableListView.setGroupIndicator(null);
 		
 		// 设置一级item点击的监听器
 		expandableListView.setOnGroupClickListener(new OnGroupClickListener() {
@@ -119,6 +123,15 @@ public class CarGroupListActivity extends Activity{
 		pd.setMessage("用户车辆列表获取...");
 		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		pd.show();
+		timer = new Timer();
+		timer.schedule(new TimerTask(){
+
+			@Override
+			public void run() {
+				handler.sendEmptyMessage(TIME_LIMIT);	
+			}
+			
+		}, TIME_LIMIT);
 		
 	}
 	
@@ -254,14 +267,16 @@ public class CarGroupListActivity extends Activity{
 			 */
 			// 新建一个TextView对象，用来显示具体内容
 			TextView child_carName = (TextView) convertView.findViewById(R.id.carName);
-			TextView child_carId = (TextView) convertView.findViewById(R.id.carId);
+			TextView child_carDevId = (TextView) convertView.findViewById(R.id.carDevId);
+			TextView child_carDevType = (TextView) convertView.findViewById(R.id.carDevType);
 			ImageView child_carImg = (ImageView) convertView.findViewById(R.id.carImg);
 			/**
 			 * 设置相应控件的内容
 			 */
 			// 设置要显示的文本信息
+			child_carDevType.setText(carTable.get(groupPosition).get(childPosition).devtype);
 			child_carName.setText(carTable.get(groupPosition).get(childPosition).name);
-			child_carId.setText(carTable.get(groupPosition).get(childPosition).id);
+			child_carDevId.setText(carTable.get(groupPosition).get(childPosition).devId);
 			child_carImg.setImageResource(R.drawable.car);
 			// 判断item的位置是否相同，如相同，则表示为选中状态，更改其背景颜色，如不相同，则设置背景色为白色
 			if (child_groupId == groupPosition
@@ -323,7 +338,11 @@ public class CarGroupListActivity extends Activity{
                 	return;
             	}
 //            	Toast.makeText(CarGroupListActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
-        	}
+        	}else if (msg.what==TIME_LIMIT){
+	           	 pd.dismiss();
+	        	 Toast.makeText(CarGroupListActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
+	        	 return;
+	         }
         	
         	
         	if((carList!=null)&&(carGroupList!=null)&&(flag==0)){
@@ -348,6 +367,7 @@ public class CarGroupListActivity extends Activity{
         		expandableListView.setAdapter(adapter);
         		flag=1;
         		pd.dismiss();// 关闭ProgressDialog
+        		timer.cancel();
         	}
        	
             

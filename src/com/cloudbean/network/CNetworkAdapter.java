@@ -33,7 +33,7 @@ public class CNetworkAdapter extends Thread {
 	public static int MSG_LOGIN = 0x2001;
 	public static int MSG_POSITION = 0x2002;
 	public static int MSG_DEF = 0x2003;
-	
+	public static int MSG_CIRCUIT = 0x2004;
 	
 	 public CNetworkAdapter(String serverIP,int port){
 		 super();
@@ -108,7 +108,7 @@ public class CNetworkAdapter extends Thread {
 						 
 						 switch(mgp.msgType){
 						 case MsgGPRSParser.MSG_TYPE_DEF:
-							 String test = ByteHexUtil.bytesToHexString(mgp.msgByteBuf);
+							
 							 b.putString("devid", mgp.msgTermID);
 							 b.putString("res", mgp.msgData);
 							 msg.what =MSG_DEF;
@@ -123,8 +123,19 @@ public class CNetworkAdapter extends Thread {
 							 b.putString("ditant", cs.distant);
 							 b.putString("date", cs.gprmc.date);
 							 b.putString("devid", cs.devid);
+							 b.putString("voltage", cs.voltage);
+							 b.putString("gsmStrength", cs.gsmStrength);
+							 
 							 msg.setData(b);
 							 msg.what = MSG_POSITION;
+							 handler.sendMessage(msg);
+							 break;
+						 case MsgGPRSParser.MSG_TYPE_CIRCUIT:
+							 String test = ByteHexUtil.bytesToHexString(mgp.msgByteBuf);
+							 b.putString("devid", mgp.msgTermID);
+							 b.putString("res", mgp.msgData);
+							 msg.what =MSG_CIRCUIT;
+							 msg.setData(b);
 							 handler.sendMessage(msg);
 							 break;
 						 }

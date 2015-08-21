@@ -38,10 +38,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".CarListActivity"
-            android:label="@string/title_activity_car_list" >
-        </activity>
+        
         <activity
             android:name=".CarGroupListActivity"
             android:label="@string/title_activity_car_list" >

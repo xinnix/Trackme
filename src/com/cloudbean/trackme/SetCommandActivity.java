@@ -1,5 +1,8 @@
 package com.cloudbean.trackme;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
@@ -32,6 +35,12 @@ public class SetCommandActivity extends Activity {
 	private Button btConnCircuit = null;
 	private TrackApp ta =null;
 	private ProgressDialog pd = null;
+	
+	//超时相关控制
+	private Timer timer = null;
+	private static final int TIME_LIMIT = 8000;
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,6 +62,15 @@ public class SetCommandActivity extends Activity {
 				pd.setMessage("命令发送中...");
 				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				pd.show();
+				timer = new Timer();
+				timer.schedule(new TimerTask(){
+
+					@Override
+					public void run() {
+						handler.sendEmptyMessage(TIME_LIMIT);	
+					}
+					
+				}, TIME_LIMIT);
 			}
 			
 		});
@@ -61,7 +79,66 @@ public class SetCommandActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				MsgEventHandler.c_sSetDef(ta.currentCar, "00");	
+				MsgEventHandler.c_sSetDef(ta.currentCar, "00");
+				pd = new ProgressDialog(SetCommandActivity.this);
+				pd.setMessage("命令发送中...");
+				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				pd.show();
+				timer = new Timer();
+				timer.schedule(new TimerTask(){
+
+					@Override
+					public void run() {
+						handler.sendEmptyMessage(TIME_LIMIT);	
+					}
+					
+				}, TIME_LIMIT);
+			}
+			
+		});
+		
+		
+		btConnCircuit.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				MsgEventHandler.c_sSetCircuit(ta.currentCar, "010202020202");
+				pd = new ProgressDialog(SetCommandActivity.this);
+				pd.setMessage("命令发送中...");
+				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				pd.show();
+				timer = new Timer();
+				timer.schedule(new TimerTask(){
+
+					@Override
+					public void run() {
+						handler.sendEmptyMessage(TIME_LIMIT);	
+					}
+					
+				}, TIME_LIMIT);
+			}
+			
+		});
+		
+		
+		btDisconCircuit.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				MsgEventHandler.c_sSetCircuit(ta.currentCar, "000202020202");
+				pd = new ProgressDialog(SetCommandActivity.this);
+				pd.setMessage("命令发送中...");
+				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				pd.show();
+				timer = new Timer();
+				timer.schedule(new TimerTask(){
+
+					@Override
+					public void run() {
+						handler.sendEmptyMessage(TIME_LIMIT);	
+					}
+					
+				}, TIME_LIMIT);
 			}
 			
 		});
@@ -72,6 +149,7 @@ public class SetCommandActivity extends Activity {
 	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
 	         
 	        	if( msg.what==CNetworkAdapter.MSG_DEF){
+	        		timer.cancel();
 	        		 Bundle b = msg.getData();
 	        		 String devid = b.getString("devid");
 	        		 int i  = devid.indexOf("f");	
@@ -80,16 +158,38 @@ public class SetCommandActivity extends Activity {
 	    				 	pd.dismiss();
 	    					String res =  b.getString("res");
 	    					if(res.equals("0100")){
-	    						Toast.makeText(SetCommandActivity.this, "设防成功", Toast.LENGTH_SHORT).show();
+	    						Toast.makeText(SetCommandActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
 	    					}else if(res.equals("0000")){
-	    						Toast.makeText(SetCommandActivity.this, "设防失败", Toast.LENGTH_SHORT).show();
+	    						Toast.makeText(SetCommandActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
 	    					}else{
 	    						Toast.makeText(SetCommandActivity.this, "服务器回复错误", Toast.LENGTH_SHORT).show();
 	    					}
 	    				 
 	    			 }
 	        	
-	        	}
+	        	}else if(msg.what==CNetworkAdapter.MSG_CIRCUIT){
+	        		timer.cancel();
+	        		 Bundle b = msg.getData();
+	        		 String devid = b.getString("devid");
+	        		 int i  = devid.indexOf("f");	
+	        		 devid = devid.substring(0, i);
+	    			 if(devid.equals(ta.currentCar.devId)){
+	    				 	pd.dismiss();
+	    					String res =  b.getString("res");
+	    					if(res.equals("01")){
+	    						Toast.makeText(SetCommandActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+	    					}else if(res.equals("00")){
+	    						Toast.makeText(SetCommandActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+	    					}else{
+	    						Toast.makeText(SetCommandActivity.this, "服务器回复错误", Toast.LENGTH_SHORT).show();
+	    					}
+	    				 
+	    			 }
+	        	}else if (msg.what==TIME_LIMIT){
+		           	 pd.dismiss();
+		        	 Toast.makeText(SetCommandActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
+		        	 return;
+		         }
 	        }
 	        	
 	 };

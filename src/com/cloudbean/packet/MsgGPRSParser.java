@@ -21,10 +21,10 @@ public class MsgGPRSParser {
 	public static short MSG_END = 0x0d0a;
 	
 	public static short MSG_TYPE_GETPOSITION = 0x4101;
-	public static short MSG_TYPE_SETDEF = 0x4352;
+	public final static short MSG_TYPE_DEF = 0x4352;
+	public final static short MSG_TYPE_CIRCUIT = 0x5114;
 	
 	public final static short MSG_TYPE_POSITION = (short)0x9955; 
-	public final static short MSG_TYPE_DEF = (short)0x4352; 
 	
 	public short msgHead;
 	public short msgLength;
@@ -48,7 +48,7 @@ public class MsgGPRSParser {
 		int datalen = this.msgLength-2-2-7-2-2-2;
 		if(this.msgType==MSG_TYPE_POSITION){
 			this.msgData = new String(Arrays.copyOfRange(msgByteBuf,head,head+=datalen));
-		}else if (this.msgType==MSG_TYPE_DEF){
+		}else{
 			this.msgData = ByteHexUtil.bytesToHexString(Arrays.copyOfRange(msgByteBuf,head,head+=datalen));
 		}
 		
@@ -66,7 +66,8 @@ public class MsgGPRSParser {
 	public MsgGPRSParser(String msgTermID, short msgType, String msgData) {
 		super();
 		this.msgHead = MSG_SEND_HEADER;
-		this.msgLength = (short)(2+2+7+2+ByteHexUtil.hexStringToBytes(msgData).length+2+2);
+		int datalen = ByteHexUtil.hexStringToBytes(msgData)==null?0:ByteHexUtil.hexStringToBytes(msgData).length;
+		this.msgLength = (short)(2+2+7+2+datalen+2+2);
 		this.msgTermID = msgTermID;
 		this.msgType = msgType;
 		this.msgData = msgData;

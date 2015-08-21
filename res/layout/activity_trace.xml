@@ -10,5 +10,10 @@
 
     </com.amap.api.maps.MapView>
 
-    
+    <ToggleButton
+     android:id="@+id/btTrace_Satelite"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:textOn="恢复正常模式"
+     android:textOff="开启卫星模式"/> 
  </RelativeLayout>

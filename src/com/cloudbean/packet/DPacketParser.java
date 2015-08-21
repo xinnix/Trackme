@@ -33,6 +33,9 @@ public class DPacketParser {
 	public static final int SIGNAL_GETCARINFO = 0x00000006;
 	public static final int SIGNAL_RE_GETCARINFO = 0xffff0006;
 	
+	public static final int SIGNAL_GETALARMLIST = 0x00000013;
+	public static final int SIGNAL_RE_GETALARMLIST = 0xffff0013;
+	
 	
 	public static final int SIGNAL_FAIL = 0xffffffff;
 	

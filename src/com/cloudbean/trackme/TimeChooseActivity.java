@@ -110,7 +110,7 @@ public class TimeChooseActivity extends Activity{
 		etDateText.setOnTouchListener(new View.OnTouchListener(){
 			int touchFlag = 0;
 			@Override
-		public boolean onTouch(View arg0, MotionEvent arg1) {
+			public boolean onTouch(View arg0, MotionEvent arg1) {
 				// TODO Auto-generated method stub
 				touchFlag++;
 				if(touchFlag==2){

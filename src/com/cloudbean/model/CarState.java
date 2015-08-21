@@ -1,5 +1,7 @@
 package com.cloudbean.model;
 
+import com.cloudbean.trackerUtil.ByteHexUtil;
+
 public class CarState {
 	
 	
@@ -28,9 +30,9 @@ public class CarState {
 			this.NorS = org[3];
 			this.longitude = decodeLon(org[4]);
 			this.EorW = org[5];
-			this.speed = org[6];
+			this.speed = decodeSpeed(org[6]);
 			this.direction = org[7];
-			this.date = org[8];
+			this.date = decodeDate(org[8]);
 			this.declination = org[9];
 			this.mDirection = org[10];
 			this.separator = org[11].substring(0,0);
@@ -68,7 +70,7 @@ public class CarState {
 		this.voltage = org[4];
 		this.baseStation = org[5];
 		this.gsmStrength = org[6];
-		this.distant = org[7];
+		this.distant = decodeDistant(org[7]);
 		
 		
 	}
@@ -84,6 +86,24 @@ public class CarState {
 		int a = Integer.parseInt(lat.substring(0, 3));
 		double b = Double.parseDouble(lat.substring(3, lat.length()))/60;
 		return a+b;
+	}
+	
+	
+	private String decodeDate(String date){
+		String y = date.substring(4);
+		String m = date.substring(2, 4);
+		String d = date.substring(0, 2);
+		return y+"年"+m+"月"+d+"日";
+	}
+	
+	private String decodeSpeed(String speed){
+		Double v = Double.parseDouble(speed)*1.852;
+		return v+"公里";
+	}
+	
+	private String decodeDistant(String dis){
+		return ""+ByteHexUtil.bytesToInt(ByteHexUtil.hexStringToBytes(dis));
+		 
 	}
 	
 	

@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
+import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.CarGroup;
 import com.cloudbean.model.Login;
@@ -36,6 +37,7 @@ public class NetworkAdapter extends Thread {
 	public static int MSG_CARINFO = 0x1002;
 	public static int MSG_CARGROUPINFO = 0x1003;
 	public static int MSG_TRACK = 0x1004;
+	public static int MSG_ALARM = 0x1005;
 	
 	 public NetworkAdapter(String serverIP,int port){
 		 super();
@@ -142,7 +144,16 @@ public class NetworkAdapter extends Thread {
 						 msg.setData(bundle);
 						 msg.what = MSG_TRACK;
 						 handler.sendMessage(msg);
-						 break;	 
+						 break;
+					 case DPacketParser.SIGNAL_RE_GETALARMLIST:
+						 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
+						 msg = handler.obtainMessage(); 
+						 bundle = new Bundle();
+						 bundle.putParcelableArray("alarmlist", alarmList);
+						 msg.setData(bundle);
+						 msg.what = MSG_ALARM;
+						 handler.sendMessage(msg);
+						 break;	
 					 case DPacketParser.SIGNAL_FAIL:
 						 MsgEventHandler.rFail(dp);
 						 msg = handler.obtainMessage(); 
