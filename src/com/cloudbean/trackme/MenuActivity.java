@@ -19,6 +19,7 @@ import android.widget.Toast;
 public class MenuActivity extends Activity {
 	
 	public String[] menuItems={"实时定位","历史轨迹","报警列表","指令下发","注销"};
+	public int[] icon = {R.drawable.menu_trace,R.drawable.menu_replay,R.drawable.menu_alarm,R.drawable.menu_command,R.drawable.menu_exit};
 	Intent intent = null;
     /** Called when the activity is first created. */
     @Override
@@ -34,7 +35,7 @@ public class MenuActivity extends Activity {
         for(int i = 0;i < menuItems.length;i++)
         {
             HashMap<String, Object> map = new HashMap<String, Object>();
-            map.put("ItemImage", R.drawable.car);
+            map.put("ItemImage", icon[i]);
             map.put("ItemText", menuItems[i]);
             meumList.add(map);
         }

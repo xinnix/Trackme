@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
+import com.cloudbean.model.Car;
 import com.cloudbean.model.CarState;
 import com.cloudbean.packet.CPacketParser;
 import com.cloudbean.packet.DPacketParser;
@@ -27,6 +28,9 @@ public class CNetworkAdapter extends Thread {
 	public byte[] sendBuffer;
 	public byte[] recieveBuffer = new byte[4096];
 	
+	private String serverIP = null;
+	private int port = 0;
+	
 	public Handler handler = null;
 	
 	public static int MSG_FAIL = 0x2000;
@@ -37,6 +41,8 @@ public class CNetworkAdapter extends Thread {
 	
 	 public CNetworkAdapter(String serverIP,int port){
 		 super();
+		 this.serverIP = serverIP;
+		 this.port = port;
 		 try{
 			 socket = new Socket(InetAddress.getByName(serverIP),port);
 			 outputStream = socket.getOutputStream();
@@ -46,6 +52,23 @@ public class CNetworkAdapter extends Thread {
 		 }
 		 
 	 }
+	 
+	 
+	 public void reConnect(){
+		 try{
+			 socket = new Socket(InetAddress.getByName(this.serverIP),this.port);
+			 outputStream = socket.getOutputStream();
+			 inputStream = socket.getInputStream();
+		 }catch(Exception e){
+			 e.printStackTrace();
+		 }
+		 
+	 }
+	 
+	 
+	 
+	 
+	 
 	 public CNetworkAdapter(byte[] packet){
 		 super();
 		 this.sendBuffer= packet;
@@ -117,18 +140,20 @@ public class CNetworkAdapter extends Thread {
 							 break;
 						 case MsgGPRSParser.MSG_TYPE_POSITION:
 							 CarState cs =MsgEventHandler.c_rGetCarPosition(mgp);
-							 b.putDouble("lat", cs.gprmc.latitude);
-							 b.putDouble("lon", cs.gprmc.longitude);
-							 b.putString("speed", cs.gprmc.speed);
-							 b.putString("ditant", cs.distant);
-							 b.putString("date", cs.gprmc.date);
-							 b.putString("devid", cs.devid);
-							 b.putString("voltage", cs.voltage);
-							 b.putString("gsmStrength", cs.gsmStrength);
-							 
-							 msg.setData(b);
-							 msg.what = MSG_POSITION;
-							 handler.sendMessage(msg);
+							 if(cs.gprmc.latitude!=0&&cs.gprmc.longitude!=0){
+								 b.putDouble("lat", cs.gprmc.latitude);
+								 b.putDouble("lon", cs.gprmc.longitude);
+								 b.putString("speed", cs.gprmc.speed);
+								 b.putString("ditant", cs.distant);
+								 b.putString("date", cs.gprmc.date);
+								 b.putString("devid", cs.devid);
+								 b.putString("voltage", cs.voltage);
+								 b.putString("gsmStrength", cs.gsmStrength);
+								
+								 msg.setData(b);
+								 msg.what = MSG_POSITION;
+								 handler.sendMessage(msg);
+							 }
 							 break;
 						 case MsgGPRSParser.MSG_TYPE_CIRCUIT:
 							 String test = ByteHexUtil.bytesToHexString(mgp.msgByteBuf);
@@ -155,6 +180,8 @@ public class CNetworkAdapter extends Thread {
 			
 	 }
 	
+	 
+
 
 
 }

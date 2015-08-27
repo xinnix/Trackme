@@ -10,5 +10,7 @@
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_alarm_list">AlarmListActivity</string>
     <string name="title_activity_set_command">SetCommandActivity</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_base">BaseActivity</string>
 
 </resources>

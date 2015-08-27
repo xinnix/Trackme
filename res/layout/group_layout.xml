@@ -10,25 +10,38 @@
         android:id="@+id/group_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp" >
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" 
+        android:background="@drawable/corners_bg">
+
+        <ImageView
+            android:id="@+id/group_state"
+            android:layout_width="40dip"
+            android:layout_height="40dip"
+            android:scaleType="centerInside"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@+id/group_title"/>
+        <TextView
+            android:id="@+id/gt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/group_state"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="48dp"
+            android:textSize="20dip"
+            android:textColor="#fff"
+            android:text = "车组：" />
 
         <TextView
             android:id="@+id/group_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="10dp"
-            android:textSize="20dp"/>
+            android:layout_alignLeft="@+id/gt"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="48dp"
+            android:textSize="20dip"
+            android:textColor="#fff" />
 
-        <ImageView
-            android:id="@+id/group_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:layout_marginRight="10dp"/>
     </RelativeLayout>
 
 </LinearLayout>

@@ -1,5 +1,7 @@
 package com.cloudbean.trackme;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -53,7 +55,7 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
 	
 	//超时相关控制
 	private Timer timer = null;
-	private static final int TIME_LIMIT = 30000;
+	private static final int TIME_LIMIT = 10000;
 	
 	
 	double lat;
@@ -75,7 +77,11 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
 	    tbSatelite = (ToggleButton)findViewById(R.id.btTrace_Satelite);
 //	    geocoderSearch = new GeocodeSearch(this);
 //		geocoderSearch.setOnGeocodeSearchListener(this);
-	    
+	    pd = new ProgressDialog(TraceActivity.this);
+		pd.setMessage("定位中...");
+		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		pd.setCancelable(false);
+		pd.show();
 	    
 	    tbSatelite.setOnClickListener(new OnClickListener(){
 	    
@@ -102,10 +108,7 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
 		ta = (TrackApp)getApplication();
 	    ta.setHandler(handler);
 		MsgEventHandler.c_sGetCarPosition(ta.currentCar);	
-		pd = new ProgressDialog(TraceActivity.this);
-		pd.setMessage("定位中...");
-		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		pd.show();
+		
 		
 		timer = new Timer();
 		timer.schedule(new TimerTask(){
@@ -144,14 +147,15 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
         public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
          if(msg.what==CNetworkAdapter.MSG_POSITION){
         	 Bundle b = msg.getData();
-        	 
+        	 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			 String devid = b.getString("devid");
 			 if(devid.equals(ta.currentCar.devId)){
+				 	ta.currentCar.setAlive(true);
 					 lat = b.getDouble("lat");
 		        	 lon = b.getDouble("lon");
 		        	 speed = b.getString("speed");
 		        	 distant = b.getString("ditant");
-					 date = b.getString("date");
+					 date = format.format(new Date());
 					 voltage = b.getString("voltage");
 					 gsmStrength = b.getString("gsmStrength");
 					 double[] correctCoordinate = new double[2];
@@ -167,13 +171,16 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
 					
 				 	MarkerOptions markerOptions = new MarkerOptions();
 					markerOptions.anchor(0.5f, 0.5f);
-					markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+					markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_trace));
 					mMoveMarker = aMap.addMarker(markerOptions);
 					mMoveMarker.setPosition(new LatLng(correctCoordinate[0], correctCoordinate[1]));
 					aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]), 14)); 
 					 mMoveMarker.setTitle("设备信息");
-					 mMoveMarker.setSnippet("坐标："+lat+"%"+lon+"\n"+
-						"速度:"+speed+"  距离"+distant+"\n"+
+					 mMoveMarker.setSnippet(
+						"设备名称："+ta.currentCar.name+"\n"+
+						"坐标："+lat+"%"+lon+"\n"+
+						"速度："+speed.substring(0,4)+"km/h"+"\n"+
+						"距离："+distant+"km"+"\n"+
 						"更新时间："+date+"\n"+
 						"电压："+voltage+"\n"+
 						"信号强度"+gsmStrength);

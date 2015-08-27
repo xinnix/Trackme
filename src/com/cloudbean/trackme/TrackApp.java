@@ -1,5 +1,6 @@
 package com.cloudbean.trackme;
 import com.cloudbean.model.Car;
+import com.cloudbean.model.CarGroup;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.User;
 import com.cloudbean.network.CNetworkAdapter;
@@ -21,8 +22,10 @@ public class TrackApp extends Application{
 	public static User  user = null;
 	public static Login  login = null;
 	public static Car[] carList = null;
-	
+	public static CarGroup[] carGroupList=null;
 	public static Car currentCar = null;
+	
+	public static String curPassword = null;
 	
 	
 	public Handler getHandler() {
@@ -34,6 +37,8 @@ public class TrackApp extends Application{
 		this.handler = handler;
 		na.handler = this.handler;
 		nac.handler = this.handler;
+		
+	
 	}
 
 
@@ -48,7 +53,35 @@ public class TrackApp extends Application{
     	nac.start();
     	hb = new HeartBeat();
 		MsgEventHandler.config(na, nac);
+		
+		
+		
+		new Thread(){
+			
+			public void run(){
+				while(true){
+					if(na.socket.isClosed()){
+						na.reConnect();
+					}
+					
+					if(nac.socket.isClosed()){
+						nac.reConnect();
+					}
+					try {
+						Thread.sleep(40000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+			}
+		}.start();
         
     }
+	
+	
+	
+	
 	
 }

@@ -8,47 +8,44 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cloudbean.trackme.SetCommandActivity" >
 
-    <GridLayout
+    <LinearLayout
+        android:id="@+id/ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:columnCount="2"
-        android:rowCount="2"  >
+        android:orientation="vertical" >
 
         <Button
             android:id="@+id/set_def"
-            android:layout_width="139dp"
-            android:layout_column="0"
-            android:layout_gravity="left|top"
-            android:layout_row="0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="设防" />
 
         <Button
             android:id="@+id/cancel_def"
-            android:layout_width="136dp"
-            android:layout_column="1"
-            android:layout_gravity="left|top"
-            android:layout_row="0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="撤防" />
 
         <Button
             android:id="@+id/discon_circuit"
-            android:layout_width="137dp"
-            android:layout_column="0"
-            android:layout_gravity="left|top"
-            android:layout_row="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="断开油路" />
 
         <Button
             android:id="@+id/conn_circuit"
-            android:layout_width="131dp"
-            android:layout_column="1"
-            android:layout_gravity="left|top"
-            android:layout_row="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="恢复油路" />
+    </LinearLayout>
 
-    </GridLayout>
+    <ListView
+        android:id="@+id/loglist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+		android:layout_below ="@id/ll" />
 
 </RelativeLayout>

@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-      android:id="@+id/GridView"
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:numColumns="auto_fit"
-      android:columnWidth="90dp"
-      android:stretchMode="columnWidth"
-      android:gravity="center">
-</GridView>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background = "@drawable/activity_bg">
+
+    <TextView
+        android:id="@+id/title_bar_text"
+        android:layout_width="match_parent"
+        android:layout_height="45dip"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="功能列表"
+        android:textSize="40dip"
+        android:textColor="#000"></TextView>
+    <GridView
+        android:id="@+id/GridView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title_bar_text"
+        
+        android:numColumns="3"
+       	android:columnWidth="6dip"
+        android:cacheColorHint="#00000000"
+        ></GridView>
+        
+
+</RelativeLayout>
+      

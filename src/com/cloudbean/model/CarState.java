@@ -98,11 +98,11 @@ public class CarState {
 	
 	private String decodeSpeed(String speed){
 		Double v = Double.parseDouble(speed)*1.852;
-		return v+"¹«Àï";
+		return v+"";
 	}
 	
 	private String decodeDistant(String dis){
-		return ""+ByteHexUtil.bytesToInt(ByteHexUtil.hexStringToBytes(dis));
+		return ""+ByteHexUtil.bytesToInt(ByteHexUtil.hexStringToBytes(dis))/1000;
 		 
 	}
 	

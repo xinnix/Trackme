@@ -330,8 +330,8 @@ public class MsgEventHandler {
 	}
 	
 	
-	public static void c_sGetAllCarPosition(){
-		String hexPacket  = "2929a400000000";
+	public static void c_sGetAllLastPosition(){
+		String hexPacket  = "2929a4000600000000";
 		String end = "0d";
 		byte[] packet = ByteHexUtil.hexStringToBytes(hexPacket);
 		byte check = CPacketParser.packetCheck(packet);
@@ -379,6 +379,11 @@ public class MsgEventHandler {
 	}
 	
 	
+	
+	
+	
+	
+	
 	public static void c_sSetDef(Car car,String data){
 		
 		c_sCommand(car,MsgGPRSParser.MSG_TYPE_DEF,data);
@@ -405,7 +410,7 @@ public class MsgEventHandler {
 		
 		CPacketParser cp = new CPacketParser(CPacketParser.SIGNAL_RELAY, fakeip, bis.toByteArray());
 		String test = ByteHexUtil.bytesToHexString(cp.pktBuffer);
-		Log.i("centre", ByteHexUtil.bytesToHexString(cp.pktBuffer));
+		
 		cna.sendPacket(cp.pktBuffer);
 	}
 	

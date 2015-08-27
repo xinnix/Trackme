@@ -28,6 +28,9 @@ public class NetworkAdapter extends Thread {
 	public Message msg = null;
 	public Bundle bundle =null;
 	
+	private String serverIP = null;
+	private int port = 0;
+	
 	
 	
 	
@@ -41,6 +44,8 @@ public class NetworkAdapter extends Thread {
 	
 	 public NetworkAdapter(String serverIP,int port){
 		 super();
+		 this.serverIP = serverIP;
+		 this.port = port;
 		 try{
 			 socket = new Socket(InetAddress.getByName(serverIP),port);
 			 outputStream = socket.getOutputStream();
@@ -50,6 +55,23 @@ public class NetworkAdapter extends Thread {
 		 }
 		 
 	 }
+	 
+	 
+	 public void reConnect(){
+		 try{
+			 socket = new Socket(InetAddress.getByName(this.serverIP),this.port);
+			 outputStream = socket.getOutputStream();
+			 inputStream = socket.getInputStream();
+		 }catch(Exception e){
+			 e.printStackTrace();
+		 }
+		 
+	 }
+	 
+	 
+	 
+	 
+	 
 	 public NetworkAdapter(byte[] packet){
 		 super();
 		 this.sendBuffer= packet;

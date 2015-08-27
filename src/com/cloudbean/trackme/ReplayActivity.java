@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
@@ -49,6 +50,9 @@ public class ReplayActivity extends Activity {
 	private Button tbPlay = null;
 	private Button tbStop = null;
 	private SeekBar sbSpeed = null;
+	private GridLayout la = null;
+	
+	
 	// 通过设置间隔时间和距离可以控制速度和图标移动的距离
 	private static int TIME_INTERVAL = 200;
 	private static final double DISTANCE = 0.0001;
@@ -75,7 +79,9 @@ public class ReplayActivity extends Activity {
 		tbPlay = (Button)findViewById(R.id.btPlay);
 		tbStop = (Button)findViewById(R.id.btStop);
 		sbSpeed = (SeekBar)findViewById(R.id.speedSeekBar);
+		la = (GridLayout)findViewById(R.id.replayGridLayout);
 		
+		la.setBackgroundColor(Color.WHITE);
 		
 		Intent intent = this.getIntent();
 		int carId = intent.getIntExtra("carId", 0);
@@ -220,15 +226,18 @@ public class ReplayActivity extends Activity {
 //			float longtitude = (float) (Math.sin(0) * radius + centerLontitude);
 //			polylineOptions.add(new LatLng(latitude, longtitude));
 	    	//new LatLng(socket9.weidu.get(0),socket9.jingdu.get(0))
-			int stopFlag = 1;
+			/*
+			 * 判断停车情况
+			 */
+	    	int stopFlag = 1;
 	    	for(int i=0;i<num;i++)
 			{
-				if(tracklist[i].status.equals(Track.ACC_SHUTDOWN)&&tracklist[i].isLocated&&(stopFlag==1)){
+				if(tracklist[i].speed==0&&tracklist[i].isLocated&&(stopFlag==1)){
 					GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
 					 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
 					 MarkerOptions markerOptions = new MarkerOptions();
 					 markerOptions.anchor(0.5f, 0.5f);
-					 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.carstop));
+					 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
 					 int last = polylineOptions.getPoints().size()-1;
 					 markerOptions.position(polylineOptions.getPoints().get(last));
 					 mAmap.addMarker(markerOptions);
@@ -249,7 +258,7 @@ public class ReplayActivity extends Activity {
 			Log.i("track", ""+mVirtureRoad.getPoints().size());
 			MarkerOptions markerOptions = new MarkerOptions();
 			markerOptions.anchor(0.5f, 0.5f);
-			markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+			markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_track));
 			
 			//markerOptions.position(polylineOptions.getPoints().get(0));
 			mMoveMarker = mAmap.addMarker(markerOptions);
@@ -408,57 +417,61 @@ public class ReplayActivity extends Activity {
 
 
 		public void run() {
-			
-			for (; progress < mVirtureRoad.getPoints().size() - 1;) {
-
-				if(control == 1){
-						
-						LatLng startPoint = mVirtureRoad.getPoints().get(progress);
-						LatLng endPoint = mVirtureRoad.getPoints().get(progress + 1);
-						mMoveMarker.setPosition(startPoint);
-			
-						mMoveMarker.setRotateAngle((float) getAngle(startPoint,endPoint));
-			
-						double slope = getSlope(startPoint, endPoint);
-						//是不是正向的标示（向上设为正向）
-						boolean isReverse = (startPoint.latitude > endPoint.latitude);
-			
-						double intercept = getInterception(slope, startPoint);
-			
-						double xMoveDistance = isReverse ? getXMoveDistance(slope)
-								: -1 * getXMoveDistance(slope);
-			
-						
-						for (double j = startPoint.latitude;!((j > endPoint.latitude)^ isReverse);j = j-xMoveDistance) {
-							LatLng latLng = null;
-							if (slope != Double.MAX_VALUE) {
-								latLng = new LatLng(j, (j - intercept) / slope);
-							} else {
-								latLng = new LatLng(j, startPoint.longitude);
-							}
-							mMoveMarker.setPosition(latLng);
-							mAmap.moveCamera(CameraUpdateFactory.changeLatLng(latLng));
-							
-							
-							try {
-								Thread.sleep(TIME_INTERVAL);
-							}catch (InterruptedException e) {
-								e.printStackTrace();
-							}catch(Exception e){
-								e.printStackTrace();
-							}
-						}
-						progress++;
+			while(true){
 				
-				}else{
+				for (; progress < mVirtureRoad.getPoints().size() - 1;) {
+
+					if(control == 1){
+							
+							LatLng startPoint = mVirtureRoad.getPoints().get(progress);
+							LatLng endPoint = mVirtureRoad.getPoints().get(progress + 1);
+							mMoveMarker.setPosition(startPoint);
+				
+							mMoveMarker.setRotateAngle((float) getAngle(startPoint,endPoint));
+				
+							double slope = getSlope(startPoint, endPoint);
+							//是不是正向的标示（向上设为正向）
+							boolean isReverse = (startPoint.latitude > endPoint.latitude);
+				
+							double intercept = getInterception(slope, startPoint);
+				
+							double xMoveDistance = isReverse ? getXMoveDistance(slope)
+									: -1 * getXMoveDistance(slope);
+				
+							
+							for (double j = startPoint.latitude;!((j > endPoint.latitude)^ isReverse);j = j-xMoveDistance) {
+								LatLng latLng = null;
+								if (slope != Double.MAX_VALUE) {
+									latLng = new LatLng(j, (j - intercept) / slope);
+								} else {
+									latLng = new LatLng(j, startPoint.longitude);
+								}
+								mMoveMarker.setPosition(latLng);
+								mAmap.moveCamera(CameraUpdateFactory.changeLatLng(latLng));
+								
+								
+								try {
+									Thread.sleep(TIME_INTERVAL);
+								}catch (InterruptedException e) {
+									e.printStackTrace();
+								}catch(Exception e){
+									e.printStackTrace();
+								}
+							}
+							progress++;
 					
+					}else{
+						
+					}
+					
+
 				}
-
 				
-					
-				
-
+				progress=0;
+				control=0;
 			}
+			
+
 		}
 		
 

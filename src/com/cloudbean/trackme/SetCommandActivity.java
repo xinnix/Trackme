@@ -1,5 +1,13 @@
 package com.cloudbean.trackme;
 
+import java.lang.reflect.Field;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -7,6 +15,7 @@ import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MarkerOptions;
+import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Login;
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.MsgEventHandler;
@@ -14,18 +23,24 @@ import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.GpsCorrect;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 public class SetCommandActivity extends Activity {
@@ -36,11 +51,32 @@ public class SetCommandActivity extends Activity {
 	private TrackApp ta =null;
 	private ProgressDialog pd = null;
 	
+	private AlertDialog alertDialog = null;
+	
+	
+	private ListView lvLog = null;
+	
+	
+	private String curCommand = null;
+	
+	SimpleAdapter adapter = null;
+	List<Map<String, Object>> data = new ArrayList<Map<String, Object>>(); 
 	//超时相关控制
 	private Timer timer = null;
-	private static final int TIME_LIMIT = 8000;
+	private static final int TIME_LIMIT = 15000;
 	
 	
+	private void getData(String res) {
+		  SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	        	Map<String, Object> map = new HashMap<String, Object>();
+	        	map.put("commandName", curCommand);
+	        	map.put("commandResult", res);
+	        	map.put("commandTime", format.format(new Date()));
+	        	data.add(map);
+	        	
+	}
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -51,6 +87,15 @@ public class SetCommandActivity extends Activity {
 		btDisconCircuit = (Button)findViewById(R.id.discon_circuit);
 		btConnCircuit = (Button)findViewById(R.id.conn_circuit);
 		
+		lvLog = (ListView)findViewById(R.id.loglist);
+		
+		adapter = new SimpleAdapter(SetCommandActivity.this,data,R.layout.commandlog_list,
+	                new String[]{"commandName","commandResult","commandTime"},
+	                new int[]{R.id.commandName,R.id.commandResult,R.id.commandTime});
+    	 lvLog.setAdapter(adapter);
+    	//  
+		
+		showWaiterAuthorizationDialog();
 		
 		btSetDef.setOnClickListener(new OnClickListener(){
 
@@ -58,6 +103,7 @@ public class SetCommandActivity extends Activity {
 			public void onClick(View v) {
 				
 				MsgEventHandler.c_sSetDef(ta.currentCar, "01");
+				curCommand = btSetDef.getText().toString();
 				pd = new ProgressDialog(SetCommandActivity.this);
 				pd.setMessage("命令发送中...");
 				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -80,6 +126,7 @@ public class SetCommandActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				MsgEventHandler.c_sSetDef(ta.currentCar, "00");
+				curCommand = btCancelDef.getText().toString();
 				pd = new ProgressDialog(SetCommandActivity.this);
 				pd.setMessage("命令发送中...");
 				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -102,7 +149,8 @@ public class SetCommandActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				MsgEventHandler.c_sSetCircuit(ta.currentCar, "010202020202");
+				MsgEventHandler.c_sSetCircuit(ta.currentCar, "0002020202");
+				curCommand = btConnCircuit.getText().toString();
 				pd = new ProgressDialog(SetCommandActivity.this);
 				pd.setMessage("命令发送中...");
 				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -125,7 +173,8 @@ public class SetCommandActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				MsgEventHandler.c_sSetCircuit(ta.currentCar, "000202020202");
+				MsgEventHandler.c_sSetCircuit(ta.currentCar, "0102020202");
+				curCommand = btDisconCircuit.getText().toString();
 				pd = new ProgressDialog(SetCommandActivity.this);
 				pd.setMessage("命令发送中...");
 				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -159,12 +208,14 @@ public class SetCommandActivity extends Activity {
 	    					String res =  b.getString("res");
 	    					if(res.equals("0100")){
 	    						Toast.makeText(SetCommandActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+	    						getData("操作成功");
 	    					}else if(res.equals("0000")){
 	    						Toast.makeText(SetCommandActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+	    						getData("操作失败");
 	    					}else{
 	    						Toast.makeText(SetCommandActivity.this, "服务器回复错误", Toast.LENGTH_SHORT).show();
 	    					}
-	    				 
+	    					adapter.notifyDataSetChanged();
 	    			 }
 	        	
 	        	}else if(msg.what==CNetworkAdapter.MSG_CIRCUIT){
@@ -178,12 +229,14 @@ public class SetCommandActivity extends Activity {
 	    					String res =  b.getString("res");
 	    					if(res.equals("01")){
 	    						Toast.makeText(SetCommandActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+	    						getData("操作成功");
 	    					}else if(res.equals("00")){
 	    						Toast.makeText(SetCommandActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+	    						getData("操作失败");
 	    					}else{
 	    						Toast.makeText(SetCommandActivity.this, "服务器回复错误", Toast.LENGTH_SHORT).show();
 	    					}
-	    				 
+	    					adapter.notifyDataSetChanged();
 	    			 }
 	        	}else if (msg.what==TIME_LIMIT){
 		           	 pd.dismiss();
@@ -217,4 +270,91 @@ public class SetCommandActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	
+	  //显示对话框
+	    public void showWaiterAuthorizationDialog() {
+	    	
+	    	//LayoutInflater是用来找layout文件夹下的xml布局文件，并且实例化
+			LayoutInflater factory = LayoutInflater.from(SetCommandActivity.this);
+			//把activity_login中的控件定义在View中
+			final View textEntryView = factory.inflate(R.layout.password_dialog, null);
+	         
+	        //将LoginActivity中的控件显示在对话框中
+			alertDialog = new AlertDialog.Builder(SetCommandActivity.this)
+			//点击其他地方不消失
+			.setCancelable(false)
+			//对话框的标题
+	       .setTitle("验证")
+	       //设定显示的View
+	       .setView(textEntryView)
+	       //对话框中的“登陆”按钮的点击事件
+	       .setPositiveButton("验证", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int whichButton) { 
+	        	   
+	  			//获取用户输入的“用户名”，“密码”
+	        	//注意：textEntryView.findViewById很重要，因为上面factory.inflate(R.layout.activity_login, null)将页面布局赋值给了textEntryView了
+//	        	final EditText etUserName = (EditText)textEntryView.findViewById(R.id.etuserName);
+	            final EditText etPassword = (EditText)textEntryView.findViewById(R.id.etPWD);
+	            
+	          //将页面输入框中获得的“用户名”，“密码”转为字符串
+//	   	        String userName = etUserName.getText().toString().trim();
+	   	    	String password = etPassword.getText().toString().trim();
+	   	    	
+	   	    	//现在为止已经获得了字符型的用户名和密码了，接下来就是根据自己的需求来编写代码了
+	   	    	//这里做一个简单的测试，假定输入的用户名和密码都是1则进入其他操作页面（OperationActivity）
+	   	    	preventDismissDialog();
+	   	    	if( password.equals(ta.curPassword)){
+	   	    		
+	   	    		dismissDialog();
+	   	    	}else{
+	   	    		
+	   	    		Toast.makeText(SetCommandActivity.this, "密码或用户名错误", Toast.LENGTH_SHORT).show();
+	   	    	}
+	           }
+	       })
+	       //对话框的“退出”单击事件
+	       .setNegativeButton("退出", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int whichButton) {
+	        	   SetCommandActivity.this.finish();
+	           }
+	       })
+	       
+	        //对话框的创建、显示
+			.create();
+			alertDialog.show();
+		}
+
+
+
+    /**
+     * 关闭对话框
+     */
+    private void dismissDialog() {
+        try {
+            Field field = alertDialog.getClass().getSuperclass().getDeclaredField("mShowing");
+            field.setAccessible(true);
+            field.set(alertDialog, true);
+        } catch (Exception e) {
+        }
+        alertDialog.dismiss();
+    }
+
+    /**
+     * 通过反射 阻止关闭对话框
+     */
+    private void preventDismissDialog() {
+        try {
+            Field field = alertDialog.getClass().getSuperclass().getDeclaredField("mShowing");
+            field.setAccessible(true);
+            //设置mShowing值，欺骗android系统
+            field.set(alertDialog, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+	
+
+	
 }

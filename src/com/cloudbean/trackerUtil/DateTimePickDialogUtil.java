@@ -1,4 +1,4 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackerUtil;
 
 
 
@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import com.cloudbean.trackme.R;
+import com.cloudbean.trackme.R.id;
+import com.cloudbean.trackme.R.layout;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -11,6 +11,7 @@ import java.util.TimerTask;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.CarGroup;
+import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 
@@ -68,7 +69,8 @@ public class CarGroupListActivity extends Activity{
 		setContentView(R.layout.activity_cargroup);
 		expandableListView = (ExpandableListView) findViewById(R.id.grouplist);
 		// 设置默认图标为不显示状态
-		//expandableListView.setGroupIndicator(null);
+		expandableListView.setGroupIndicator(null);
+		expandableListView.setAdapter(adapter);
 		
 		// 设置一级item点击的监听器
 		expandableListView.setOnGroupClickListener(new OnGroupClickListener() {
@@ -140,6 +142,12 @@ public class CarGroupListActivity extends Activity{
 	     super.onResume();  
 	     ta = (TrackApp)getApplication();
 	     ta.setHandler(handler);
+	     if(ta.carList!=null&&ta.carGroupList!=null){
+	    	 pd.dismiss();
+		     initCarTable(ta.carList,ta.carGroupList);
+		     ((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
+	     }
+	    
 	     Log.i("test", "onResume");
 	}  
 	 
@@ -232,6 +240,7 @@ public class CarGroupListActivity extends Activity{
 			 */
 			// 设置标题上的文本信息
 			group_title.setText(carGroupArry.get(groupPosition).vehGroupName);
+			group_state.setBackgroundResource(R.drawable.group_state);
 			// 设置整体描述上的文本信息
 
 //			if (group_checked[groupPosition] % 2 == 1) {
@@ -277,7 +286,7 @@ public class CarGroupListActivity extends Activity{
 			child_carDevType.setText(carTable.get(groupPosition).get(childPosition).devtype);
 			child_carName.setText(carTable.get(groupPosition).get(childPosition).name);
 			child_carDevId.setText(carTable.get(groupPosition).get(childPosition).devId);
-			child_carImg.setImageResource(R.drawable.car);
+			child_carImg.setImageResource(carTable.get(groupPosition).get(childPosition).isAlive()?R.drawable.car_online:R.drawable.car_offline);
 			// 判断item的位置是否相同，如相同，则表示为选中状态，更改其背景颜色，如不相同，则设置背景色为白色
 			if (child_groupId == groupPosition
 					&& child_childId == childPosition) {
@@ -326,9 +335,9 @@ public class CarGroupListActivity extends Activity{
             	}
         	}else if(msg.what==NetworkAdapter.MSG_CARGROUPINFO){
         		Bundle b = msg.getData();
-            	carGroupList = (CarGroup[]) b.getParcelableArray("carGroupList");
+            	ta.carGroupList = (CarGroup[]) b.getParcelableArray("carGroupList");
             	
-            	if(carGroupList.length>0){
+            	if(ta.carGroupList.length>0){
             		// 为列表绑定数据源
             		flag=0;
                 	
@@ -338,33 +347,30 @@ public class CarGroupListActivity extends Activity{
                 	return;
             	}
 //            	Toast.makeText(CarGroupListActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+        	}else if(msg.what==CNetworkAdapter.MSG_POSITION){
+        		
+        		Bundle b = msg.getData();
+        		if(ta.carList!=null){
+        			updateCarAlive(ta.carList,b.getString("devid"));
+        		}
+        		if(ta.carList!=null&&ta.carGroupList!=null){
+        			initCarTable(ta.carList,ta.carGroupList);
+        		}
+        		
+        		((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
+        		
         	}else if (msg.what==TIME_LIMIT){
+        	
 	           	 pd.dismiss();
 	        	 Toast.makeText(CarGroupListActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
 	        	 return;
-	         }
+	        }
         	
         	
-        	if((carList!=null)&&(carGroupList!=null)&&(flag==0)){
+        	if((ta.carList!=null)&&(ta.carGroupList!=null)&&(flag==0)){
         		
-        		for (int ii=0; ii<carGroupList.length;ii++){
-        			carGroupArry.add(carGroupList[ii]);
-        		}
-        		
-        		
-        		
-        		for (int ii=0; ii<carGroupList.length;ii++){
-        			List<Car> tempCarList= new ArrayList<Car>();
-        			
-        			for (int jj=0; jj<carList.length;jj++){
-        				if(Integer.parseInt(carList[jj].carGroupId)==carGroupList[ii].vehGroupID)
-        					tempCarList.add(carList[jj]);
-        			}
-        			
-        			
-        			carTable.add(tempCarList);
-        		}
-        		expandableListView.setAdapter(adapter);
+        		initCarTable(ta.carList,ta.carGroupList);
+        		((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
         		flag=1;
         		pd.dismiss();// 关闭ProgressDialog
         		timer.cancel();
@@ -374,6 +380,40 @@ public class CarGroupListActivity extends Activity{
          }
         	
  };
+ 
+ 
+ 	private void initCarTable(Car[] carList,CarGroup[] carGroupList){
+ 		carGroupArry.clear();
+ 		carTable.clear();
+ 		
+ 		for (int ii=0; ii<carGroupList.length;ii++){
+			carGroupArry.add(carGroupList[ii]);
+		}
+		
+		
+		
+		for (int ii=0; ii<carGroupList.length;ii++){
+			List<Car> tempCarList= new ArrayList<Car>();
+			
+			for (int jj=0; jj<carList.length;jj++){
+				if(Integer.parseInt(carList[jj].carGroupId)==carGroupList[ii].vehGroupID)
+					tempCarList.add(carList[jj]);
+			}
+			
+			
+			carTable.add(tempCarList);
+		}
+ 	}
+ 	
+ 	
+	 private void updateCarAlive(Car[] carList,String devId){
+		 for (int ii=0;ii<carList.length;ii++){
+			 if(carList[ii].devId.equals(devId)){
+				 carList[ii].setAlive(true);
+				 return;
+			 }
+		 }
+	 }
 
 }
 
