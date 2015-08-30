@@ -9,34 +9,33 @@ import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.util.Log;
 
 public class TrackApp extends Application{
 	
-	public static NetworkAdapter na = null;
-	public static CNetworkAdapter nac = null;
-	public HeartBeat hb = null;
-	public Handler handler = null;
+	
+	public static Handler curHandler = null;
 	
 	public static User  user = null;
 	public static Login  login = null;
 	public static Car[] carList = null;
 	public static CarGroup[] carGroupList=null;
 	public static Car currentCar = null;
-	
 	public static String curPassword = null;
+	public static NetWorkService nws = null;
 	
-	
-	public Handler getHandler() {
-		return handler;
+	public static Handler getHandler() {
+		return curHandler;
 	}
 
 
-	public void setHandler(Handler handler) {
-		this.handler = handler;
-		na.handler = this.handler;
-		nac.handler = this.handler;
+	public static void setHandler(Handler handler) {
+		curHandler = handler;
+//		na.handler = this.handler;
+//		nac.handler = this.handler;
 		
 	
 	}
@@ -47,39 +46,9 @@ public class TrackApp extends Application{
         super.onCreate();
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects().detectLeakedClosableObjects().penaltyLog().penaltyDeath().build());
-        na = new NetworkAdapter("61.145.122.143",4519);
-    	nac = new CNetworkAdapter("61.145.122.143",4508);
-    	na.start();
-    	nac.start();
-    	hb = new HeartBeat();
-		MsgEventHandler.config(na, nac);
-		
-		
-		
-		new Thread(){
-			
-			public void run(){
-				while(true){
-					if(na.socket.isClosed()){
-						na.reConnect();
-					}
-					
-					if(nac.socket.isClosed()){
-						nac.reConnect();
-					}
-					try {
-						Thread.sleep(40000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-			}
-		}.start();
+      
         
     }
-	
 	
 	
 	

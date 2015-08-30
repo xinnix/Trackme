@@ -39,13 +39,12 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class ReplayActivity extends Activity {
-	private TrackApp ta = null ;
+public class ReplayActivity extends BaseActivity {
+
 	private MapView mMapView;
 	private AMap mAmap;
 	private Polyline mVirtureRoad;
 	private Marker mMoveMarker;
-	private ProgressDialog pd = null;
 	private ToggleButton tbSatelite = null;
 	private Button tbPlay = null;
 	private Button tbStop = null;
@@ -59,8 +58,6 @@ public class ReplayActivity extends Activity {
 	private Track[] trackList = null;
 	
 	//超时相关控制
-	private Timer timer = null;
-	private static final int TIME_LIMIT = 8000;
 	MyThread moveThread= null ;
 	
 	
@@ -69,19 +66,8 @@ public class ReplayActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_reply);
-		mMapView = (MapView) findViewById(R.id.replymap);
-
 		mMapView.onCreate(savedInstanceState);
-		mAmap = mMapView.getMap();
-		//mAmap.setPointToCenter((int) (22.90923 * 1E6), (int) (116.397428 * 1E6));
-		tbSatelite = (ToggleButton)findViewById(R.id.btSatelite);
-		tbPlay = (Button)findViewById(R.id.btPlay);
-		tbStop = (Button)findViewById(R.id.btStop);
-		sbSpeed = (SeekBar)findViewById(R.id.speedSeekBar);
-		la = (GridLayout)findViewById(R.id.replayGridLayout);
 		
-		la.setBackgroundColor(Color.WHITE);
 		
 		Intent intent = this.getIntent();
 		int carId = intent.getIntExtra("carId", 0);
@@ -89,113 +75,45 @@ public class ReplayActivity extends Activity {
 		String endDate = intent.getStringExtra("endDate");
 		
 		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
-		
-		pd = new ProgressDialog(ReplayActivity.this);
-		pd.setMessage("历史轨迹获取中...");
-		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		pd.show();
-		
-		timer = new Timer();
-		timer.schedule(new TimerTask(){
-
-			@Override
-			public void run() {
-				handler.sendEmptyMessage(TIME_LIMIT);	
-			}
-			
-		}, TIME_LIMIT);
+		showProgressDialog("历史轨迹获取中...");
+		timerStart();
 		moveThread=new MyThread() ;
 		
 		//mAmap.moveCamera(CameraUpdateFactory.zoomTo(10));
-		sbSpeed.setMax(1000);
-		
-		sbSpeed.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
-
-			@Override
-			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar arg0) {
-				
-				
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar sb) {
-				// TODO Auto-generated method stub
-				TIME_INTERVAL=sb.getProgress()+100;
-			}
-			
-		});
-		
-		
-		tbSatelite.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				if(tbSatelite.isChecked()){
-					mAmap.setMapType(AMap.MAP_TYPE_SATELLITE);
-				}else{
-					mAmap.setMapType(AMap.MAP_TYPE_NORMAL);
-				}
-				
-			}
-			
-		});
-		
-		tbPlay.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				moveThread.setControl(1);
-			}
-			
-		});
-		tbStop.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				moveThread.setControl(0);
-			}
-			
-		});
 		
 	}
 	
 
-	private  Handler handler = new Handler() {  
-	        @Override  
-	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-	         if(msg.what==NetworkAdapter.MSG_TRACK){
-	        	 pd.dismiss();
-	        	 timer.cancel();
-	        	 Bundle b = msg.getData();
-		        	Track[] trackList = (Track[]) b.getParcelableArray("trackList");
-		        	initRoadData(trackList);
-		        	pd.dismiss();// 关闭ProgressDialog
-		        	if (mVirtureRoad.getPoints().size()>1){
-		        		
-		        		moveThread.start();
-		        		Toast.makeText(ReplayActivity.this, "单击播放按钮回放历史轨迹",Toast.LENGTH_SHORT).show();
-		        	}else{
-		        		Toast.makeText(ReplayActivity.this, "这段时间处于停车状态",Toast.LENGTH_SHORT).show();
-		        		return;
-		        	}
-		    		// 关闭ProgressDialog
-		    		
-	         }else if (msg.what==NetworkAdapter.MSG_FAIL){
-	        	 pd.dismiss();
-	        	 timer.cancel();
-	        	 Toast.makeText(ReplayActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
-	         }else if (msg.what==TIME_LIMIT){
-	        	 pd.dismiss();
-	        	 Toast.makeText(ReplayActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
-	        	 return;
-	         }
-	        }
-	        	
-	 };
+//	private  Handler handler = new Handler() {  
+//	        @Override  
+//	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
+//	         if(msg.what==NetworkAdapter.MSG_TRACK){
+//	        	 dismissProgressDialog();
+//	        	 timerStop();
+//	        	 Bundle b = msg.getData();
+//	        	 Track[] trackList = (Track[]) b.getParcelableArray("trackList");
+//	        	 initRoadData(trackList);
+//			     if (mVirtureRoad.getPoints().size()>1){
+//			        moveThread.start();
+//			        showMessage("单击播放按钮回放历史轨迹");
+//			     }else{
+//			    	 showMessage("这段时间处于停车状态");
+//			        return;
+//			      }
+//		    		// 关闭ProgressDialog
+//		    		
+//	         }else if (msg.what==NetworkAdapter.MSG_FAIL){
+//	        	 dismissProgressDialog();
+//	        	 timerStop();
+//	        	 showMessage("获取数据错误或数据库无数据");
+//	         }else if (msg.what==TIME_OUT){
+//	        	 dismissProgressDialog();
+//	        	 showMessage("设备关机或网络状况导致数据返回超时");
+//	        	 return;
+//	         }
+//	       }
+//	        	
+//	 };
 	private void initRoadData(Track[] tracklist) {
 		// 116.504505 39.931057
 	//	double centerLatitude = 39.916049;
@@ -346,8 +264,6 @@ public class ReplayActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		mMapView.onResume();
-		ta = (TrackApp)getApplication();
-	    ta.setHandler(handler);
 	    Log.i("test", "onResume");
 	}
 
@@ -477,6 +393,125 @@ public class ReplayActivity extends Activity {
 
 	}
 	//画图线程
+
+	@Override
+	public void initWidget() {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.activity_reply);
+		mMapView = (MapView) findViewById(R.id.replymap);	
+		mAmap = mMapView.getMap();
+		//mAmap.setPointToCenter((int) (22.90923 * 1E6), (int) (116.397428 * 1E6));
+		tbSatelite = (ToggleButton)findViewById(R.id.btSatelite);
+		tbPlay = (Button)findViewById(R.id.btPlay);
+		tbStop = (Button)findViewById(R.id.btStop);
+		sbSpeed = (SeekBar)findViewById(R.id.speedSeekBar);
+		la = (GridLayout)findViewById(R.id.replayGridLayout);
+		la.setBackgroundColor(Color.WHITE);
+		sbSpeed.setMax(1000);
+		
+		sbSpeed.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+
+			@Override
+			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar arg0) {
+				
+				
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar sb) {
+				// TODO Auto-generated method stub
+				TIME_INTERVAL=sb.getProgress()+100;
+			}
+			
+		});
+		
+		
+		tbSatelite.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				if(tbSatelite.isChecked()){
+					mAmap.setMapType(AMap.MAP_TYPE_SATELLITE);
+				}else{
+					mAmap.setMapType(AMap.MAP_TYPE_NORMAL);
+				}
+				
+			}
+			
+		});
+		
+		tbPlay.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				moveThread.setControl(1);
+			}
+			
+		});
+		tbStop.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				moveThread.setControl(0);
+			}
+			
+		});
+		
+	}
+
+	@Override
+	public void widgetClick(View v) {
+		// TODO Auto-generated method stub
+		switch(v.getId()){
+		case R.id.btPlay:
+			moveThread.setControl(1);
+			break;
+		case R.id.btStop:
+			moveThread.setControl(0);
+			break;
+		case R.id.btSatelite:
+			if(tbSatelite.isChecked()){
+				mAmap.setMapType(AMap.MAP_TYPE_SATELLITE);
+			}else{
+				mAmap.setMapType(AMap.MAP_TYPE_NORMAL);
+			}
+			break;
+		}
+	}
+
+	@Override
+	public void handleMsg(Message msg) {
+		// TODO Auto-generated method stub
+		if(msg.what==NetworkAdapter.MSG_TRACK){
+       	 dismissProgressDialog();
+       	 timerStop();
+       	 Bundle b = msg.getData();
+       	 Track[] trackList = (Track[]) b.getParcelableArray("trackList");
+       	 initRoadData(trackList);
+		     if (mVirtureRoad.getPoints().size()>1){
+		        moveThread.start();
+		        showMessage("单击播放按钮回放历史轨迹");
+		     }else{
+		    	 showMessage("这段时间处于停车状态");
+		        return;
+		      }
+	    		// 关闭ProgressDialog
+	    		
+        }else if (msg.what==NetworkAdapter.MSG_FAIL){
+       	 dismissProgressDialog();
+       	 timerStop();
+       	 showMessage("获取数据错误或数据库无数据");
+        }else if (msg.what==TIME_OUT){
+       	 dismissProgressDialog();
+       	 showMessage("设备关机或网络状况导致数据返回超时");
+       	 return;
+        }
+     }
+	
 	
 //	public void moveLooper() {
 		

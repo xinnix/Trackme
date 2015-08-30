@@ -345,7 +345,7 @@ public class MsgEventHandler {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		System.out.println(ByteHexUtil.bytesToHexString(bis.toByteArray()));
+		Log.i("position", ByteHexUtil.bytesToHexString(bis.toByteArray()));
 		
 		cna.sendPacket(bis.toByteArray());
 		

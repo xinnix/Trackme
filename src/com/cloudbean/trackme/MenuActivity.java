@@ -6,7 +6,7 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-
+import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -16,8 +16,8 @@ import android.widget.Toast;
 
 
  
-public class MenuActivity extends Activity {
-	
+public class MenuActivity extends BaseActivity {
+	private GridView gridview;
 	public String[] menuItems={"实时定位","历史轨迹","报警列表","指令下发","注销"};
 	public int[] icon = {R.drawable.menu_trace,R.drawable.menu_replay,R.drawable.menu_alarm,R.drawable.menu_command,R.drawable.menu_exit};
 	Intent intent = null;
@@ -25,12 +25,11 @@ public class MenuActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_menu);
         
         
         intent = this.getIntent();
         
-        GridView gridview = (GridView) findViewById(R.id.GridView);
+        
         ArrayList<HashMap<String, Object>> meumList = new ArrayList<HashMap<String, Object>>();
         for(int i = 0;i < menuItems.length;i++)
         {
@@ -82,4 +81,20 @@ public class MenuActivity extends Activity {
                     }
                 );
     }
+	@Override
+	public void initWidget() {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.activity_menu);
+		gridview = (GridView) findViewById(R.id.GridView);
+	}
+	@Override
+	public void widgetClick(View v) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void handleMsg(Message msg) {
+		// TODO Auto-generated method stub
+		
+	}
 }

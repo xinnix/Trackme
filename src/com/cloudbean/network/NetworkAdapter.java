@@ -12,28 +12,18 @@ import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.packet.DPacketParser;
 import com.cloudbean.trackerUtil.ByteHexUtil;
+import com.cloudbean.trackme.TrackApp;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-public class NetworkAdapter extends Thread {
-	public static Socket socket;
-	public static OutputStream outputStream;
-	public static InputStream inputStream;
-	public byte[] sendBuffer;
-	public byte[] recieveBuffer = new byte[100000];
-	public Handler handler = null;
+public class NetworkAdapter extends BaseNetworkAdapter {
+
+
 	
 	public Message msg = null;
 	public Bundle bundle =null;
-	
-	private String serverIP = null;
-	private int port = 0;
-	
-	
-	
-	
 
 	public static int MSG_FAIL = 0x1000;
 	public static int MSG_LOGIN = 0x1001;
@@ -42,57 +32,16 @@ public class NetworkAdapter extends Thread {
 	public static int MSG_TRACK = 0x1004;
 	public static int MSG_ALARM = 0x1005;
 	
-	 public NetworkAdapter(String serverIP,int port){
-		 super();
-		 this.serverIP = serverIP;
-		 this.port = port;
-		 try{
-			 socket = new Socket(InetAddress.getByName(serverIP),port);
-			 outputStream = socket.getOutputStream();
-			 inputStream = socket.getInputStream();
-		 }catch(Exception e){
-			 e.printStackTrace();
-		 }
-		 
-	 }
-	 
-	 
-	 public void reConnect(){
-		 try{
-			 socket = new Socket(InetAddress.getByName(this.serverIP),this.port);
-			 outputStream = socket.getOutputStream();
-			 inputStream = socket.getInputStream();
-		 }catch(Exception e){
-			 e.printStackTrace();
-		 }
-		 
-	 }
-	 
-	 
-	 
-	 
-	 
+	 public NetworkAdapter(final String serverIP,final int port){
+		 super(serverIP,port);
+		 connect();
+	}
+	
 	 public NetworkAdapter(byte[] packet){
-		 super();
-		 this.sendBuffer= packet;
+		 super(packet);
 	 }
-	 
-	 
-	 public void sendPacket(byte[] packet){
-		 try{
-			 this.sendBuffer = packet;
-			 outputStream.write(packet);
-			 outputStream.flush();
-		 }catch(Exception e){
-			 e.printStackTrace();
-		 }
-		 
-	 }
-	 
-	 public void setHandler(Handler hd){
-		 handler = hd;
-	 }
-	 public byte[] preParser(InputStream inputStream){
+
+	 public byte[] preParser(InputStream inputStream) throws Exception{
 		 DataInputStream dis = new DataInputStream((new BufferedInputStream(inputStream)));
 		 ByteArrayOutputStream  bos = new ByteArrayOutputStream();
 		 try{
@@ -106,93 +55,177 @@ public class NetworkAdapter extends Thread {
 			 
 			 
 		 }catch(Exception e){
-			 e.printStackTrace();
+			 throw e;
 		 }
 		 return bos.toByteArray();
 	 }
-	 public void run(){
-		 while(true){
-			 try{
-				 
-				 byte[] packetByte  = preParser(inputStream);
-				 
-				// System.out.println(len);
-				// System.out.println(ByteHexUtil.bytesToHexString(Arrays.copyOfRange(recieveBuffer,0,len)));
-				 
-					 
-					 DPacketParser dp = new DPacketParser(packetByte);
-					 switch (dp.pktSignal){
-					 case DPacketParser.SIGNAL_RE_LOGIN:
-						 
-						 Login l = MsgEventHandler.rLogin(dp);	
-						 msg = handler.obtainMessage(); 
-						 bundle = new Bundle();
-						 bundle.putParcelable("login", l);
-						 msg.setData(bundle);
-						 msg.what = MSG_LOGIN;
-						 handler.sendMessage(msg);
-						
-						 break;
-					 case DPacketParser.SIGNAL_RE_HEARTBEAT:
-						 System.out.println("heart beat");
-						 break;
-					 case DPacketParser.SIGNAL_RE_GETCARGROUP:
-						 CarGroup[] carGroupList = MsgEventHandler.rGetCarGroup(dp);
-						 msg = handler.obtainMessage(); 
-						 bundle = new Bundle();
-						 bundle.putParcelableArray("carGroupList", carGroupList);
-						 msg.setData(bundle);
-						 msg.what = MSG_CARGROUPINFO;
-						 handler.sendMessage(msg);
-						 break;
-					 case DPacketParser.SIGNAL_RE_GETUSERINFO:
-						 MsgEventHandler.rGetUserInfo(dp);
-						 break;
-					 case DPacketParser.SIGNAL_RE_GETCARINFO:
-						 Car[] carList=MsgEventHandler.rGetCarInfo(dp);
-						 msg = handler.obtainMessage(); 
-						 bundle = new Bundle();
-						 bundle.putParcelableArray("carList", carList);
-						 msg.setData(bundle);
-						 msg.what = MSG_CARINFO;
-						 handler.sendMessage(msg);
-						 
-						 break;
-					 case DPacketParser.SIGNAL_RE_GETCARTRACK:
-						 Track[] trackList = MsgEventHandler.rGetCarTrack(dp);	
-						 msg = handler.obtainMessage(); 
-						 bundle = new Bundle();
-						 bundle.putParcelableArray("trackList", trackList);
-						 msg.setData(bundle);
-						 msg.what = MSG_TRACK;
-						 handler.sendMessage(msg);
-						 break;
-					 case DPacketParser.SIGNAL_RE_GETALARMLIST:
-						 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
-						 msg = handler.obtainMessage(); 
-						 bundle = new Bundle();
-						 bundle.putParcelableArray("alarmlist", alarmList);
-						 msg.setData(bundle);
-						 msg.what = MSG_ALARM;
-						 handler.sendMessage(msg);
-						 break;	
-					 case DPacketParser.SIGNAL_FAIL:
-						 MsgEventHandler.rFail(dp);
-						 msg = handler.obtainMessage(); 
-						 handler.sendEmptyMessage(MSG_FAIL);
-						 break;
-					 
-					 }
-				
-				 
+//	 public void run(){
+//		 while(true){
+//			 try{
+//				 
+//				 byte[] packetByte  = preParser(inputStream);
+//				 
+//				// System.out.println(len);
+//				// System.out.println(ByteHexUtil.bytesToHexString(Arrays.copyOfRange(recieveBuffer,0,len)));
+//				 
+//					 
+//					 DPacketParser dp = new DPacketParser(packetByte);
+//					 switch (dp.pktSignal){
+//					 case DPacketParser.SIGNAL_RE_LOGIN:
+//						 
+//						 Login l = MsgEventHandler.rLogin(dp);	
+//						 msg = TrackApp.curHandler.obtainMessage(); 
+//						 bundle = new Bundle();
+//						 bundle.putParcelable("login", l);
+//						 msg.setData(bundle);
+//						 msg.what = MSG_LOGIN;
+//						 TrackApp.curHandler.sendMessage(msg);
+//						
+//						 break;
+//					 case DPacketParser.SIGNAL_RE_HEARTBEAT:
+//						 System.out.println("heart beat");
+//						 break;
+//					 case DPacketParser.SIGNAL_RE_GETCARGROUP:
+//						 CarGroup[] carGroupList = MsgEventHandler.rGetCarGroup(dp);
+//						 msg = TrackApp.curHandler.obtainMessage(); 
+//						 bundle = new Bundle();
+//						 bundle.putParcelableArray("carGroupList", carGroupList);
+//						 msg.setData(bundle);
+//						 msg.what = MSG_CARGROUPINFO;
+//						 TrackApp.curHandler.sendMessage(msg);
+//						 break;
+//					 case DPacketParser.SIGNAL_RE_GETUSERINFO:
+//						 MsgEventHandler.rGetUserInfo(dp);
+//						 break;
+//					 case DPacketParser.SIGNAL_RE_GETCARINFO:
+//						 Car[] carList=MsgEventHandler.rGetCarInfo(dp);
+//						 msg = TrackApp.curHandler.obtainMessage(); 
+//						 bundle = new Bundle();
+//						 bundle.putParcelableArray("carList", carList);
+//						 msg.setData(bundle);
+//						 msg.what = MSG_CARINFO;
+//						 TrackApp.curHandler.sendMessage(msg);
+//						 
+//						 break;
+//					 case DPacketParser.SIGNAL_RE_GETCARTRACK:
+//						 Track[] trackList = MsgEventHandler.rGetCarTrack(dp);	
+//						 msg = TrackApp.curHandler.obtainMessage(); 
+//						 bundle = new Bundle();
+//						 bundle.putParcelableArray("trackList", trackList);
+//						 msg.setData(bundle);
+//						 msg.what = MSG_TRACK;
+//						 TrackApp.curHandler.sendMessage(msg);
+//						 break;
+//					 case DPacketParser.SIGNAL_RE_GETALARMLIST:
+//						 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
+//						 msg = TrackApp.curHandler.obtainMessage(); 
+//						 bundle = new Bundle();
+//						 bundle.putParcelableArray("alarmlist", alarmList);
+//						 msg.setData(bundle);
+//						 msg.what = MSG_ALARM;
+//						 TrackApp.curHandler.sendMessage(msg);
+//						 break;	
+//					 case DPacketParser.SIGNAL_FAIL:
+//						 MsgEventHandler.rFail(dp);
+//						 msg = TrackApp.curHandler.obtainMessage(); 
+//						 break;
+//					 
+//					 }
+//				
+//				 
+//
+//			 }catch(Exception e ){
+//				e.printStackTrace(); 
+//			 }
+//			 	  
+//		 }
+//			
+//	 }
 
-			 }catch(Exception e ){
-				e.printStackTrace(); 
-			 }
-			 	  
-		 }
+
+	@Override
+	public void recivePacket() throws Exception {
+		// TODO Auto-generated method stub
+
+		 try{
+			 
+			 byte[] packetByte  = preParser(inputStream);
+			 
+			// System.out.println(len);
+			// System.out.println(ByteHexUtil.bytesToHexString(Arrays.copyOfRange(recieveBuffer,0,len)));
+			 
+				 
+				 DPacketParser dp = new DPacketParser(packetByte);
+				 switch (dp.pktSignal){
+				 case DPacketParser.SIGNAL_RE_LOGIN:
+					 
+					 Login l = MsgEventHandler.rLogin(dp);	
+					 msg = TrackApp.curHandler.obtainMessage(); 
+					 bundle = new Bundle();
+					 bundle.putParcelable("login", l);
+					 msg.setData(bundle);
+					 msg.what = MSG_LOGIN;
+					 TrackApp.curHandler.sendMessage(msg);
+					
+					 break;
+				 case DPacketParser.SIGNAL_RE_HEARTBEAT:
+					 System.out.println("heart beat");
+					 break;
+				 case DPacketParser.SIGNAL_RE_GETCARGROUP:
+					 CarGroup[] carGroupList = MsgEventHandler.rGetCarGroup(dp);
+					 msg = TrackApp.curHandler.obtainMessage(); 
+					 bundle = new Bundle();
+					 bundle.putParcelableArray("carGroupList", carGroupList);
+					 msg.setData(bundle);
+					 msg.what = MSG_CARGROUPINFO;
+					 TrackApp.curHandler.sendMessage(msg);
+					 break;
+				 case DPacketParser.SIGNAL_RE_GETUSERINFO:
+					 MsgEventHandler.rGetUserInfo(dp);
+					 break;
+				 case DPacketParser.SIGNAL_RE_GETCARINFO:
+					 Car[] carList=MsgEventHandler.rGetCarInfo(dp);
+					 msg = TrackApp.curHandler.obtainMessage(); 
+					 bundle = new Bundle();
+					 bundle.putParcelableArray("carList", carList);
+					 msg.setData(bundle);
+					 msg.what = MSG_CARINFO;
+					 TrackApp.curHandler.sendMessage(msg);
+					 
+					 break;
+				 case DPacketParser.SIGNAL_RE_GETCARTRACK:
+					 Track[] trackList = MsgEventHandler.rGetCarTrack(dp);	
+					 msg = TrackApp.curHandler.obtainMessage(); 
+					 bundle = new Bundle();
+					 bundle.putParcelableArray("trackList", trackList);
+					 msg.setData(bundle);
+					 msg.what = MSG_TRACK;
+					 TrackApp.curHandler.sendMessage(msg);
+					 break;
+				 case DPacketParser.SIGNAL_RE_GETALARMLIST:
+					 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
+					 msg = TrackApp.curHandler.obtainMessage(); 
+					 bundle = new Bundle();
+					 bundle.putParcelableArray("alarmlist", alarmList);
+					 msg.setData(bundle);
+					 msg.what = MSG_ALARM;
+					 TrackApp.curHandler.sendMessage(msg);
+					 break;	
+				 case DPacketParser.SIGNAL_FAIL:
+					 MsgEventHandler.rFail(dp);
+					 msg = TrackApp.curHandler.obtainMessage(); 
+					 break;
+				 
+				 }
 			
-	 }
+			 
+
+		 }catch(Exception e ){
+			throw e; 
+		 }
+		 	  
+	 
+	}
 	
 
 }

@@ -11,13 +11,13 @@ import com.cloudbean.packet.DPacketParser;
 public class Util {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-//		
-		NetworkAdapter na = new NetworkAdapter("61.145.122.143",4519);
-		CNetworkAdapter nac = new CNetworkAdapter("61.145.122.143",4508);
-		na.start();
-		nac.start();
-		MsgEventHandler.config(na,nac);
+//		// TODO Auto-generated method stub
+////		
+////		NetworkAdapter na = new NetworkAdapter("61.145.122.143",4519);
+////		CNetworkAdapter nac = new CNetworkAdapter("61.145.122.143",4508);
+//		na.start();
+//		nac.start();
+//		MsgEventHandler.config(na,nac);
 		//MsgEventHandler.sLogin("lkk", "lkk");
 		//HeartBeat hb = new HeartBeat();
 		//hb.start();

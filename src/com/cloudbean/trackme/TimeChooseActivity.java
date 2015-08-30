@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.trackerUtil.DateTimePickDialogUtil;
 
 import android.app.Activity;
@@ -16,6 +17,7 @@ import android.content.DialogInterface;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,14 +27,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class TimeChooseActivity extends Activity{
+public class TimeChooseActivity extends BaseActivity{
 	
 
 
 
 	private static boolean isShow = true;
 	private EditText etDateText = null ;
-	
 	private EditText etPeriodText = null ;
 	private Button btReply = null;
 	
@@ -44,7 +45,7 @@ public class TimeChooseActivity extends Activity{
 			"9小时","10小时","11小时","12小时","13小时","14小时","15小时","16小时",
 			"17小时","18小时","19小时","20小时","21小时","22小时","23小时","24小时"}; 
 
-	public static String subDateHour(String day, int x)//返回的是字符串型的时间，输入的 
+	private static String subDateHour(String day, int x)//返回的是字符串型的时间，输入的 
 	//是String day, int x 
 	 {    
 	        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 24小时制   
@@ -72,12 +73,7 @@ public class TimeChooseActivity extends Activity{
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		
-		setContentView(R.layout.activity_timechoose);		
-		etDateText = (EditText)findViewById(R.id.etDateText);		
-		etPeriodText = (EditText)findViewById(R.id.etPeriodText);
-		btReply = (Button)findViewById(R.id.btReply);
-		
+
 		Date d= new Date();
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		etDateText.setText(format.format(d));
@@ -85,28 +81,7 @@ public class TimeChooseActivity extends Activity{
 		Bundle b  = intent.getExtras();
 		carId = b.getInt("carid");
 		
-		btReply.setOnClickListener(new OnClickListener(){
-
-			
-			@Override
-			public void onClick(View v) {
-				String startDate = etDateText.getText().toString();// TODO Auto-generated method stub
-				String period = etPeriodText.getText().toString();
-				
-				String endDate=subDateHour(startDate,Integer.parseInt(period.substring(0, period.length()-2)));
-				Log.i("date", endDate);
-				int carId = TimeChooseActivity.this.carId;
-				
-				Intent intent = new Intent();
-				intent.setClass(TimeChooseActivity.this, ReplayActivity.class);
-				intent.putExtra("startDate", startDate);
-				intent.putExtra("endDate", endDate);
-				intent.putExtra("carId", carId);
-				startActivity(intent);
-				
-			}
-			
-		});
+		
 		
 		
 		etDateText.setOnTouchListener(new View.OnTouchListener(){
@@ -188,6 +163,48 @@ public class TimeChooseActivity extends Activity{
 			
 		});
 		
+		
+	}
+
+
+	@Override
+	public void initWidget() {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.activity_timechoose);		
+		etDateText = (EditText)findViewById(R.id.etDateText);		
+		etPeriodText = (EditText)findViewById(R.id.etPeriodText);
+		btReply = (Button)findViewById(R.id.btReply);
+		btReply.setOnClickListener(this);
+	}
+
+
+	@Override
+	public void widgetClick(View v) {
+		// TODO Auto-generated method stub
+		switch(v.getId()){
+		case R.id.btReply:
+			String startDate = etDateText.getText().toString();// TODO Auto-generated method stub
+			String period = etPeriodText.getText().toString();
+			
+			String endDate=subDateHour(startDate,Integer.parseInt(period.substring(0, period.length()-2)));
+			Log.i("date", endDate);
+//			int carId = TimeChooseActivity.this.carId;
+			
+			Intent intent = new Intent();
+			intent.setClass(TimeChooseActivity.this, ReplayActivity.class);
+			intent.putExtra("startDate", startDate);
+			intent.putExtra("endDate", endDate);
+			intent.putExtra("carId", Integer.parseInt(TrackApp.currentCar.id));
+			startActivity(intent);
+			break;
+		
+		}
+	}
+
+
+	@Override
+	public void handleMsg(Message msg) {
+		// TODO Auto-generated method stub
 		
 	}
 

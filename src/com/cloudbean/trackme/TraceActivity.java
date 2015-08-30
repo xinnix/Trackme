@@ -40,22 +40,20 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class TraceActivity extends Activity implements OnGeocodeSearchListener {
+public class TraceActivity extends BaseActivity implements OnGeocodeSearchListener {
 	
-	private MapView mapView;
-    private AMap aMap;
-    TrackApp ta  = null;
+	private MapView mapView = null;
+    private AMap aMap = null;
     private Marker mMoveMarker = null;
 	private ProgressDialog pd = null;
 	private ToggleButton tbSatelite = null;
-	private String addressName;
-	private GeocodeSearch geocoderSearch;
+	private String addressName = null;
+	private GeocodeSearch geocoderSearch = null;
 	
 	private final int ADDRESS_COMPLETE = 0x3001;
 	
-	//超时相关控制
-	private Timer timer = null;
-	private static final int TIME_LIMIT = 10000;
+	
+	
 	
 	
 	double lat;
@@ -69,56 +67,17 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_trace);
-		mapView = (MapView) findViewById(R.id.map);
-		
 		mapView.onCreate(savedInstanceState);// 必须要写
-	    aMap = mapView.getMap();
-	    tbSatelite = (ToggleButton)findViewById(R.id.btTrace_Satelite);
 //	    geocoderSearch = new GeocodeSearch(this);
 //		geocoderSearch.setOnGeocodeSearchListener(this);
-	    pd = new ProgressDialog(TraceActivity.this);
-		pd.setMessage("定位中...");
-		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		pd.setCancelable(false);
-		pd.show();
-	    
-	    tbSatelite.setOnClickListener(new OnClickListener(){
-	    
-			@Override
-			public void onClick(View v) {
-				if(tbSatelite.isChecked()){
-					aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
-				}else{
-					aMap.setMapType(AMap.MAP_TYPE_NORMAL);
-				}
-				
-			}
-			
-		});
-	
-	    
-	   
+	    showProgressDialog("定位中...");
 	}
 
 	protected void onResume() {
 		super.onResume();
 		mapView.onResume();
-		
-		ta = (TrackApp)getApplication();
-	    ta.setHandler(handler);
-		MsgEventHandler.c_sGetCarPosition(ta.currentCar);	
-		
-		
-		timer = new Timer();
-		timer.schedule(new TimerTask(){
-
-			@Override
-			public void run() {
-				handler.sendEmptyMessage(TIME_LIMIT);	
-			}
-			
-		}, TIME_LIMIT);
+		MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);	
+		timerStart();
 	
 	    
 	}
@@ -142,69 +101,69 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
 	}
 	
 	
-    private  Handler handler = new Handler() {  
-        @Override  
-        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-         if(msg.what==CNetworkAdapter.MSG_POSITION){
-        	 Bundle b = msg.getData();
-        	 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			 String devid = b.getString("devid");
-			 if(devid.equals(ta.currentCar.devId)){
-				 	ta.currentCar.setAlive(true);
-					 lat = b.getDouble("lat");
-		        	 lon = b.getDouble("lon");
-		        	 speed = b.getString("speed");
-		        	 distant = b.getString("ditant");
-					 date = format.format(new Date());
-					 voltage = b.getString("voltage");
-					 gsmStrength = b.getString("gsmStrength");
-					 double[] correctCoordinate = new double[2];
-					 GpsCorrect.transform(lat, lon, correctCoordinate);
-					 
-					 
-//					 LatLonPoint latLonPoint =new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
-//					 RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200,GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
-//					 geocoderSearch.getFromLocationAsyn(query);// 设置同步逆地理编码请求
-					 
-					
-						
-					
-				 	MarkerOptions markerOptions = new MarkerOptions();
-					markerOptions.anchor(0.5f, 0.5f);
-					markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_trace));
-					mMoveMarker = aMap.addMarker(markerOptions);
-					mMoveMarker.setPosition(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-					aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]), 14)); 
-					 mMoveMarker.setTitle("设备信息");
-					 mMoveMarker.setSnippet(
-						"设备名称："+ta.currentCar.name+"\n"+
-						"坐标："+lat+"%"+lon+"\n"+
-						"速度："+speed.substring(0,4)+"km/h"+"\n"+
-						"距离："+distant+"km"+"\n"+
-						"更新时间："+date+"\n"+
-						"电压："+voltage+"\n"+
-						"信号强度"+gsmStrength);
-					mMoveMarker.showInfoWindow();
-					timer.cancel();
-					pd.dismiss();// 关闭ProgressDialog 
-			 }
-					
-         }else if (msg.what==ADDRESS_COMPLETE){
-        	 	
-         }
-         else if (msg.what==NetworkAdapter.MSG_FAIL){
-        	 timer.cancel();
-        	 pd.dismiss();
-        	 Toast.makeText(TraceActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
-         }else if (msg.what==TIME_LIMIT){
-        	 pd.dismiss();
-        	 Toast.makeText(TraceActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
-        	 return;
-         }
-        	
-        }
-        	
- };
+//    private  Handler handler = new Handler() {  
+//        @Override  
+//        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
+//         if(msg.what==CNetworkAdapter.MSG_POSITION){
+//        	 Bundle b = msg.getData();
+//        	 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//			 String devid = b.getString("devid");
+//			 if(devid.equals(TrackApp.currentCar.devId)){
+//				 	TrackApp.currentCar.setAlive(true);
+//					 lat = b.getDouble("lat");
+//		        	 lon = b.getDouble("lon");
+//		        	 speed = b.getString("speed");
+//		        	 distant = b.getString("ditant");
+//					 date = format.format(new Date());
+//					 voltage = b.getString("voltage");
+//					 gsmStrength = b.getString("gsmStrength");
+//					 double[] correctCoordinate = new double[2];
+//					 GpsCorrect.transform(lat, lon, correctCoordinate);
+//					 
+//					 
+////					 LatLonPoint latLonPoint =new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
+////					 RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200,GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
+////					 geocoderSearch.getFromLocationAsyn(query);// 设置同步逆地理编码请求
+//					 
+//					
+//						
+//					
+//				 	MarkerOptions markerOptions = new MarkerOptions();
+//					markerOptions.anchor(0.5f, 0.5f);
+//					markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_trace));
+//					mMoveMarker = aMap.addMarker(markerOptions);
+//					mMoveMarker.setPosition(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+//					aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]), 14)); 
+//					 mMoveMarker.setTitle("设备信息");
+//					 mMoveMarker.setSnippet(
+//						"设备名称："+TrackApp.currentCar.name+"\n"+
+//						"坐标："+lat+"%"+lon+"\n"+
+//						"速度："+speed.substring(0,4)+"km/h"+"\n"+
+//						"距离："+distant+"km"+"\n"+
+//						"更新时间："+date+"\n"+
+//						"电压："+voltage+"\n"+
+//						"信号强度"+gsmStrength);
+//					mMoveMarker.showInfoWindow();
+//					timerStop();
+//					dismissProgressDialog();
+//			 }
+//					
+//         }else if (msg.what==ADDRESS_COMPLETE){
+//        	 	
+//         }
+//         else if (msg.what==NetworkAdapter.MSG_FAIL){
+//        	 timerStop();
+//			dismissProgressDialog();
+//        	 Toast.makeText(TraceActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+//         }else if (msg.what==TIME_OUT){
+//        	 pd.dismiss();
+//        	 Toast.makeText(TraceActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
+//        	 return;
+//         }
+//        	
+//        }
+//        	
+// };
  
 
 
@@ -253,6 +212,93 @@ public class TraceActivity extends Activity implements OnGeocodeSearchListener {
 		} else {
 			Toast.makeText(TraceActivity.this, rCode,Toast.LENGTH_SHORT).show();;
 		}
+	}
+
+	@Override
+	public void initWidget() {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.activity_trace);
+		mapView = (MapView) findViewById(R.id.map);
+	    aMap = mapView.getMap();
+	    tbSatelite = (ToggleButton)findViewById(R.id.btTrace_Satelite);
+	    tbSatelite.setOnClickListener(this);
+	    MarkerOptions markerOptions = new MarkerOptions();
+		markerOptions.anchor(0.5f, 0.5f);
+		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_trace));
+		mMoveMarker = aMap.addMarker(markerOptions);
+	}
+
+	@Override
+	public void widgetClick(View v) {
+		// TODO Auto-generated method stub
+		switch(v.getId()){
+		case R.id.btTrace_Satelite:
+			if(tbSatelite.isChecked()){
+				aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
+			}else{
+				aMap.setMapType(AMap.MAP_TYPE_NORMAL);
+			}
+			break;
+		
+		}
+	}
+
+	@Override
+	public void handleMsg(Message msg) {
+		// TODO Auto-generated method stub
+		 if(msg.what==CNetworkAdapter.MSG_POSITION){
+        	 Bundle b = msg.getData();
+        	 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			 String devid = b.getString("devid");
+			 if(devid.equals(TrackApp.currentCar.devId)){
+				 	TrackApp.currentCar.setAlive(true);
+					 lat = b.getDouble("lat");
+		        	 lon = b.getDouble("lon");
+		        	 speed = b.getString("speed");
+		        	 distant = b.getString("ditant");
+					 date = format.format(new Date());
+					 voltage = b.getString("voltage");
+					 gsmStrength = b.getString("gsmStrength");
+					 double[] correctCoordinate = new double[2];
+					 GpsCorrect.transform(lat, lon, correctCoordinate);
+					 
+					 
+//					 LatLonPoint latLonPoint =new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
+//					 RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200,GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
+//					 geocoderSearch.getFromLocationAsyn(query);// 设置同步逆地理编码请求
+					 
+					
+						
+					
+				 	
+					mMoveMarker.setPosition(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+					aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]), 14)); 
+					 mMoveMarker.setTitle("设备信息");
+					 mMoveMarker.setSnippet(
+						"设备名称："+TrackApp.currentCar.name+"\n"+
+						"坐标："+lat+"%"+lon+"\n"+
+						"速度："+speed.substring(0,4)+"km/h"+"\n"+
+						"距离："+distant+"km"+"\n"+
+						"更新时间："+date+"\n"+
+						"电压："+voltage+"\n"+
+						"信号强度"+gsmStrength);
+					mMoveMarker.showInfoWindow();
+					timerStop();
+					dismissProgressDialog();
+			 }
+					
+         }else if (msg.what==ADDRESS_COMPLETE){
+        	 	
+         }
+         else if (msg.what==NetworkAdapter.MSG_FAIL){
+        	timerStop();
+			dismissProgressDialog();
+        	showMessage("获取数据错误或数据库无数据");
+         }else if (msg.what==TIME_OUT){
+        	 dismissProgressDialog();
+        	 showMessage("设备关机或网络状况导致数据返回超时");
+        	 return;
+         }
 	}
 	
 	

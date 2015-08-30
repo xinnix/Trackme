@@ -25,34 +25,26 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-public class AlarmListActivity extends ListActivity {
-	
-	private ProgressDialog pd = null;
-	private TrackApp ta=null;
-	//超时相关控制
-	private Timer timer = null;
-	private static final int TIME_LIMIT = 8000;
+public class AlarmListActivity extends BaseActivity {
+	private ListView lv =null;
 	SimpleAdapter adapter = null;
 	List data = new ArrayList<Map<String,?>>();  
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//setContentView(R.layout.activity_alarm_list);
-		
-		
 	}
-	
-	  private List<Map<String, Object>> getData(Alarm[] alarmList) {
+	 private List<Map<String, Object>> getData(Alarm[] alarmList) {
 
 	        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
 	        for (int ii = 0 ; ii<alarmList.length;ii++){
 	        	Map<String, Object> map = new HashMap<String, Object>();
-	        	map.put("alarmCarName", ta.currentCar.name);
+	        	map.put("alarmCarName", TrackApp.currentCar.name);
 	        	map.put("alarmType", alarmList[ii].alarmType);
 	        	map.put("alarmTime", alarmList[ii].alarmTime);
 	        	list.add(map);
@@ -64,30 +56,30 @@ public class AlarmListActivity extends ListActivity {
 
 	 }
 	  
-	  private  Handler handler = new Handler() {  
-	        @Override  
-	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-	         
-	        	if( msg.what==NetworkAdapter.MSG_ALARM){
-	        		 pd.dismiss();
-		        	 timer.cancel();
-		        	 Bundle b = msg.getData();
-		        	 Alarm[] alarmList = (Alarm[]) b.getParcelableArray("alarmlist");
-		        	 data= getData(alarmList);
-		        	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
-		 	                new String[]{"alarmCarName","alarmType","alarmTime"},
-		 	                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
-		        	 setListAdapter(adapter);
-		        	//adapter.notifyDataSetChanged();  
-	        	}else if (msg.what==TIME_LIMIT){
-	           	 pd.dismiss();
-	        	 Toast.makeText(AlarmListActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
-	        	 return;
-	         }
-	        	  
-	      }
-	        	
-	 }; 
+//	  private  Handler handler = new Handler() {  
+//	        @Override  
+//	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
+//	         
+//	        	if( msg.what==NetworkAdapter.MSG_ALARM){
+//	        		 dismissProgressDialog();
+//		        	 timerStop();
+//		        	 Bundle b = msg.getData();
+//		        	 Alarm[] alarmList = (Alarm[]) b.getParcelableArray("alarmlist");
+//		        	 data= getData(alarmList);
+//		        	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
+//		 	                new String[]{"alarmCarName","alarmType","alarmTime"},
+//		 	                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
+//		        	 lv.setAdapter(adapter);
+//		        	//adapter.notifyDataSetChanged();  
+//	        	}else if (msg.what==TIME_OUT){
+//	           	 pd.dismiss();
+//	        	 Toast.makeText(AlarmListActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
+//	        	 return;
+//	         }
+//	        	  
+//	      }
+//	        	
+//	 }; 
 	private static String subDateMinute(String day, int x)//返回的是字符串型的时间，输入的 
 	//是String day, int x 
 	 {    
@@ -114,29 +106,12 @@ public class AlarmListActivity extends ListActivity {
 	 }   
 	protected void onResume() {
 			// TODO Auto-generated method stub
-			super.onResume();
-			 
-			 ta = (TrackApp)getApplication();
-			 ta.setHandler(handler);
-			 Date date= new Date();
+			super.onResume(); 
+			Date date= new Date();
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			MsgEventHandler.sGetAlarmList(ta.currentCar.id, subDateMinute(format.format(date),20), format.format(date), "");
-			
-			
-			pd = new ProgressDialog(AlarmListActivity.this);
-			pd.setMessage("报警信息获取中...");
-			pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			pd.show();
-			
-			timer = new Timer();
-			timer.schedule(new TimerTask(){
-
-				@Override
-				public void run() {
-					handler.sendEmptyMessage(TIME_LIMIT);	
-				}
-				
-			}, TIME_LIMIT);
+			MsgEventHandler.sGetAlarmList(TrackApp.currentCar.id, subDateMinute(format.format(date),20), format.format(date), "");
+			showProgressDialog("报警信息获取中...");
+			timerStart();
 	}
 
 	@Override
@@ -156,5 +131,39 @@ public class AlarmListActivity extends ListActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void initWidget() {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.activity_alarm_list);
+		lv = (ListView) findViewById(R.id.alarmList);
+	}
+
+	@Override
+	public void widgetClick(View v) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleMsg(Message msg) {
+		// TODO Auto-generated method stub
+		if( msg.what==NetworkAdapter.MSG_ALARM){
+	   		 dismissProgressDialog();
+	       	 timerStop();
+	       	 Bundle b = msg.getData();
+	       	 Alarm[] alarmList = (Alarm[]) b.getParcelableArray("alarmlist");
+	       	 data= getData(alarmList);
+	       	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
+		                new String[]{"alarmCarName","alarmType","alarmTime"},
+		                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
+	       	 lv.setAdapter(adapter);
+       	//adapter.notifyDataSetChanged();  
+	   	}else if (msg.what==TIME_OUT){
+	   		dismissProgressDialog();
+		   	showMessage("设备关机或网络状况导致数据返回超时");
+		   	return;
+	    }
 	}
 }

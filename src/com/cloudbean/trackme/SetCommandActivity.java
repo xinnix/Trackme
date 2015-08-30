@@ -43,28 +43,18 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-public class SetCommandActivity extends Activity {
+public class SetCommandActivity extends BaseActivity {
 	private Button btSetDef = null;
 	private Button btCancelDef = null;
 	private Button btDisconCircuit = null;
 	private Button btConnCircuit = null;
-	private TrackApp ta =null;
-	private ProgressDialog pd = null;
-	
 	private AlertDialog alertDialog = null;
-	
-	
 	private ListView lvLog = null;
-	
 	
 	private String curCommand = null;
 	
 	SimpleAdapter adapter = null;
 	List<Map<String, Object>> data = new ArrayList<Map<String, Object>>(); 
-	//超时相关控制
-	private Timer timer = null;
-	private static final int TIME_LIMIT = 15000;
-	
 	
 	private void getData(String res) {
 		  SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -80,177 +70,16 @@ public class SetCommandActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_set_command);
-		
-		btSetDef = (Button)findViewById(R.id.set_def);
-		btCancelDef = (Button)findViewById(R.id.cancel_def);
-		btDisconCircuit = (Button)findViewById(R.id.discon_circuit);
-		btConnCircuit = (Button)findViewById(R.id.conn_circuit);
-		
-		lvLog = (ListView)findViewById(R.id.loglist);
-		
 		adapter = new SimpleAdapter(SetCommandActivity.this,data,R.layout.commandlog_list,
 	                new String[]{"commandName","commandResult","commandTime"},
 	                new int[]{R.id.commandName,R.id.commandResult,R.id.commandTime});
-    	 lvLog.setAdapter(adapter);
-    	//  
-		
+    	lvLog.setAdapter(adapter);
 		showWaiterAuthorizationDialog();
-		
-		btSetDef.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				
-				MsgEventHandler.c_sSetDef(ta.currentCar, "01");
-				curCommand = btSetDef.getText().toString();
-				pd = new ProgressDialog(SetCommandActivity.this);
-				pd.setMessage("命令发送中...");
-				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				pd.show();
-				timer = new Timer();
-				timer.schedule(new TimerTask(){
-
-					@Override
-					public void run() {
-						handler.sendEmptyMessage(TIME_LIMIT);	
-					}
-					
-				}, TIME_LIMIT);
-			}
-			
-		});
-		
-		btCancelDef.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				MsgEventHandler.c_sSetDef(ta.currentCar, "00");
-				curCommand = btCancelDef.getText().toString();
-				pd = new ProgressDialog(SetCommandActivity.this);
-				pd.setMessage("命令发送中...");
-				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				pd.show();
-				timer = new Timer();
-				timer.schedule(new TimerTask(){
-
-					@Override
-					public void run() {
-						handler.sendEmptyMessage(TIME_LIMIT);	
-					}
-					
-				}, TIME_LIMIT);
-			}
-			
-		});
-		
-		
-		btConnCircuit.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				MsgEventHandler.c_sSetCircuit(ta.currentCar, "0002020202");
-				curCommand = btConnCircuit.getText().toString();
-				pd = new ProgressDialog(SetCommandActivity.this);
-				pd.setMessage("命令发送中...");
-				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				pd.show();
-				timer = new Timer();
-				timer.schedule(new TimerTask(){
-
-					@Override
-					public void run() {
-						handler.sendEmptyMessage(TIME_LIMIT);	
-					}
-					
-				}, TIME_LIMIT);
-			}
-			
-		});
-		
-		
-		btDisconCircuit.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				MsgEventHandler.c_sSetCircuit(ta.currentCar, "0102020202");
-				curCommand = btDisconCircuit.getText().toString();
-				pd = new ProgressDialog(SetCommandActivity.this);
-				pd.setMessage("命令发送中...");
-				pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				pd.show();
-				timer = new Timer();
-				timer.schedule(new TimerTask(){
-
-					@Override
-					public void run() {
-						handler.sendEmptyMessage(TIME_LIMIT);	
-					}
-					
-				}, TIME_LIMIT);
-			}
-			
-		});
-		
 	}
-	 private  Handler handler = new Handler() {  
-	        @Override  
-	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-	         
-	        	if( msg.what==CNetworkAdapter.MSG_DEF){
-	        		timer.cancel();
-	        		 Bundle b = msg.getData();
-	        		 String devid = b.getString("devid");
-	        		 int i  = devid.indexOf("f");	
-	        		 devid = devid.substring(0, i);
-	    			 if(devid.equals(ta.currentCar.devId)){
-	    				 	pd.dismiss();
-	    					String res =  b.getString("res");
-	    					if(res.equals("0100")){
-	    						Toast.makeText(SetCommandActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
-	    						getData("操作成功");
-	    					}else if(res.equals("0000")){
-	    						Toast.makeText(SetCommandActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
-	    						getData("操作失败");
-	    					}else{
-	    						Toast.makeText(SetCommandActivity.this, "服务器回复错误", Toast.LENGTH_SHORT).show();
-	    					}
-	    					adapter.notifyDataSetChanged();
-	    			 }
-	        	
-	        	}else if(msg.what==CNetworkAdapter.MSG_CIRCUIT){
-	        		timer.cancel();
-	        		 Bundle b = msg.getData();
-	        		 String devid = b.getString("devid");
-	        		 int i  = devid.indexOf("f");	
-	        		 devid = devid.substring(0, i);
-	    			 if(devid.equals(ta.currentCar.devId)){
-	    				 	pd.dismiss();
-	    					String res =  b.getString("res");
-	    					if(res.equals("01")){
-	    						Toast.makeText(SetCommandActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
-	    						getData("操作成功");
-	    					}else if(res.equals("00")){
-	    						Toast.makeText(SetCommandActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
-	    						getData("操作失败");
-	    					}else{
-	    						Toast.makeText(SetCommandActivity.this, "服务器回复错误", Toast.LENGTH_SHORT).show();
-	    					}
-	    					adapter.notifyDataSetChanged();
-	    			 }
-	        	}else if (msg.what==TIME_LIMIT){
-		           	 pd.dismiss();
-		        	 Toast.makeText(SetCommandActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
-		        	 return;
-		         }
-	        }
-	        	
-	 };
+
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		 ta = (TrackApp)getApplication();
-		 ta.setHandler(handler);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -304,7 +133,7 @@ public class SetCommandActivity extends Activity {
 	   	    	//现在为止已经获得了字符型的用户名和密码了，接下来就是根据自己的需求来编写代码了
 	   	    	//这里做一个简单的测试，假定输入的用户名和密码都是1则进入其他操作页面（OperationActivity）
 	   	    	preventDismissDialog();
-	   	    	if( password.equals(ta.curPassword)){
+	   	    	if( password.equals(TrackApp.curPassword)){
 	   	    		
 	   	    		dismissDialog();
 	   	    	}else{
@@ -353,6 +182,111 @@ public class SetCommandActivity extends Activity {
             e.printStackTrace();
         }
     }
+
+
+	@Override
+	public void initWidget() {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.activity_set_command);
+		btSetDef = (Button)findViewById(R.id.set_def);
+		btCancelDef = (Button)findViewById(R.id.cancel_def);
+		btDisconCircuit = (Button)findViewById(R.id.discon_circuit);
+		btConnCircuit = (Button)findViewById(R.id.conn_circuit);
+		lvLog = (ListView)findViewById(R.id.loglist);
+		btSetDef.setOnClickListener(this);
+		btCancelDef.setOnClickListener(this);
+		btConnCircuit.setOnClickListener(this);
+		btDisconCircuit.setOnClickListener(this);
+	}
+
+
+	@Override
+	public void widgetClick(View v) {
+		// TODO Auto-generated method stub
+		switch(v.getId()){
+		case R.id.set_def:
+			MsgEventHandler.c_sSetDef(TrackApp.currentCar, "01");
+			curCommand = btSetDef.getText().toString();
+			showProgressDialog("发送中...");
+			timerStart();
+			break;
+		case R.id.cancel_def:
+			MsgEventHandler.c_sSetDef(TrackApp.currentCar, "00");
+			curCommand = btCancelDef.getText().toString();
+			showProgressDialog("发送中...");
+			timerStart();
+			break;
+		case R.id.discon_circuit:
+			MsgEventHandler.c_sSetCircuit(TrackApp.currentCar, "0002020202");
+			curCommand = btConnCircuit.getText().toString();
+			showProgressDialog("发送中...");
+			timerStart();
+			break;
+		case R.id.conn_circuit:
+			MsgEventHandler.c_sSetCircuit(TrackApp.currentCar, "0102020202");
+			curCommand = btDisconCircuit.getText().toString();
+			showProgressDialog("发送中...");
+			timerStart();
+			break;
+	}
+		
+	}
+
+
+	@Override
+	public void handleMsg(Message msg) {
+		// TODO Auto-generated method stub
+		// handler接收到消息后就会执行此方法  
+        
+    	if( msg.what==CNetworkAdapter.MSG_DEF){
+    		timerStop();
+    		 Bundle b = msg.getData();
+    		 String devid = b.getString("devid");
+    		 int i  = devid.indexOf("f");	
+    		 devid = devid.substring(0, i);
+			 if(devid.equals(TrackApp.currentCar.devId)){
+				 	dismissProgressDialog();
+					String res =  b.getString("res");
+					if(res.equals("0100")){
+						showMessage("操作成功");
+						getData("操作成功");
+					}else if(res.equals("0000")){
+						showMessage("操作失败");
+						getData("操作失败");
+					}else{
+						showMessage("服务器回复错误");
+					}
+					adapter.notifyDataSetChanged();
+			 }
+    	
+    	}else if(msg.what==CNetworkAdapter.MSG_CIRCUIT){
+    		timerStop();
+    		 Bundle b = msg.getData();
+    		 String devid = b.getString("devid");
+    		 int i  = devid.indexOf("f");	
+    		 devid = devid.substring(0, i);
+			 if(devid.equals(TrackApp.currentCar.devId)){
+				 	pd.dismiss();
+					String res =  b.getString("res");
+					if(res.equals("01")){
+						showMessage("操作成功");
+						getData("操作成功");
+					}else if(res.equals("00")){
+						showMessage("操作失败");
+						getData("操作失败");
+					}else{
+						showMessage("服务器回复错误");
+					}
+					adapter.notifyDataSetChanged();
+			 }
+    	}else if (msg.what==TIME_OUT){
+    		dismissProgressDialog();
+           	 showMessage("设备关机或网络状况导致数据返回超时");
+        	 return;
+         }
+    
+		
+	}
 
 	
 

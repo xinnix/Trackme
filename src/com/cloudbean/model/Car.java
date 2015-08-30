@@ -12,9 +12,22 @@ public class Car  implements Parcelable {
 	public String devtype;
 	public String carGroupId;
 	public boolean alive;
+	public CarState lastState;
 	
 	
 	
+	public CarState getLastState() {
+		return lastState;
+	}
+
+
+
+	public void setLastState(CarState lastState) {
+		this.lastState = lastState;
+	}
+
+
+
 	public boolean isAlive() {
 		return alive;
 	}
@@ -36,6 +49,7 @@ public class Car  implements Parcelable {
 		this.devtype = devtype.trim();
 		this.carGroupId = carGroupId.trim();
 		this.alive = false;
+		this.lastState = null;
 	}
 
 

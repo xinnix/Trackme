@@ -8,10 +8,14 @@ import com.cloudbean.network.NetworkAdapter;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
@@ -29,14 +33,18 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	private static final int ACTIVITY_DESTROY = 3;
 	
 	
-	private static final int TIME_LIMIT = 0x5001;
-	  
+	protected static final int TIME_OUT = 0x5001;
+	private static final int TIME_LIMIT = 10000;
+	
 	public int activityState;
 	private boolean mAllowFullScreen = true;
 	
-	protected TrackApp ta=null;
+	
 	protected ProgressDialog pd = null;
-	public Handler handler =  new Handler() {  
+	
+	NetWorkService networkService;
+	
+	public  Handler handler =  new Handler() {  
         // handler接收到消息后就会执行此方法  
 		@Override  
         public void handleMessage(Message msg) {
@@ -44,6 +52,23 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
         }
         	
 	};
+	
+	
+	public ServiceConnection conn = new ServiceConnection() {
+
+		@Override
+		public void onServiceConnected(ComponentName arg0, IBinder service) {
+			// TODO Auto-generated method stub
+			networkService = ((NetWorkService.NetworkBinder)service).getService();
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			// TODO Auto-generated method stub
+			networkService = null;
+		}
+	};
+	
 	
 	private Timer timer = null;
 	
@@ -78,14 +103,14 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	
 	
 	public void timerStart(){
-		if(timer == null){
-			timer = new Timer();
-		}
+		
+		timer = new Timer();
+		
 		timer.schedule(new TimerTask(){
 
 			@Override
 			public void run() {
-				handler.sendEmptyMessage(TIME_LIMIT);	
+				handler.sendEmptyMessage(TIME_OUT);	
 			}
 			
 		}, TIME_LIMIT);
@@ -102,11 +127,11 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		ta = (TrackApp)getApplication();
         if (mAllowFullScreen) {
             requestWindowFeature(Window.FEATURE_NO_TITLE); // 取消标题
         }
         AppManager.getAppManager().addActivity(this);
+        bindService(new Intent(BaseActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
         initWidget();
 	}
 	
@@ -120,6 +145,7 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	    protected void onResume() {
 	        super.onResume();
 	        activityState = ACTIVITY_RESUME;
+	        TrackApp.curHandler = handler;
 	        Log.i(this.getClass().getName(), "----onResume");
 	    }
 	 
@@ -147,6 +173,7 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	    protected void onDestroy() {
 	        super.onDestroy();
 	        activityState = ACTIVITY_DESTROY;
+	        unbindService(conn);
 	        Log.i(this.getClass().getName(), "----onDestroy");
 	        AppManager.getAppManager().finishActivity(this);
 	        
