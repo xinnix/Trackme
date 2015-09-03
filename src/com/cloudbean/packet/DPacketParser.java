@@ -107,7 +107,7 @@ public class DPacketParser {
 		int head = 0;//指向包头指针
 		
 		
-		
+		this.pktBuffer = pktBuffer;
 		
 		this.pktHead = ByteHexUtil.bytesToInt(Arrays.copyOfRange(pktBuffer,head,head+=4));
 		this.pktLength = ByteHexUtil.bytesToInt(Arrays.copyOfRange(pktBuffer,head,head+=4));

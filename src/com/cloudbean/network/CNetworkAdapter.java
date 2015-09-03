@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
+import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.CarState;
 import com.cloudbean.packet.CPacketParser;
@@ -17,9 +18,11 @@ import com.cloudbean.packet.MsgGPRSParser;
 import com.cloudbean.trackerUtil.ByteHexUtil;
 import com.cloudbean.trackme.TrackApp;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Toast;
 
 public class CNetworkAdapter extends BaseNetworkAdapter {
 	
@@ -28,9 +31,13 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 	public static int MSG_POSITION = 0x2002;
 	public static int MSG_DEF = 0x2003;
 	public static int MSG_CIRCUIT = 0x2004;
+	public static int MSG_ALARM = 0x2005;
 	
-	 public CNetworkAdapter(final String serverIP,final int port){
+	private Application app =null;
+	
+	 public CNetworkAdapter(final String serverIP,final int port,Application app){
 		super(serverIP,port);
+		this.app =app;
 		connect(); 
 	 }
 
@@ -43,14 +50,16 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 //	 }
 //	 
 	 
-	 public byte[] preParser(InputStream inputStream){
-		 DataInputStream dis = new DataInputStream((new BufferedInputStream(inputStream)));
+	 public byte[] preParser(){
+		 
 		 ByteArrayOutputStream  bos = new ByteArrayOutputStream();
 		 try{
 			 short header = dis.readShort();
 			 byte signal = dis.readByte();
 			 short datalen = dis.readShort();
-			 
+			 if(signal == 0xa9){
+				 System.out.print("pos complete");
+			 }
 			 byte[] packet = new byte[datalen];
 			 dis.readFully(packet);
 			 bos.write(ByteHexUtil.shortToByte(header));
@@ -62,7 +71,9 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 		 }catch(Exception e){
 			 e.printStackTrace();
 		 }
-		 return bos.toByteArray();
+		 byte[] buf = bos.toByteArray();
+		 String res = ByteHexUtil.bytesToHexString(buf);
+		 return buf;
 	 }
 	 
 //	 public void run(){
@@ -136,14 +147,21 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 	public void recivePacket() throws Exception {
 		// TODO Auto-generated method stub
 		try{		  			 			 
-		 	byte[] packetByte  = preParser(inputStream);
+		 	byte[] packetByte  = preParser();
 		 	Message msg = TrackApp.curHandler.obtainMessage();
 		 	Bundle b = new Bundle();
 			CPacketParser cp = new CPacketParser(packetByte);
+			
 			 switch (cp.pktSignal){
 			 case CPacketParser.SIGNAL_RE_LOGIN:
-				 MsgEventHandler.c_rLogin(cp);
+				 int i =MsgEventHandler.c_rLogin(cp);
 				 msg.what =MSG_LOGIN;
+				 break;
+			 case CPacketParser.SIGNAL_PREPOSITION:
+				 System.out.println("pre pos");
+				 break;
+			 case CPacketParser.SIGNAL_POSCOMPLETE:
+				 
 				 break;
 			 case CPacketParser.SIGNAL_RELAY:
 				 MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
@@ -163,6 +181,7 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 						 for(int ii=0;ii<TrackApp.carList.length;ii++){
 							 if(cs.devid.equals(TrackApp.carList[ii].devId)){
 								 TrackApp.carList[ii].setLastState(cs);
+								 TrackApp.carList[ii].alive++;
 							 }
 						 }
 						 
@@ -188,9 +207,14 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					 msg.setData(b);
 					 TrackApp.curHandler.sendMessage(msg);
 					 break;
+				 case MsgGPRSParser.MSG_TYPE_ALARM:
+					
+					 Alarm al = MsgEventHandler.c_rGetAlarmInfo(mgp);
+					 TrackApp.alarmList.add(al);
+					 
+					 break;
 				 }
-				
-				 break;
+			
 
 		 }
 

@@ -1,10 +1,11 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -15,6 +16,11 @@ import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackme.R;
+import com.cloudbean.trackme.TrackApp;
+import com.cloudbean.trackme.R.id;
+import com.cloudbean.trackme.R.layout;
+import com.cloudbean.trackme.R.menu;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -38,15 +44,16 @@ public class AlarmListActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	 private List<Map<String, Object>> getData(Alarm[] alarmList) {
+	 private List<Map<String, Object>> getData(List alarmList) {
 
 	        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-	        for (int ii = 0 ; ii<alarmList.length;ii++){
+	        for (Iterator l =alarmList.iterator();l.hasNext();){
+	        	Alarm al = (Alarm) l.next();
 	        	Map<String, Object> map = new HashMap<String, Object>();
-	        	map.put("alarmCarName", TrackApp.currentCar.name);
-	        	map.put("alarmType", alarmList[ii].alarmType);
-	        	map.put("alarmTime", alarmList[ii].alarmTime);
+	        	map.put("alarmCarName", al.termid);
+	        	map.put("alarmType", al.alarmType);
+	        	map.put("alarmTime", al.alarmTime);
 	        	list.add(map);
 	        }
 
@@ -80,38 +87,45 @@ public class AlarmListActivity extends BaseActivity {
 //	      }
 //	        	
 //	 }; 
-	private static String subDateMinute(String day, int x)//返回的是字符串型的时间，输入的 
-	//是String day, int x 
-	 {    
-	        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 24小时制   
-	//引号里面个格式也可以是 HH:mm:ss或者HH:mm等等，很随意的，不过在主函数调用时，要和输入的变 
-	//量day格式一致 
-	        Date date = null;    
-	        try {    
-	            date = format.parse(day);    
-	        } catch (Exception ex) {    
-	            ex.printStackTrace();    
-	        }    
-	        if (date == null)    
-	            return "";    
-	        //System.out.println("front:" + format.format(date)); //显示输入的日期   
-	        Calendar cal = Calendar.getInstance();    
-	        cal.setTime(date);    
-	        cal.add(Calendar.MINUTE, -x);// 24小时制    
-	        date = cal.getTime();    
-	        //System.out.println("after:" + format.format(date));  //显示更新后的日期  
-	        cal = null;    
-	        return format.format(date);    
-	   
-	 }   
+//	private static String subDateMinute(String day, int x)//返回的是字符串型的时间，输入的 
+//	//是String day, int x 
+//	 {    
+//	        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 24小时制   
+//	//引号里面个格式也可以是 HH:mm:ss或者HH:mm等等，很随意的，不过在主函数调用时，要和输入的变 
+//	//量day格式一致 
+//	        Date date = null;    
+//	        try {    
+//	            date = format.parse(day);    
+//	        } catch (Exception ex) {    
+//	            ex.printStackTrace();    
+//	        }    
+//	        if (date == null)    
+//	            return "";    
+//	        //System.out.println("front:" + format.format(date)); //显示输入的日期   
+//	        Calendar cal = Calendar.getInstance();    
+//	        cal.setTime(date);    
+//	        cal.add(Calendar.MINUTE, -x);// 24小时制    
+//	        date = cal.getTime();    
+//	        //System.out.println("after:" + format.format(date));  //显示更新后的日期  
+//	        cal = null;    
+//	        return format.format(date);    
+//	   
+//	 }   
 	protected void onResume() {
 			// TODO Auto-generated method stub
 			super.onResume(); 
-			Date date= new Date();
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			MsgEventHandler.sGetAlarmList(TrackApp.currentCar.id, subDateMinute(format.format(date),20), format.format(date), "");
-			showProgressDialog("报警信息获取中...");
-			timerStart();
+			
+			
+				data= getData(TrackApp.alarmList);
+	       	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
+		                new String[]{"alarmCarName","alarmType","alarmTime"},
+		                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
+	       	 lv.setAdapter(adapter);
+//			Date date= new Date();
+//			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+////			MsgEventHandler.sGetAlarmList(TrackApp.currentCar.id, subDateMinute(format.format(date),20), format.format(date), "");
+////			showProgressDialog("报警信息获取中...");
+//			timerStart();
 	}
 
 	@Override
@@ -148,22 +162,22 @@ public class AlarmListActivity extends BaseActivity {
 
 	@Override
 	public void handleMsg(Message msg) {
-		// TODO Auto-generated method stub
-		if( msg.what==NetworkAdapter.MSG_ALARM){
-	   		 dismissProgressDialog();
-	       	 timerStop();
-	       	 Bundle b = msg.getData();
-	       	 Alarm[] alarmList = (Alarm[]) b.getParcelableArray("alarmlist");
-	       	 data= getData(alarmList);
-	       	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
-		                new String[]{"alarmCarName","alarmType","alarmTime"},
-		                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
-	       	 lv.setAdapter(adapter);
-       	//adapter.notifyDataSetChanged();  
-	   	}else if (msg.what==TIME_OUT){
-	   		dismissProgressDialog();
-		   	showMessage("设备关机或网络状况导致数据返回超时");
-		   	return;
-	    }
+//		// TODO Auto-generated method stub
+//		if( msg.what==NetworkAdapter.MSG_ALARM){
+//	   		 dismissProgressDialog();
+//	       	 timerStop();
+//	       	 Bundle b = msg.getData();
+//	       	 Alarm[] alarmList = (Alarm[]) b.getParcelableArray("alarmlist");
+//	       	 data= getData(alarmList);
+//	       	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
+//		                new String[]{"alarmCarName","alarmType","alarmTime"},
+//		                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
+//	       	 lv.setAdapter(adapter);
+//       	//adapter.notifyDataSetChanged();  
+//	   	}else if (msg.what==TIME_OUT){
+//	   		dismissProgressDialog();
+//		   	showMessage("设备关机或网络状况导致数据返回超时");
+//		   	return;
+//	    }
 	}
 }

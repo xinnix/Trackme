@@ -1,13 +1,22 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.cloudbean.model.Login;
+import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackme.AppManager;
+import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
+import com.cloudbean.trackme.dialog.IPDialog;
+import com.cloudbean.trackme.R.id;
+import com.cloudbean.trackme.R.layout;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -37,9 +46,11 @@ public class MainActivity extends BaseActivity {
 	private EditText etPassword = null;
 	
 	private Button btLogin = null;
-	private Button btExit = null;
-	private CheckBox ckRemPassword = null;
+	private Button btExit = null;	
+	private Button btSetServer = null;
 	
+	private CheckBox ckRemPassword = null;
+	private int flag = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +89,7 @@ public class MainActivity extends BaseActivity {
 		etPassword = (EditText)findViewById(R.id.password);
 		btLogin = (Button)findViewById(R.id.login);
 		btExit = (Button)findViewById(R.id.exit);
+		btSetServer = (Button)findViewById(R.id.setServer);
 		ckRemPassword = (CheckBox)findViewById(R.id.remPass);
 		ckRemPassword.setChecked(true);
 		
@@ -85,6 +97,7 @@ public class MainActivity extends BaseActivity {
 		
 		btLogin.setOnClickListener(this);
 		btExit.setOnClickListener(this);
+		btSetServer.setOnClickListener(this);
 	}
 
 	@Override
@@ -100,6 +113,10 @@ public class MainActivity extends BaseActivity {
 			case R.id.exit:
 				AppManager.getAppManager().finishAllActivity();
 				break;
+			case R.id.setServer:
+				IPDialog ipd = new IPDialog(this);
+				ipd.show();
+				break;
 		}
 		
 	}
@@ -107,7 +124,8 @@ public class MainActivity extends BaseActivity {
 	@Override
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
-		if( msg.what==NetworkAdapter.MSG_LOGIN){
+	
+		if(msg.what==NetworkAdapter.MSG_LOGIN){
     		Bundle b = msg.getData();
         	Login l = (Login) b.get("login");
         	
@@ -120,13 +138,12 @@ public class MainActivity extends BaseActivity {
         		}
         		showMessage("登录成功");
         		networkService.hreatBeat();
-        		MsgEventHandler.c_sGetAllLastPosition();
+        		
+        		MsgEventHandler.sGetCarInfo(l.userid,"");
+        		MsgEventHandler.sGetCarGroup(l.userid,"");
+        		showProgressDialog("加载基础数据");
         		TrackApp.curPassword = etPassword.getText().toString();
-	            Intent intent = new Intent();
 	            
-				intent.setClass(MainActivity.this, CarGroupListActivity.class);
-				intent.putExtra("userId",l.userid);
-				startActivity(intent);
 				
         	}else{
         		dismissProgressDialog();
@@ -134,14 +151,31 @@ public class MainActivity extends BaseActivity {
             	showMessage("登录失败");
             	return;
         	}
-        	pd.dismiss();// 关闭ProgressDialog
+        	dismissProgressDialog();// 关闭ProgressDialog
     		//Toast.makeText(MainActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+    	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
+    		flag++;
+    		
+    	}else if(msg.what == NetworkAdapter.MSG_CARINFO){
+    		flag++;
+		
     	}else if (msg.what==TIME_OUT){
     		dismissProgressDialog();
        	 	showMessage("设备关机或网络状况导致数据返回超时");
        	 	return;
-     }
+		}
+		
+		if(flag == 2){
+			dismissProgressDialog();
+			MsgEventHandler.c_sGetAllLastPosition();
+			Intent intent = new Intent();
+			intent.setClass(MainActivity.this, MenuActivity.class);
+			intent.putExtra("userId",TrackApp.login.userid);
+			startActivity(intent);
+		}
 	}
+	
+	
 	
 	
 }

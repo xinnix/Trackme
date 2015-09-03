@@ -1,4 +1,4 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
 
 
 import java.util.ArrayList;
@@ -14,6 +14,11 @@ import com.cloudbean.model.CarGroup;
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackme.R;
+import com.cloudbean.trackme.TrackApp;
+import com.cloudbean.trackme.R.drawable;
+import com.cloudbean.trackme.R.id;
+import com.cloudbean.trackme.R.layout;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -50,12 +55,6 @@ public class CarGroupListActivity extends BaseActivity{
 
 	private ExpandableListView expandableListView;
 	
-	
-	
-	
-	private Car[] carList = null;
-	private CarGroup[] carGroupList = null;
-	//// 为列表绑定数据源
 	
 	private int child_groupId = -1;
 	private int child_childId = -1;
@@ -112,16 +111,16 @@ public class CarGroupListActivity extends BaseActivity{
 			}
 		});
 		
-		
-		
-		
-		Intent intent = this.getIntent();
-		int userId = intent.getIntExtra("userId", 0);
-		MsgEventHandler.sGetCarInfo(userId,"");
-		MsgEventHandler.sGetCarGroup(userId,"");
-		
-		showProgressDialog("获取车辆列表");
-		timerStart();
+//		
+//		
+//		
+//		Intent intent = this.getIntent();
+//		int userId = intent.getIntExtra("userId", 0);
+//		MsgEventHandler.sGetCarInfo(userId,"");
+//		MsgEventHandler.sGetCarGroup(userId,"");
+//		
+//		showProgressDialog("获取车辆列表");
+//		timerStart();
 		
 	}
 	
@@ -130,7 +129,7 @@ public class CarGroupListActivity extends BaseActivity{
 	     super.onResume();  
 	     
 	     if(TrackApp.carList!=null&&TrackApp.carGroupList!=null){
-	    	 dismissProgressDialog();
+	    	 
 		     initCarTable(TrackApp.carList,TrackApp.carGroupList);
 		     ((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
 	     }
@@ -273,7 +272,18 @@ public class CarGroupListActivity extends BaseActivity{
 			child_carDevType.setText(carTable.get(groupPosition).get(childPosition).devtype);
 			child_carName.setText(carTable.get(groupPosition).get(childPosition).name);
 			child_carDevId.setText(carTable.get(groupPosition).get(childPosition).devId);
-			child_carImg.setImageResource(carTable.get(groupPosition).get(childPosition).getLastState()!=null?R.drawable.car_online:R.drawable.car_offline);
+			int carImg = 0;
+			switch(carTable.get(groupPosition).get(childPosition).getAlive()){
+			case 0:
+				carImg  = R.drawable.car_offline;
+				break;
+			case 1:
+				carImg = R.drawable.car_online;
+				break;
+			default:
+				carImg = R.drawable.car_online2;
+			}
+			child_carImg.setImageResource(carImg);
 			// 判断item的位置是否相同，如相同，则表示为选中状态，更改其背景颜色，如不相同，则设置背景色为白色
 			if (child_groupId == groupPosition
 					&& child_childId == childPosition) {
@@ -298,75 +308,75 @@ public class CarGroupListActivity extends BaseActivity{
 	};
 	
 	
-	private  Handler handler = new Handler() {  
-		int flag = 0;//防止其他消息导致数据重复刷新
-		@Override  
-        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-        	
-        	
-        	
-//        	if(msg.what==NetworkAdapter.MSG_CARINFO){
-//        		Bundle b = msg.getData();
-//            	carList = (Car[]) b.getParcelableArray("carList");
-//            	
-//            	TrackApp.carList = carList;
-//            	
-//            	if(carList.length>0){
-//            		// 为列表绑定数据源
-//            		flag=0;
-//                	
-//            	}else{
-//            		
-//                	Toast.makeText(CarGroupListActivity.this, "获取失败",Toast.LENGTH_SHORT).show();
-//                	return;
-//            	}
-//        	}else if(msg.what==NetworkAdapter.MSG_CARGROUPINFO){
-//        		Bundle b = msg.getData();
-//        		TrackApp.carGroupList = (CarGroup[]) b.getParcelableArray("carGroupList");
-//            	
-//            	if(TrackApp.carGroupList.length>0){
-//            		// 为列表绑定数据源
-//            		flag=0;
-//                	
-//            	}else{
-//            		
-//                	Toast.makeText(CarGroupListActivity.this, "获取失败",Toast.LENGTH_SHORT).show();
-//                	return;
-//            	}
-////            	Toast.makeText(CarGroupListActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
-//        	}else if(msg.what==CNetworkAdapter.MSG_POSITION){
-//        		
-//        		Bundle b = msg.getData();
-//        		if(TrackApp.carList!=null){
-//        			updateCarAlive(TrackApp.carList,b.getString("devid"));
-//        		}
-//        		if(TrackApp.carList!=null&&TrackApp.carGroupList!=null){
-//        			initCarTable(TrackApp.carList,TrackApp.carGroupList);
-//        		}
-//        		
-//        		((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
-//        		
-//        	}else if (msg.what==TIME_LIMIT){
-//        	
-//	           	 pd.dismiss();
-//	        	 Toast.makeText(CarGroupListActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
-//	        	 return;
-//	        }
+//	private  Handler handler = new Handler() {  
+//		int flag = 0;//防止其他消息导致数据重复刷新
+//		@Override  
+//        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
 //        	
 //        	
-//        	if((TrackApp.carList!=null)&&(TrackApp.carGroupList!=null)&&(flag==0)){
-//        		
-//        		initCarTable(TrackApp.carList,TrackApp.carGroupList);
-//        		((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
-//        		flag=1;
-//        		pd.dismiss();// 关闭ProgressDialog
-//        		timer.cancel();
-//        	}
-//       	
-//            
-         }
-        	
- };
+//        	
+////        	if(msg.what==NetworkAdapter.MSG_CARINFO){
+////        		Bundle b = msg.getData();
+////            	carList = (Car[]) b.getParcelableArray("carList");
+////            	
+////            	TrackApp.carList = carList;
+////            	
+////            	if(carList.length>0){
+////            		// 为列表绑定数据源
+////            		flag=0;
+////                	
+////            	}else{
+////            		
+////                	Toast.makeText(CarGroupListActivity.this, "获取失败",Toast.LENGTH_SHORT).show();
+////                	return;
+////            	}
+////        	}else if(msg.what==NetworkAdapter.MSG_CARGROUPINFO){
+////        		Bundle b = msg.getData();
+////        		TrackApp.carGroupList = (CarGroup[]) b.getParcelableArray("carGroupList");
+////            	
+////            	if(TrackApp.carGroupList.length>0){
+////            		// 为列表绑定数据源
+////            		flag=0;
+////                	
+////            	}else{
+////            		
+////                	Toast.makeText(CarGroupListActivity.this, "获取失败",Toast.LENGTH_SHORT).show();
+////                	return;
+////            	}
+//////            	Toast.makeText(CarGroupListActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+////        	}else if(msg.what==CNetworkAdapter.MSG_POSITION){
+////        		
+////        		Bundle b = msg.getData();
+////        		if(TrackApp.carList!=null){
+////        			updateCarAlive(TrackApp.carList,b.getString("devid"));
+////        		}
+////        		if(TrackApp.carList!=null&&TrackApp.carGroupList!=null){
+////        			initCarTable(TrackApp.carList,TrackApp.carGroupList);
+////        		}
+////        		
+////        		((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
+////        		
+////        	}else if (msg.what==TIME_LIMIT){
+////        	
+////	           	 pd.dismiss();
+////	        	 Toast.makeText(CarGroupListActivity.this, "设备关机或网络状况导致数据返回超时",Toast.LENGTH_SHORT).show();
+////	        	 return;
+////	        }
+////        	
+////        	
+////        	if((TrackApp.carList!=null)&&(TrackApp.carGroupList!=null)&&(flag==0)){
+////        		
+////        		initCarTable(TrackApp.carList,TrackApp.carGroupList);
+////        		((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
+////        		flag=1;
+////        		pd.dismiss();// 关闭ProgressDialog
+////        		timer.cancel();
+////        	}
+////       	
+////            
+//         }
+//        	
+// };
  
  
  	private void initCarTable(Car[] carList,CarGroup[] carGroupList){
@@ -393,14 +403,14 @@ public class CarGroupListActivity extends BaseActivity{
  	}
  	
  	
-	 private void updateCarAlive(Car[] carList,String devId){
-		 for (int ii=0;ii<carList.length;ii++){
-			 if(carList[ii].devId.equals(devId)){
-				 carList[ii].setAlive(true);
-				 return;
-			 }
-		 }
-	 }
+//	 private void updateCarAlive(Car[] carList,String devId){
+//		 for (int ii=0;ii<carList.length;ii++){
+//			 if(carList[ii].devId.equals(devId)){
+//				 carList[ii].setAlive(true);
+//				 return;
+//			 }
+//		 }
+//	 }
 
 
 	@Override
@@ -424,63 +434,70 @@ public class CarGroupListActivity extends BaseActivity{
 	@Override
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
-	    	if(msg.what==NetworkAdapter.MSG_CARINFO){
-			Bundle b = msg.getData();
-	    	carList = (Car[]) b.getParcelableArray("carList");
-	    	
-	    	TrackApp.carList = carList;
-	    	
-	    	if(carList.length>0){
-	    		// 为列表绑定数据源
-	    	}else{
-	    		showMessage("获取失败");
-	        	return;
-	    	}
-		}else if(msg.what==NetworkAdapter.MSG_CARGROUPINFO){
-			Bundle b = msg.getData();
-			TrackApp.carGroupList = (CarGroup[]) b.getParcelableArray("carGroupList");
-	    	
-	    	if(TrackApp.carGroupList.length>0){
-	    		// 为列表绑定数据源
-	    		
-	        	
-	    	}else{
-	    		
-	    		showMessage("获取失败");
-	        	return;
-	    	}
-	//    	Toast.makeText(CarGroupListActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
-		}else if(msg.what==CNetworkAdapter.MSG_POSITION){
-			
-			Bundle b = msg.getData();
-			if(TrackApp.carList!=null){
-				updateCarAlive(TrackApp.carList,b.getString("devid"));
-			}
-			if(TrackApp.carList!=null&&TrackApp.carGroupList!=null){
-				initCarTable(TrackApp.carList,TrackApp.carGroupList);
-			}
-			
-			((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
-			
-		}else if (msg.what==TIME_OUT){
 		
-	       	 dismissProgressDialog();
-	    	 showMessage("设备关机或网络状况导致数据返回超时");
-	    	 return;
-	    }
-		
-		
-		if((TrackApp.carList!=null)&&(TrackApp.carGroupList!=null)){
-			
-			initCarTable(TrackApp.carList,TrackApp.carGroupList);
-			((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
-			
-			dismissProgressDialog();// 关闭ProgressDialog
-			timerStop();
-		}
-		
-
 	}
+
+
+//	@Override
+//	public void handleMsg(Message msg) {
+//		// TODO Auto-generated method stub
+//	    	if(msg.what==NetworkAdapter.MSG_CARINFO){
+//			Bundle b = msg.getData();
+//	    	carList = (Car[]) b.getParcelableArray("carList");
+//	    	
+//	    	TrackApp.carList = carList;
+//	    	
+//	    	if(carList.length>0){
+//	    		// 为列表绑定数据源
+//	    	}else{
+//	    		showMessage("获取失败");
+//	        	return;
+//	    	}
+//		}else if(msg.what==NetworkAdapter.MSG_CARGROUPINFO){
+//			Bundle b = msg.getData();
+//			TrackApp.carGroupList = (CarGroup[]) b.getParcelableArray("carGroupList");
+//	    	
+//	    	if(TrackApp.carGroupList.length>0){
+//	    		// 为列表绑定数据源
+//	    		
+//	        	
+//	    	}else{
+//	    		
+//	    		showMessage("获取失败");
+//	        	return;
+//	    	}
+//	//    	Toast.makeText(CarGroupListActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
+//		}else if(msg.what==CNetworkAdapter.MSG_POSITION){
+//			
+//			Bundle b = msg.getData();
+//			if(TrackApp.carList!=null){
+//				updateCarAlive(TrackApp.carList,b.getString("devid"));
+//			}
+//			if(TrackApp.carList!=null&&TrackApp.carGroupList!=null){
+//				initCarTable(TrackApp.carList,TrackApp.carGroupList);
+//			}
+//			
+//			((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
+//			
+//		}else if (msg.what==TIME_OUT){
+//		
+//	       	 dismissProgressDialog();
+//	    	 showMessage("设备关机或网络状况导致数据返回超时");
+//	    	 return;
+//	    }
+//		
+//		
+//		if((TrackApp.carList!=null)&&(TrackApp.carGroupList!=null)){
+//			
+//			initCarTable(TrackApp.carList,TrackApp.carGroupList);
+//			((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
+//			
+//			dismissProgressDialog();// 关闭ProgressDialog
+//			timerStop();
+//		}
+//		
+//
+//	}
 
 }
 

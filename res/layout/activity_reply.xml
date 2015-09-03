@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cloudbean.trackme.ReplayActivity" >
+    tools:context="com.cloudbean.trackme.activity.ReplayActivity" >
 
     <com.amap.api.maps.MapView
         android:id="@+id/replymap"

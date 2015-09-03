@@ -5,26 +5,25 @@ import android.os.Parcelable;
 
 public class Alarm implements Parcelable{
 	
-	public int carId;	
+	public String termid;	
 	public String alarmTime;
 	public String alarmType;
-	public double longitude;
-	public double latitude;
-	public int speed;
-	public int angle;
-	public String address;
+//	public double longitude;
+//	public double latitude;
+//	public int speed;
+//	public int angle;
+//	public String address;
 	
-	public Alarm(int carId, String alarmTime, String alarmType, double longitude, double latitude, int speed, int angle,
-			String address) {
+	public Alarm(String termid, String alarmTime, String alarmType) {
 		super();
-		this.carId = carId;
+		this.termid = termid;
 		this.alarmTime = alarmTime.trim();
 		this.alarmType = alarmType.trim();
-		this.longitude = longitude;
-		this.latitude = latitude;
-		this.speed = speed;
-		this.angle = angle;
-		this.address = address;
+//		this.longitude = longitude;
+//		this.latitude = latitude;
+//		this.speed = speed;
+//		this.angle = angle;
+//		this.address = address;
 	}
 	
 	
@@ -41,14 +40,14 @@ public class Alarm implements Parcelable{
 	@Override
 	public void writeToParcel(Parcel out, int flag) {
 		// TODO Auto-generated method stub
-		out.writeInt(carId);
+		out.writeString(termid);
 		out.writeString(alarmTime);
 		out.writeString(alarmType);
-		out.writeDouble(longitude);
-		out.writeDouble(latitude);
-		out.writeInt(speed);
-		out.writeInt(angle);
-		out.writeString(address);
+//		out.writeDouble(longitude);
+//		out.writeDouble(latitude);
+//		out.writeInt(speed);
+//		out.writeInt(angle);
+//		out.writeString(address);
 		
 	}
 	
@@ -59,14 +58,14 @@ public class Alarm implements Parcelable{
 			   public Alarm createFromParcel(Parcel in) 
 			   {
 				   Alarm msg = new Alarm();
-				   msg.carId = in.readInt();
+				   msg.termid = in.readString();
 				   msg.alarmTime = in.readString(); 
 				   msg.alarmType = in.readString(); 
-				   msg.longitude = in.readDouble(); 
-				   msg.latitude = in.readDouble(); 
-				   msg.speed = in.readInt(); 
-				   msg.angle = in.readInt(); 
-				   msg.address = in.readString(); 
+//				   msg.longitude = in.readDouble(); 
+//				   msg.latitude = in.readDouble(); 
+//				   msg.speed = in.readInt(); 
+//				   msg.angle = in.readInt(); 
+//				   msg.address = in.readString(); 
 				   return msg;
 			   }
 			   public Alarm[] newArray(int size) 

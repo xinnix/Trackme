@@ -11,7 +11,7 @@ public class Car  implements Parcelable {
 	public String devId;
 	public String devtype;
 	public String carGroupId;
-	public boolean alive;
+	public int alive = 0;
 	public CarState lastState;
 	
 	
@@ -28,13 +28,13 @@ public class Car  implements Parcelable {
 
 
 
-	public boolean isAlive() {
+	public int getAlive() {
 		return alive;
 	}
 
 
 
-	public void setAlive(boolean alive) {
+	public void setAlive(int alive) {
 		this.alive = alive;
 	}
 
@@ -48,7 +48,7 @@ public class Car  implements Parcelable {
 		this.devId = devId.trim();
 		this.devtype = devtype.trim();
 		this.carGroupId = carGroupId.trim();
-		this.alive = false;
+		this.alive = 0;
 		this.lastState = null;
 	}
 
@@ -73,7 +73,7 @@ public class Car  implements Parcelable {
 		out.writeString(devId);
 		out.writeString(devtype);
 		out.writeString(carGroupId);
-		out.writeByte((byte) (alive ? 1 : 0));
+		out.writeInt(alive);
 		
 		
 	}
@@ -91,7 +91,7 @@ public class Car  implements Parcelable {
 				   msg.devId = in.readString(); 
 				   msg.devtype = in.readString(); 
 				   msg.carGroupId = in.readString(); 
-				   msg.alive = in.readByte() != 0; 
+				   msg.alive = in.readInt(); 
 				   return msg;
 			   }
 			   public Car[] newArray(int size) 

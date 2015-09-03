@@ -26,11 +26,20 @@ public class CarState {
 			String org[] = orgString.split(",");
 			this.utc = org[0];
 			this.locateState = org[1];
-			this.latitude = decodeLat(org[2]);
-			this.NorS = org[3];
-			this.longitude = decodeLon(org[4]);
-			this.EorW = org[5];
-			this.speed = decodeSpeed(org[6]);
+			if(this.locateState.equals("A")){
+				this.latitude = decodeLat(org[2]);
+				this.NorS = org[3];
+				this.longitude = decodeLon(org[4]);
+				this.EorW = org[5];
+				this.speed = decodeSpeed(org[6]);
+			}else{
+				this.latitude = 0;
+				this.NorS = "";
+				this.longitude = 0;
+				this.EorW = "";
+				this.speed = "0";
+			}
+			
 			this.direction = org[7];
 			this.date = decodeDate(org[8]);
 			this.declination = org[9];

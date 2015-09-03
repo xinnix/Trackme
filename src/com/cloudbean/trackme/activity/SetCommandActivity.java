@@ -1,4 +1,4 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
 
 import java.lang.reflect.Field;
 
@@ -21,6 +21,11 @@ import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.GpsCorrect;
+import com.cloudbean.trackme.R;
+import com.cloudbean.trackme.TrackApp;
+import com.cloudbean.trackme.R.id;
+import com.cloudbean.trackme.R.layout;
+import com.cloudbean.trackme.R.menu;
 
 import android.app.Activity;
 import android.app.AlertDialog;

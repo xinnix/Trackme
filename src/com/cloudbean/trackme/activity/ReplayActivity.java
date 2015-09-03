@@ -1,4 +1,4 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,6 +18,11 @@ import com.cloudbean.model.Track;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.GpsCorrect;
+import com.cloudbean.trackme.R;
+import com.cloudbean.trackme.R.drawable;
+import com.cloudbean.trackme.R.id;
+import com.cloudbean.trackme.R.layout;
+import com.cloudbean.trackme.TrackApp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -144,39 +149,60 @@ public class ReplayActivity extends BaseActivity {
 //			float longtitude = (float) (Math.sin(0) * radius + centerLontitude);
 //			polylineOptions.add(new LatLng(latitude, longtitude));
 	    	//new LatLng(socket9.weidu.get(0),socket9.jingdu.get(0))
-			/*
+			
+	    	MarkerOptions markerOptions = new MarkerOptions();
+			markerOptions.anchor(0.5f, 0.5f);
+	    	/*
 			 * ÅÐ¶ÏÍ£³µÇé¿ö
 			 */
-	    	int stopFlag = 1;
-	    	for(int i=0;i<num;i++)
-			{
-				if(tracklist[i].speed==0&&tracklist[i].isLocated&&(stopFlag==1)){
-					GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
-					 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-					 MarkerOptions markerOptions = new MarkerOptions();
-					 markerOptions.anchor(0.5f, 0.5f);
-					 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
-					 int last = polylineOptions.getPoints().size()-1;
-					 markerOptions.position(polylineOptions.getPoints().get(last));
-					 mAmap.addMarker(markerOptions);
-					 stopFlag=0;
+	    	if(TrackApp.currentCar.devtype.equals("GT601")){
+	    		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_gt610));
+	    		for(int i=0;i<num;i++)
+				{
+	    			GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+	    			polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
 				}
-				if (tracklist[i].status.equals(Track.ACC_START)&&tracklist[i].isLocated){
-					GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
-					 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-					 stopFlag=1;
+	    	}else{
+	    		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_track));
+	    		int stopFlag = 1;
+		    	for(int i=0;i<num;i++)
+				{
+					if(tracklist[i].speed<6&&tracklist[i].isLocated&&(stopFlag==1)){
+						GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+						 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+						 MarkerOptions mo = new MarkerOptions();
+						 mo.anchor(0.5f, 0.5f);
+						 mo.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
+						 int last = polylineOptions.getPoints().size()-1;
+						 mo.position(polylineOptions.getPoints().get(last));
+						 mAmap.addMarker(mo);
+						 stopFlag=0;
+					}
+					if (tracklist[i].status.equals(Track.ACC_START)&&tracklist[i].isLocated){
+						GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+						 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+						 stopFlag=1;
+					}
+					
 				}
-				
-			}
+	    		
+	    	}
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	
 			
 
 			polylineOptions.width(8);
 			polylineOptions.color(Color.RED);
 			mVirtureRoad = mAmap.addPolyline(polylineOptions);
 			Log.i("track", ""+mVirtureRoad.getPoints().size());
-			MarkerOptions markerOptions = new MarkerOptions();
-			markerOptions.anchor(0.5f, 0.5f);
-			markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_track));
+			
+			
+			
 			
 			//markerOptions.position(polylineOptions.getPoints().get(0));
 			mMoveMarker = mAmap.addMarker(markerOptions);

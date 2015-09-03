@@ -1,7 +1,14 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.cloudbean.network.MsgEventHandler;
+import com.cloudbean.trackme.R;
+import com.cloudbean.trackme.TrackApp;
+import com.cloudbean.trackme.R.drawable;
+import com.cloudbean.trackme.R.id;
+import com.cloudbean.trackme.R.layout;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -18,8 +26,9 @@ import android.widget.Toast;
  
 public class MenuActivity extends BaseActivity {
 	private GridView gridview;
-	public String[] menuItems={"实时定位","历史轨迹","报警列表","指令下发","注销"};
-	public int[] icon = {R.drawable.menu_trace,R.drawable.menu_replay,R.drawable.menu_alarm,R.drawable.menu_command,R.drawable.menu_exit};
+	private TextView tvCarid;
+	public String[] menuItems={"车辆列表","实时定位","历史轨迹","报警列表","指令下发","注销"};
+	public int[] icon = {R.drawable.menu_carlist,R.drawable.menu_trace,R.drawable.menu_replay,R.drawable.menu_alarm,R.drawable.menu_command,R.drawable.menu_exit};
 	Intent intent = null;
     /** Called when the activity is first created. */
     @Override
@@ -55,19 +64,22 @@ public class MenuActivity extends BaseActivity {
                         	
                         	switch (position){
                         	case 0:
+                        		intent.setClass(MenuActivity.this, CarGroupListActivity.class);
+                        		break;
+                        	case 1:
                         		
                         		intent.setClass(MenuActivity.this, TraceActivity.class);
                         		break;
-                        	case 1:
+                        	case 2:
                         		intent.setClass(MenuActivity.this, TimeChooseActivity.class);
                         		break;
-                        	case 2:
+                        	case 3:
                         		intent.setClass(MenuActivity.this, AlarmListActivity.class);
                         		break;
-                        	case 3:
+                        	case 4:
                         		intent.setClass(MenuActivity.this, SetCommandActivity.class);
                         		break;
-                        	case 4:
+                        	case 5:
                         		intent.setClass(MenuActivity.this, MainActivity.class);
                         		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
                         		
@@ -86,6 +98,9 @@ public class MenuActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		setContentView(R.layout.activity_menu);
 		gridview = (GridView) findViewById(R.id.GridView);
+		tvCarid = (TextView) findViewById(R.id.tv_menu_carid);
+		tvCarid.setText(TrackApp.currentCar.name);
+		
 	}
 	@Override
 	public void widgetClick(View v) {

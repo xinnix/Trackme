@@ -1,5 +1,7 @@
 package com.cloudbean.network;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,8 +27,13 @@ public abstract class BaseNetworkAdapter extends Thread{
 	public  Socket socket;
 	public  OutputStream outputStream;
 	public  InputStream inputStream;
+	
+	
+	public  DataInputStream dis;
+	 
+	 
 	public byte[] sendBuffer;
-	public byte[] recieveBuffer = new byte[10000];
+	public byte[] recieveBuffer = new byte[20000];
 	
 	
 	private String serverIP = null;
@@ -52,6 +59,7 @@ public abstract class BaseNetworkAdapter extends Thread{
 								 socket = new Socket(InetAddress.getByName(serverIP),port);
 								 outputStream = socket.getOutputStream();
 								 inputStream = socket.getInputStream();
+								 dis =  new DataInputStream((new BufferedInputStream(inputStream)));
 								 setNetworkState(NETWORK_CONNECTED);
 								 while(true){
 									 try{
@@ -62,8 +70,8 @@ public abstract class BaseNetworkAdapter extends Thread{
 									 }
 									 
 								 }
-							 }catch(SocketTimeoutException  ste){
-								 ste.printStackTrace();
+							 }catch(SocketException  se){
+								 se.printStackTrace();
 								 break;
 							 }
 							

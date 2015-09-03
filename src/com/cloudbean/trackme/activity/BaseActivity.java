@@ -1,10 +1,14 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.cloudbean.model.Login;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackme.AppManager;
+import com.cloudbean.trackme.TrackApp;
+import com.cloudbean.trackme.server.NetWorkService;
+import com.cloudbean.trackme.server.NetWorkService.NetworkBinder;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -98,7 +102,10 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	}
 	
 	public void dismissProgressDialog(){
-		pd.dismiss();
+		if(pd!=null){
+			pd.dismiss();
+		}
+		
 	}
 	
 	
@@ -117,8 +124,11 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 		
 	}
 	
-	public void timerStop(){	
-		timer.cancel();		
+	public void timerStop(){
+		if(timer!=null){
+			timer.cancel();		
+		}
+		
 	}
 	
 	

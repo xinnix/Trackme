@@ -23,6 +23,7 @@ public class MsgGPRSParser {
 	public static short MSG_TYPE_GETPOSITION = 0x4101;
 	public final static short MSG_TYPE_DEF = 0x4352;
 	public final static short MSG_TYPE_CIRCUIT = 0x5114;
+	public final static short MSG_TYPE_ALARM = (short) 0x9999;
 	
 	public final static short MSG_TYPE_POSITION = (short)0x9955; 
 	

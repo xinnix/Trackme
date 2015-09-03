@@ -1,7 +1,11 @@
 package com.cloudbean.network;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Car;
@@ -17,10 +21,29 @@ import com.cloudbean.packet.MsgGPRSParser;
 import com.cloudbean.trackerUtil.ByteHexUtil;
 
 import android.util.Log;
+import android.widget.Toast;
 
 public class MsgEventHandler {
 	public static NetworkAdapter na;
 	public static CNetworkAdapter cna;
+	
+	public static Map<Integer, String> alarmMap = new HashMap<Integer,String>(){{
+		put(0x64,"非法点火报警");
+		put(0x11,"超速报警");
+		put(0x12,"出围栏报警");
+		put(0x50,"掉电报警");
+		put(0x12,"移动报警");
+		put(0x14,"终端开机报警");
+		put(0x01,"SOS报警");
+		put(0x10,"内置电池低电压报警");
+		put(0x03,"接触成功");
+		put(0x33,"脱落报警");
+		put(0x66,"长时间停留报警");
+	}};
+	
+	
+	
+	
 	public static void config(NetworkAdapter nwa,CNetworkAdapter cwa){
 		na = nwa;
 		cna = cwa;
@@ -38,10 +61,12 @@ public class MsgEventHandler {
 		DPacketParser dp = new DPacketParser(DPacketParser.SIGNAL_LOGIN,1,2,pktDataColumnType, pktDataColumnLength, pktData);	
 		na.sendPacket(dp.pktBuffer);
 		
+				
+		
 	}
 	
 	public static Login rLogin(DPacketParser dp){
-		
+		String res = ByteHexUtil.bytesToHexString(dp.pktBuffer);
 		Login l =new Login((Integer) (dp.dataTable.table[0][0]),
 				(Integer) (dp.dataTable.table[0][1]),
 				(String) (dp.dataTable.table[0][2]),
@@ -271,23 +296,23 @@ public class MsgEventHandler {
 		
 	}
 	
-	public static Alarm[] rGetAlarmList(DPacketParser dp){
-		 
-		Alarm[] al = new Alarm[dp.dataTable.table.length];
-		for (int ii=0;ii<al.length;ii++){
-			al[ii] = new Alarm((Integer)dp.dataTable.table[ii][0],
-					(String)dp.dataTable.table[ii][1],
-					(String)dp.dataTable.table[ii][2],
-					(Double)dp.dataTable.table[ii][3],
-					(Double)dp.dataTable.table[ii][4],
-					(Integer)dp.dataTable.table[ii][5],
-					(Integer)dp.dataTable.table[ii][6],
-					(String)dp.dataTable.table[ii][7]);
-		}
-
-		return al;
-		
-	}
+//	public static Alarm[] rGetAlarmList(DPacketParser dp){
+//		 
+//		Alarm[] al = new Alarm[dp.dataTable.table.length];
+//		for (int ii=0;ii<al.length;ii++){
+//			al[ii] = new Alarm((Integer)dp.dataTable.table[ii][0],
+//					(String)dp.dataTable.table[ii][1],
+//					(String)dp.dataTable.table[ii][2],
+//					(Double)dp.dataTable.table[ii][3],
+//					(Double)dp.dataTable.table[ii][4],
+//					(Integer)dp.dataTable.table[ii][5],
+//					(Integer)dp.dataTable.table[ii][6],
+//					(String)dp.dataTable.table[ii][7]);
+//		}
+//
+//		return al;
+//		
+//	}
 	
 	
 	
@@ -310,13 +335,13 @@ public class MsgEventHandler {
 		System.arraycopy(bpassword, 0, data, 20, bpassword.length);
 		
 		CPacketParser cp = new CPacketParser(signal,fakeip, data);
-		System.out.println(ByteHexUtil.bytesToHexString(cp.pktBuffer));
+		
 		cna.sendPacket(cp.pktBuffer);
 			
 	}
 	
 	public static int c_rLogin(CPacketParser cp){
-		
+		System.out.println("clogin:"+ByteHexUtil.bytesToHexString(cp.pktBuffer));
 		byte sig = ByteHexUtil.intToByte(cp.pktFakeIP)[0];
 		
 		if (sig==(byte)0x01){
@@ -331,31 +356,38 @@ public class MsgEventHandler {
 	
 	
 	public static void c_sGetAllLastPosition(){
-		String hexPacket  = "2929a4000600000000";
-		String end = "0d";
-		byte[] packet = ByteHexUtil.hexStringToBytes(hexPacket);
-		byte check = CPacketParser.packetCheck(packet);
-		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
-		try{
-			bis.write(packet);
-			bis.write(check);
-			bis.write(ByteHexUtil.hexStringToBytes(end));
+//		String hexPacket  = "2929a4000600000000";
+//		String end = "0d";
+//		byte[] packet = ByteHexUtil.hexStringToBytes(hexPacket);
+//		byte check = CPacketParser.packetCheck(packet);
+//		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
+//		try{
+//			bis.write(packet);
+//			bis.write(check);
+//			bis.write(ByteHexUtil.hexStringToBytes(end));
+//		
+//			
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
 		
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		Log.i("position", ByteHexUtil.bytesToHexString(bis.toByteArray()));
 		
-		cna.sendPacket(bis.toByteArray());
+//		cna.sendPacket(bis.toByteArray());
+		byte signal = (byte)0xa4;
+		int fakeip = 0;
+		byte[] data = null;
 		
-			
+		CPacketParser cp = new CPacketParser(signal,fakeip, data);
+		
+		cna.sendPacket(cp.pktBuffer);
+		String res = ByteHexUtil.bytesToHexString(cp.pktBuffer);
 	}
 	
 	
 	public static CarState c_rGetAllCarPosition(CPacketParser cp){
 		MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
 		CarState cs = new CarState(mgp.msgData);
+		
 		return cs;
 		
 	}
@@ -363,7 +395,7 @@ public class MsgEventHandler {
 	
 	public static void c_sGetCarPosition(Car car){
 		
-		c_sCommand(car,MsgGPRSParser.MSG_TYPE_GETPOSITION,"");
+		String res = c_sCommand(car,MsgGPRSParser.MSG_TYPE_GETPOSITION,"");
 			
 	}
 	
@@ -371,9 +403,27 @@ public class MsgEventHandler {
 	public static CarState c_rGetCarPosition(MsgGPRSParser mgp){
 
 		CarState cs = new CarState(mgp.msgData);
-		int i  = mgp.msgTermID.indexOf("f");	
-		cs.setDevid(mgp.msgTermID.substring(0, i));
+		int i  = mgp.msgTermID.indexOf("f");
+		
+		
+		if(i!=0){
+			cs.setDevid(mgp.msgTermID.substring(0, i));
+		}else{
+			cs.setDevid(mgp.msgTermID);
+		}
+		
+		
 		return cs;
+		
+			
+	}
+	
+	public static Alarm c_rGetAlarmInfo(MsgGPRSParser mgp){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+		int alarmType = ByteHexUtil.hexStringToBytes(mgp.msgData.substring(0, 2))[0];
+		Alarm al = new Alarm(mgp.msgTermID,format.format(new Date()),alarmMap.get(alarmType));
+		
+		return al;
 		
 			
 	}
@@ -393,7 +443,7 @@ public class MsgEventHandler {
 		c_sCommand(car,MsgGPRSParser.MSG_TYPE_CIRCUIT,data);
 	}
 	
-	public static void c_sCommand(Car car,short commandType,String data){
+	public static String c_sCommand(Car car,short commandType,String data){
 		String devid = car.devId;
 		for(int i = (14-devid.length());i>0;i--){
 			devid=devid.concat("f");
@@ -412,6 +462,7 @@ public class MsgEventHandler {
 		String test = ByteHexUtil.bytesToHexString(cp.pktBuffer);
 		
 		cna.sendPacket(cp.pktBuffer);
+		return ByteHexUtil.bytesToHexString(cp.pktBuffer);
 	}
 	
 	

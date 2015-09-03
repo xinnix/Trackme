@@ -1,9 +1,10 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.server;
 
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackme.TrackApp;
 
 import android.app.Service;
 import android.content.Intent;
@@ -15,6 +16,12 @@ public class NetWorkService extends Service {
 	public CNetworkAdapter cna;
 	public HeartBeat hb;
 	private Binder binder;
+	
+	private String dip;
+	private String cip;
+	private int dport;
+	private int cport;
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -27,12 +34,28 @@ public class NetWorkService extends Service {
 	            return NetWorkService.this;
 	   }
 	}
+	
+	private String[] decodeAddr(String addr){
+		return addr.split(":");
+		
+	}
+	
+	
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		na = new NetworkAdapter("61.145.122.143",4519);
-		cna = new CNetworkAdapter("61.145.122.143",4508);
+		String[] d = decodeAddr(TrackApp.dServerAddr);
+		String[] c = decodeAddr(TrackApp.cServerAddr);
+		
+		dip = d[0];
+		dport = Integer.parseInt(d[1]);
+		
+		cip = c[0];
+		cport = Integer.parseInt(c[1]);
+		
+		na = new NetworkAdapter(dip,dport);
+		cna = new CNetworkAdapter(cip,cport,getApplication());
 		hb = new HeartBeat();
 		MsgEventHandler.config(na, cna);
 //		na.start();

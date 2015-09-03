@@ -17,6 +17,9 @@ public class CPacketParser {
 	public final static byte SIGNAL_RE_LOGIN = (byte)0xe3; 
 
 	public final static byte SIGNAL_RELAY = (byte)0xaa; 
+	public final static byte SIGNAL_POSCOMPLETE = (byte)0xa9; 
+	
+	public final static byte SIGNAL_PREPOSITION = (byte)0xbb; 
 	
 	public short pktHead=0x2929;
 	public byte pktSignal;
@@ -41,7 +44,7 @@ public class CPacketParser {
 		
 		this.pktSignal = pktSignal;
 		this.pktData = data;
-		this.pktLength = (short)(6+data.length);
+		this.pktLength = (short)(6+(data!=null?data.length:0));
 		this.pktFakeIP = pktFakeIP;
 		
 		ByteArrayOutputStream  bis = new ByteArrayOutputStream();
@@ -51,7 +54,10 @@ public class CPacketParser {
 			bis.write(this.pktSignal);
 			bis.write(ByteHexUtil.shortToByte(this.pktLength));
 			bis.write(ByteHexUtil.intToByte(this.pktFakeIP));
-			bis.write(this.pktData);
+			if (this.pktData != null){
+				bis.write(this.pktData);
+			}
+			
 			
 			this.pktCheck =packetCheck(bis.toByteArray());
 			

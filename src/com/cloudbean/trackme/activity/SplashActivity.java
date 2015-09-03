@@ -1,4 +1,7 @@
-package com.cloudbean.trackme;
+package com.cloudbean.trackme.activity;
+
+import com.cloudbean.trackme.R;
+import com.cloudbean.trackme.R.layout;
 
 import android.app.Activity; 
 import android.content.Intent; 

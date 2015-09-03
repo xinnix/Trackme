@@ -32,6 +32,9 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 	public static int MSG_TRACK = 0x1004;
 	public static int MSG_ALARM = 0x1005;
 	
+	
+	
+	
 	 public NetworkAdapter(final String serverIP,final int port){
 		 super(serverIP,port);
 		 connect();
@@ -41,8 +44,8 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 		 super(packet);
 	 }
 
-	 public byte[] preParser(InputStream inputStream) throws Exception{
-		 DataInputStream dis = new DataInputStream((new BufferedInputStream(inputStream)));
+	 public byte[] preParser() throws Exception{
+		 
 		 ByteArrayOutputStream  bos = new ByteArrayOutputStream();
 		 try{
 			 int header = dis.readInt();
@@ -149,7 +152,7 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 
 		 try{
 			 
-			 byte[] packetByte  = preParser(inputStream);
+			 byte[] packetByte  = preParser();
 			 
 			// System.out.println(len);
 			// System.out.println(ByteHexUtil.bytesToHexString(Arrays.copyOfRange(recieveBuffer,0,len)));
@@ -173,6 +176,8 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 					 break;
 				 case DPacketParser.SIGNAL_RE_GETCARGROUP:
 					 CarGroup[] carGroupList = MsgEventHandler.rGetCarGroup(dp);
+					 TrackApp.carGroupList = carGroupList;
+					 
 					 msg = TrackApp.curHandler.obtainMessage(); 
 					 bundle = new Bundle();
 					 bundle.putParcelableArray("carGroupList", carGroupList);
@@ -185,6 +190,8 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 					 break;
 				 case DPacketParser.SIGNAL_RE_GETCARINFO:
 					 Car[] carList=MsgEventHandler.rGetCarInfo(dp);
+					 TrackApp.carList = carList;
+					 TrackApp.currentCar = carList[0];
 					 msg = TrackApp.curHandler.obtainMessage(); 
 					 bundle = new Bundle();
 					 bundle.putParcelableArray("carList", carList);
@@ -202,15 +209,15 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 					 msg.what = MSG_TRACK;
 					 TrackApp.curHandler.sendMessage(msg);
 					 break;
-				 case DPacketParser.SIGNAL_RE_GETALARMLIST:
-					 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
-					 msg = TrackApp.curHandler.obtainMessage(); 
-					 bundle = new Bundle();
-					 bundle.putParcelableArray("alarmlist", alarmList);
-					 msg.setData(bundle);
-					 msg.what = MSG_ALARM;
-					 TrackApp.curHandler.sendMessage(msg);
-					 break;	
+//				 case DPacketParser.SIGNAL_RE_GETALARMLIST:
+//					 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
+//					 msg = TrackApp.curHandler.obtainMessage(); 
+//					 bundle = new Bundle();
+//					 bundle.putParcelableArray("alarmlist", alarmList);
+//					 msg.setData(bundle);
+//					 msg.what = MSG_ALARM;
+//					 TrackApp.curHandler.sendMessage(msg);
+//					 break;	
 				 case DPacketParser.SIGNAL_FAIL:
 					 MsgEventHandler.rFail(dp);
 					 msg = TrackApp.curHandler.obtainMessage(); 
@@ -226,6 +233,9 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 		 	  
 	 
 	}
+	
+	
+	
 	
 
 }

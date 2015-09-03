@@ -16,6 +16,10 @@ android:layout_marginRight ="28.0dip"
 android:layout_marginTop ="40.0dip" 
 android:orientation ="vertical" > 
 
+    
+    
+    
+
 <LinearLayout 
 android:layout_width ="fill_parent" 
 android:layout_height ="44.0dip" 
@@ -94,6 +98,21 @@ android:gravity ="center"
 android:textSize ="20dp"
 android:textColor ="#ffffff" 
 android:text = "退出" /> 
+
+
+<Button 
+android:id ="@+id/setServer" 
+android:layout_width ="fill_parent" 
+android:paddingTop ="1.0dip" 
+android:layout_height ="40dp" 
+android:layout_marginLeft ="28.0dip" 
+android:layout_marginRight ="28.0dip" 
+android:layout_marginTop ="5.0dip" 
+android:layout_below ="@+id/exit" 
+android:gravity ="center" 
+android:textSize ="20dp"
+android:textColor ="#ffffff" 
+android:text = "设置服务器地址" /> 
 </RelativeLayout >
 
 <RelativeLayout 
