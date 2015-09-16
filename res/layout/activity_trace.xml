@@ -14,10 +14,10 @@
  	     android:layout_width="match_parent"
  	     android:layout_height="wrap_content"
  	     android:layout_alignTop="@id/map"
- 	     android:background="#D000"
- 	     android:minWidth="130dip"
+ 	     
+ 	  
  	     android:orientation="vertical"
- 	     android:padding="6dp" >
+ 	      >
 
 		<ToggleButton
 		     android:id="@+id/btTrace_Satelite"
@@ -40,24 +40,28 @@
             android:id="@+id/bt_dev_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设备位置" />
+            android:text="设备位置" 
+            android:textColor="#fff"/>
         <Button
             android:id="@+id/bt_my_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="我的位置" />
+            android:text="我的位置" 
+            android:textColor="#fff"/>
 
         <Button
             android:id="@+id/bt_trace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="跟踪" />
+            android:text="跟踪"
+            android:textColor="#fff" />
 
         <Button
             android:id="@+id/bt_navi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="导航" />
+            android:text="导航" 
+            android:textColor="#fff"/>
     </LinearLayout>
 
     

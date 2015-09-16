@@ -16,7 +16,7 @@ public class Alarm implements Parcelable{
 	
 	public Alarm(String termid, String alarmTime, String alarmType) {
 		super();
-		this.termid = termid;
+		this.termid = decodeDevId(termid);
 		this.alarmTime = alarmTime.trim();
 		this.alarmType = alarmType.trim();
 //		this.longitude = longitude;
@@ -25,7 +25,12 @@ public class Alarm implements Parcelable{
 //		this.angle = angle;
 //		this.address = address;
 	}
-	
+	private String decodeDevId(String devid){
+		if(devid.indexOf("f")>0){
+			return devid.substring(devid.indexOf("f"));
+		}
+		return devid;
+	}
 	
 	public Alarm() {
 		// TODO Auto-generated constructor stub

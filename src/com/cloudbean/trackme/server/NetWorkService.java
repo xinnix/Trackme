@@ -7,6 +7,7 @@ import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackme.TrackApp;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -16,6 +17,10 @@ public class NetWorkService extends Service {
 	public CNetworkAdapter cna;
 	public HeartBeat hb;
 	private Binder binder;
+	
+	
+	private Context context;
+	
 	
 	private String dip;
 	private String cip;
@@ -53,9 +58,9 @@ public class NetWorkService extends Service {
 		
 		cip = c[0];
 		cport = Integer.parseInt(c[1]);
-		
+		context = getApplicationContext();
 		na = new NetworkAdapter(dip,dport);
-		cna = new CNetworkAdapter(cip,cport,getApplication());
+		cna = new CNetworkAdapter(cip,cport,context);
 		hb = new HeartBeat();
 		MsgEventHandler.config(na, cna);
 //		na.start();

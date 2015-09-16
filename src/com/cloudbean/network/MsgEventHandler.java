@@ -60,7 +60,7 @@ public class MsgEventHandler {
 		System.arraycopy(bpassword, 0, pktData, busername.length*2, bpassword.length);
 		DPacketParser dp = new DPacketParser(DPacketParser.SIGNAL_LOGIN,1,2,pktDataColumnType, pktDataColumnLength, pktData);	
 		na.sendPacket(dp.pktBuffer);
-		
+		String res = ByteHexUtil.bytesToHexString(dp.pktBuffer);
 				
 		
 	}
@@ -82,9 +82,6 @@ public class MsgEventHandler {
 	public static Fail rFail(DPacketParser dp){
 		
 		Fail f = new Fail((Integer)dp.dataTable.table[0][0],(String)dp.dataTable.table[0][1]);
-		
-		System.out.print(""+f.signal+'#'+f.reason.trim());
-		System.out.println("");	
 	
 		return f;
 		
@@ -241,6 +238,7 @@ public class MsgEventHandler {
 		System.arraycopy(bedate, 0, pktData, bcarid.length+bsdate.length*2, bedate.length);
 		DPacketParser dp = new DPacketParser(DPacketParser.SIGNAL_GETCARTRACK,1,3,pktDataColumnType, pktDataColumnLength, pktData);	
 		na.sendPacket(dp.pktBuffer);
+		String res = ByteHexUtil.bytesToHexString(dp.pktBuffer);
 	}
 	public static Track[] rGetCarTrack(DPacketParser dp){
 		
@@ -419,20 +417,12 @@ public class MsgEventHandler {
 	}
 	
 	public static Alarm c_rGetAlarmInfo(MsgGPRSParser mgp){
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		int alarmType = ByteHexUtil.hexStringToBytes(mgp.msgData.substring(0, 2))[0];
 		Alarm al = new Alarm(mgp.msgTermID,format.format(new Date()),alarmMap.get(alarmType));
-		
 		return al;
-		
-			
 	}
-	
-	
-	
-	
-	
-	
+
 	
 	public static void c_sSetDef(Car car,String data){
 		

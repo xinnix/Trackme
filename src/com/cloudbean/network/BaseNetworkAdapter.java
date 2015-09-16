@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
+import com.cloudbean.trackme.TrackApp;
+
 public abstract class BaseNetworkAdapter extends Thread{
 	private static final int NETWORK_CONNECTED = 0;
 	private static final int NETWORK_DISCONNECT = 1;
@@ -53,46 +55,40 @@ public abstract class BaseNetworkAdapter extends Thread{
 		 new Thread () {
 			 public void run(){
 				 while(true){
-					 try{
 						 try{
-							 try{
-								 socket = new Socket(InetAddress.getByName(serverIP),port);
-								 outputStream = socket.getOutputStream();
-								 inputStream = socket.getInputStream();
-								 dis =  new DataInputStream((new BufferedInputStream(inputStream)));
-								 setNetworkState(NETWORK_CONNECTED);
-								 while(true){
-									 try{
-										 recivePacket(); 
-									 }catch(EOFException  se){
-										 se.printStackTrace();
-										 break;
-									 }
-									 
-								 }
-							 }catch(SocketException  se){
-								 se.printStackTrace();
-								 break;
+							 socket = new Socket(InetAddress.getByName(serverIP),port);
+							 outputStream = socket.getOutputStream();
+							 inputStream = socket.getInputStream();
+							 dis =  new DataInputStream((new BufferedInputStream(inputStream)));
+							 setNetworkState(NETWORK_CONNECTED);
+							 if(TrackApp.curUsername!=null){
+								MsgEventHandler.sLogin(TrackApp.curUsername, TrackApp.curPassword);
+								MsgEventHandler.c_sLogin(TrackApp.curUsername, TrackApp.curPassword);
 							 }
-							
-						 }catch(Exception e){
+							 while(true){
+								 try{
+									 recivePacket(); 
+								 }catch(Exception  e){
+									 e.printStackTrace();
+									 break;
+								 } 
+							 }
+						 }catch(Exception e ){
 							 e.printStackTrace();
 							 break;
-						 } 
-						 sleep(100);
-					 }catch(Exception e){
-						 e.printStackTrace();
-					 }
-					 
-					 
-				 }
+						 }// end of try		
 				
-				 
-			 }
-			
-		 }.start();
+				}// end of while
+				
+				try {
+					sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+		 }
+	}.start();
 	}
-	
 	 public void sendPacket(byte[] packet){
 		 try{
 			 this.sendBuffer = packet;

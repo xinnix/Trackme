@@ -32,9 +32,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class TimeChooseActivity extends BaseActivity{
-	
-
-
 
 	private static boolean isShow = true;
 	private EditText etDateText = null ;
@@ -78,13 +75,11 @@ public class TimeChooseActivity extends BaseActivity{
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 
-		Date d= new Date();
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		etDateText.setText(format.format(d));
+		
 		Intent intent = this.getIntent();
 		Bundle b  = intent.getExtras();
 		carId = b.getInt("carid");
-		
+		setFinishOnTouchOutside(false);
 		
 		
 		
@@ -179,6 +174,10 @@ public class TimeChooseActivity extends BaseActivity{
 		etPeriodText = (EditText)findViewById(R.id.etPeriodText);
 		btReply = (Button)findViewById(R.id.btReply);
 		btReply.setOnClickListener(this);
+		Date d= new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		etDateText.setText(format.format(d));
+		etPeriodText.setText("1Сʱ");
 	}
 
 
@@ -199,7 +198,9 @@ public class TimeChooseActivity extends BaseActivity{
 			intent.putExtra("startDate", startDate);
 			intent.putExtra("endDate", endDate);
 			intent.putExtra("carId", Integer.parseInt(TrackApp.currentCar.id));
+			intent.putExtra("isTimeSelected", "ok");
 			startActivity(intent);
+			finish();
 			break;
 		
 		}

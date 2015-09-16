@@ -128,6 +128,22 @@ public class ByteHexUtil {
 	public static short byteToShort(byte[] b) {  
 	      return (short) (((b[ 0] << 8) | b[1] & 0xff));  
 	}  
-
+	
+	
+	/**
+     * 将byte转换为一个长度为8的boolean数组（每bit代表一个boolean值）
+     * 
+     * @param b byte
+     * @return boolean数组
+     */
+    public static boolean[] getBooleanArray(byte b) {
+        boolean[] array = new boolean[8];
+        for (int i = 7; i >= 0; i--) { //对于byte的每bit进行判定
+            array[i] = (b & 1) == 1;   //判定byte的最后一位是否为1，若为1，则是true；否则是false
+            b = (byte) (b >> 1);       //将byte右移一位
+        }
+        return array;
+    }
+ 
 
 }

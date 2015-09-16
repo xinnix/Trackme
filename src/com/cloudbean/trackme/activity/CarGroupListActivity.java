@@ -264,6 +264,7 @@ public class CarGroupListActivity extends BaseActivity{
 			TextView child_carName = (TextView) convertView.findViewById(R.id.carName);
 			TextView child_carDevId = (TextView) convertView.findViewById(R.id.carDevId);
 			TextView child_carDevType = (TextView) convertView.findViewById(R.id.carDevType);
+			TextView child_isOnline = (TextView) convertView.findViewById(R.id.isOnline);
 			ImageView child_carImg = (ImageView) convertView.findViewById(R.id.carImg);
 			/**
 			 * 设置相应控件的内容
@@ -273,16 +274,22 @@ public class CarGroupListActivity extends BaseActivity{
 			child_carName.setText(carTable.get(groupPosition).get(childPosition).name);
 			child_carDevId.setText(carTable.get(groupPosition).get(childPosition).devId);
 			int carImg = 0;
-			switch(carTable.get(groupPosition).get(childPosition).getAlive()){
-			case 0:
+			int alive = carTable.get(groupPosition).get(childPosition).getAlive();
+			String online = "离线";
+			if(alive==0){
 				carImg  = R.drawable.car_offline;
-				break;
-			case 1:
+			}else if(alive == 1){
 				carImg = R.drawable.car_online;
-				break;
-			default:
+				online = "有最后位置";
+			}else if(alive >1){
 				carImg = R.drawable.car_online2;
+				online = "在线";
+			}else{
+				carImg  = R.drawable.car_offline;
 			}
+			
+			child_isOnline.setText(online);
+			
 			child_carImg.setImageResource(carImg);
 			// 判断item的位置是否相同，如相同，则表示为选中状态，更改其背景颜色，如不相同，则设置背景色为白色
 			if (child_groupId == groupPosition
@@ -434,7 +441,9 @@ public class CarGroupListActivity extends BaseActivity{
 	@Override
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
-		
+		if(msg.what==CNetworkAdapter.MSG_POSITION){
+			((BaseExpandableListAdapter) adapter).notifyDataSetChanged();
+		}
 	}
 
 

@@ -55,7 +55,7 @@ public class ReplayActivity extends BaseActivity {
 	private Button tbStop = null;
 	private SeekBar sbSpeed = null;
 	private GridLayout la = null;
-	
+	private String isTimeSelected =null;
 	
 	// 通过设置间隔时间和距离可以控制速度和图标移动的距离
 	private static int TIME_INTERVAL = 200;
@@ -72,8 +72,6 @@ public class ReplayActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mMapView.onCreate(savedInstanceState);
-		
-		
 		Intent intent = this.getIntent();
 		int carId = intent.getIntExtra("carId", 0);
 		String startDate = intent.getStringExtra("startDate");
@@ -82,8 +80,7 @@ public class ReplayActivity extends BaseActivity {
 		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
 		showProgressDialog("历史轨迹获取中...");
 		timerStart();
-		moveThread=new MyThread() ;
-		
+		moveThread=new MyThread();
 		//mAmap.moveCamera(CameraUpdateFactory.zoomTo(10));
 		
 	}
@@ -290,7 +287,9 @@ public class ReplayActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		mMapView.onResume();
-	    Log.i("test", "onResume");
+		
+	
+		
 	}
 
 	/**
@@ -431,8 +430,6 @@ public class ReplayActivity extends BaseActivity {
 		tbPlay = (Button)findViewById(R.id.btPlay);
 		tbStop = (Button)findViewById(R.id.btStop);
 		sbSpeed = (SeekBar)findViewById(R.id.speedSeekBar);
-		la = (GridLayout)findViewById(R.id.replayGridLayout);
-		la.setBackgroundColor(Color.WHITE);
 		sbSpeed.setMax(1000);
 		
 		sbSpeed.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
@@ -530,7 +527,9 @@ public class ReplayActivity extends BaseActivity {
         }else if (msg.what==NetworkAdapter.MSG_FAIL){
        	 dismissProgressDialog();
        	 timerStop();
-       	 showMessage("获取数据错误或数据库无数据");
+       	 Bundle b = msg.getData();
+       	 String reason = b.getString("reason");
+       	 showMessage(reason);
         }else if (msg.what==TIME_OUT){
        	 dismissProgressDialog();
        	 showMessage("设备关机或网络状况导致数据返回超时");

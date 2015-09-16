@@ -11,6 +11,7 @@ import com.cloudbean.trackme.R.layout;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;

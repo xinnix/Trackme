@@ -17,46 +17,50 @@
         android:textOff="开启卫星模式"
         android:textOn="恢复正常模式" />
 
-    <GridLayout
-        android:id="@+id/replayGridLayout"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:columnCount="3"
-        android:rowCount="2" >
+        android:background="#D000"
+         >
 
-        <SeekBar
-            android:id="@+id/speedSeekBar"
-            android:layout_width="fill_parent"
-            android:layout_column="1"
-            android:layout_gravity="fill_horizontal|center_vertical"
-            android:layout_row="1" />
-
-        <TextView
-            android:layout_column="0"
-            android:layout_gravity="left|center_vertical"
-            android:layout_row="1"
-            android:text="播放速度控制" />
-
-        <Button
-            android:id="@+id/btStop"
+        <LinearLayout
+            android:id="@+id/ll"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_gravity="left"
-            android:layout_row="0"
-            android:text="暂停" />
+            android:layout_height="wrap_content" >
 
-        <Button
-            android:id="@+id/btPlay"
-            android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/btPlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#fff"
+                android:text="播放" />
+
+            <Button
+                android:id="@+id/btStop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#fff"
+                android:text="暂停" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_gravity="left"
-            android:layout_row="0"
-            android:text="播放" />
-    </GridLayout>
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="播放速度控制"
+                android:textColor="#fff" />
+
+            <SeekBar
+                android:id="@+id/speedSeekBar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -16,11 +16,13 @@ import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackme.AppManager;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
 import com.cloudbean.trackme.R.id;
 import com.cloudbean.trackme.R.layout;
 import com.cloudbean.trackme.R.menu;
+import com.cloudbean.trackme.dialog.IPDialog;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -32,12 +34,14 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 public class AlarmListActivity extends BaseActivity {
 	private ListView lv =null;
+	private Button btClearAlarmList = null;
 	SimpleAdapter adapter = null;
 	List data = new ArrayList<Map<String,?>>();  
 	@Override
@@ -152,12 +156,20 @@ public class AlarmListActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		setContentView(R.layout.activity_alarm_list);
 		lv = (ListView) findViewById(R.id.alarmList);
+		btClearAlarmList = (Button) findViewById(R.id.bt_clearAlarmList);
+		btClearAlarmList.setOnClickListener(this);
 	}
 
 	@Override
 	public void widgetClick(View v) {
 		// TODO Auto-generated method stub
-		
+		switch(v.getId()){
+		case R.id.bt_clearAlarmList:
+			TrackApp.alarmList.clear();
+			adapter.notifyDataSetChanged();
+			break;
+	
+		}
 	}
 
 	@Override

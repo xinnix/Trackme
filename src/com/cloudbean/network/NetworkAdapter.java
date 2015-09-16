@@ -8,6 +8,7 @@ import java.util.Arrays;
 import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Car;
 import com.cloudbean.model.CarGroup;
+import com.cloudbean.model.Fail;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.packet.DPacketParser;
@@ -31,8 +32,7 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 	public static int MSG_CARGROUPINFO = 0x1003;
 	public static int MSG_TRACK = 0x1004;
 	public static int MSG_ALARM = 0x1005;
-	
-	
+
 	
 	
 	 public NetworkAdapter(final String serverIP,final int port){
@@ -219,10 +219,14 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 //					 TrackApp.curHandler.sendMessage(msg);
 //					 break;	
 				 case DPacketParser.SIGNAL_FAIL:
-					 MsgEventHandler.rFail(dp);
-					 msg = TrackApp.curHandler.obtainMessage(); 
+					 Fail f = MsgEventHandler.rFail(dp);
+					 msg = TrackApp.curHandler.obtainMessage();
+					 bundle = new Bundle();
+					 bundle.putString("reason", f.reason);
+					 msg.setData(bundle);
+					 msg.what = MSG_FAIL;
+					 TrackApp.curHandler.sendMessage(msg);
 					 break;
-				 
 				 }
 			
 			 

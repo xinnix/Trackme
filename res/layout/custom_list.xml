@@ -67,6 +67,21 @@
                 android:layout_row="1"
            		android:layout_column="1"     
                 android:text="TextView" />
+             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_row="1"
+           		android:layout_column="2"     
+                android:text="状态" />
+             <TextView
+                android:id="@+id/isOnline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_row="1"
+           		android:layout_column="3"     
+                android:text="TextView" />
 
             
 

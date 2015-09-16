@@ -6,20 +6,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.cloudbean.trackme.activity.AlarmListActivity" >
+    tools:context="com.cloudbean.trackme.activity.OtherCommandActivity" >
 
-       
-    <ListView  
-    android:id="@+id/alarmList"  
-    android:layout_width="fill_parent"  
-    android:layout_height="fill_parent" />
-
-    <Button
-        android:id="@+id/bt_clearAlarmList"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:text="清空报警列表" />
+        android:text="@string/hello_world" />
 
 </RelativeLayout>

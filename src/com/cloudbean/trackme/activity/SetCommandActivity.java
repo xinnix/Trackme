@@ -49,8 +49,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 public class SetCommandActivity extends BaseActivity {
-	private Button btSetDef = null;
-	private Button btCancelDef = null;
+	
 	private Button btDisconCircuit = null;
 	private Button btConnCircuit = null;
 	private AlertDialog alertDialog = null;
@@ -193,13 +192,11 @@ public class SetCommandActivity extends BaseActivity {
 	public void initWidget() {
 		// TODO Auto-generated method stub
 		setContentView(R.layout.activity_set_command);
-		btSetDef = (Button)findViewById(R.id.set_def);
-		btCancelDef = (Button)findViewById(R.id.cancel_def);
+		
 		btDisconCircuit = (Button)findViewById(R.id.discon_circuit);
 		btConnCircuit = (Button)findViewById(R.id.conn_circuit);
 		lvLog = (ListView)findViewById(R.id.loglist);
-		btSetDef.setOnClickListener(this);
-		btCancelDef.setOnClickListener(this);
+		
 		btConnCircuit.setOnClickListener(this);
 		btDisconCircuit.setOnClickListener(this);
 	}
@@ -209,18 +206,6 @@ public class SetCommandActivity extends BaseActivity {
 	public void widgetClick(View v) {
 		// TODO Auto-generated method stub
 		switch(v.getId()){
-		case R.id.set_def:
-			MsgEventHandler.c_sSetDef(TrackApp.currentCar, "01");
-			curCommand = btSetDef.getText().toString();
-			showProgressDialog("发送中...");
-			timerStart();
-			break;
-		case R.id.cancel_def:
-			MsgEventHandler.c_sSetDef(TrackApp.currentCar, "00");
-			curCommand = btCancelDef.getText().toString();
-			showProgressDialog("发送中...");
-			timerStart();
-			break;
 		case R.id.discon_circuit:
 			MsgEventHandler.c_sSetCircuit(TrackApp.currentCar, "0002020202");
 			curCommand = btConnCircuit.getText().toString();

@@ -1,6 +1,9 @@
 package com.cloudbean.model;
 
+import java.text.DecimalFormat;
+
 import com.cloudbean.trackerUtil.ByteHexUtil;
+import com.cloudbean.trackme.TrackApp;
 
 public class CarState {
 	
@@ -55,11 +58,13 @@ public class CarState {
 	public GPRMC gprmc;
 	public String posAccuracy;
 	public String height;
-	public String portState;
-	public String voltage;
+	public byte[] portState;
+	public String analogInput;
+	public String temperature;
 	public String baseStation;
 	public String gsmStrength;
 	public String distant;
+	public String voltage;
 	
 	public void setDevid(String devid){
 		
@@ -75,12 +80,13 @@ public class CarState {
 		this.gprmc = new GPRMC(org[0]);
 		this.posAccuracy = org[1];
 		this.height	= org[2];
-		this.portState	= org[3];
-		this.voltage = org[4];
+		this.portState	= ByteHexUtil.hexStringToBytes(org[3].trim());
+		this.analogInput  = org[4];
+		this.temperature = ""+decodeTemp(this.analogInput);
 		this.baseStation = org[5];
 		this.gsmStrength = org[6];
 		this.distant = decodeDistant(org[7]);
-		
+		this.voltage =decodeVoltage(org[8]);
 		
 	}
 	
@@ -91,12 +97,31 @@ public class CarState {
 		return a+b;
 	}
 	
+	private double decodeTemp(String analogInput){
+		String[] tmp =  analogInput.split(",");
+		String res;
+		if (tmp[1].length()<3){
+			res = "00"+tmp[1].substring(tmp[1].length()-2);
+		}else{
+			res = tmp[1];
+		}
+		short ress = ByteHexUtil.byteToShort(ByteHexUtil.hexStringToBytes(res));
+		return ress;
+	}
 	private double decodeLon(String lat){
 		int a = Integer.parseInt(lat.substring(0, 3));
 		double b = Double.parseDouble(lat.substring(3, lat.length()))/60;
 		return a+b;
 	}
-	
+	private String decodeVoltage(String voltage){
+		byte[] voltageByte = ByteHexUtil.hexStringToBytes(voltage); 
+		int voltageInt  = ByteHexUtil.byteToShort(voltageByte);
+		double res = (voltageInt*3.2*16)/4096;
+		DecimalFormat formatter = new DecimalFormat("##0.0");
+		
+		return formatter.format(res);
+		
+	}
 	
 	private String decodeDate(String date){
 		String y = date.substring(4);
@@ -107,7 +132,11 @@ public class CarState {
 	
 	private String decodeSpeed(String speed){
 		Double v = Double.parseDouble(speed)*1.852;
-		return v+"";
+		v = v<6?0:v;//速度小于6km过滤
+		DecimalFormat formatter = new DecimalFormat("##0.00");
+		String ns = formatter.format(v);
+		
+		return ns;
 	}
 	
 	private String decodeDistant(String dis){

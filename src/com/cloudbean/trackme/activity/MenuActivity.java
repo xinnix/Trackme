@@ -2,7 +2,13 @@ package com.cloudbean.trackme.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import com.cloudbean.model.Alarm;
+import com.cloudbean.model.Car;
+import com.cloudbean.model.CarGroup;
+import com.cloudbean.model.Login;
+import com.cloudbean.model.User;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
@@ -13,6 +19,7 @@ import com.cloudbean.trackme.R.layout;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,8 +34,8 @@ import android.widget.Toast;
 public class MenuActivity extends BaseActivity {
 	private GridView gridview;
 	private TextView tvCarid;
-	public String[] menuItems={"车辆列表","实时定位","历史轨迹","报警列表","指令下发","注销"};
-	public int[] icon = {R.drawable.menu_carlist,R.drawable.menu_trace,R.drawable.menu_replay,R.drawable.menu_alarm,R.drawable.menu_command,R.drawable.menu_exit};
+	public String[] menuItems={"设备列表","位置获取","历史轨迹","报警查看","油路控制","设防撤防","指令下发","注销"};
+	public int[] icon = {R.drawable.menu_carlist,R.drawable.menu_trace,R.drawable.menu_replay,R.drawable.menu_alarm,R.drawable.menu_command,R.drawable.set_def,R.drawable.send_command,R.drawable.menu_exit};
 	Intent intent = null;
     /** Called when the activity is first created. */
     @Override
@@ -80,9 +87,15 @@ public class MenuActivity extends BaseActivity {
                         		intent.setClass(MenuActivity.this, SetCommandActivity.class);
                         		break;
                         	case 5:
+                        		intent.setClass(MenuActivity.this, SetDefActivity.class);
+                        		break;
+                        	case 6:
+                        		intent.setClass(MenuActivity.this,OtherCommandActivity.class);
+                        		break;
+                        	case 7:
                         		intent.setClass(MenuActivity.this, MainActivity.class);
                         		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
-                        		
+                        		initApp();
                         		break;
                         		
                         	}
@@ -93,6 +106,23 @@ public class MenuActivity extends BaseActivity {
                     }
                 );
     }
+    
+    
+    private void initApp(){
+    	TrackApp.isLogin = false;
+		TrackApp.alarmList= new ArrayList<Alarm>();
+		TrackApp.curHandler = null;
+		TrackApp.user = null;
+		TrackApp.login = null;
+		TrackApp.carList = null;
+		TrackApp.carGroupList=null;
+		TrackApp.currentCar = null;
+		TrackApp.curUsername = null;
+		TrackApp.curPassword = null;
+		
+    }
+    
+    
 	@Override
 	public void initWidget() {
 		// TODO Auto-generated method stub

@@ -19,8 +19,10 @@ import com.cloudbean.trackerUtil.ByteHexUtil;
 import com.cloudbean.trackme.TrackApp;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 
@@ -32,12 +34,13 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 	public static int MSG_DEF = 0x2003;
 	public static int MSG_CIRCUIT = 0x2004;
 	public static int MSG_ALARM = 0x2005;
+	public static int MSG_POSCOMPLETE = 0x2006;
 	
-	private Application app =null;
+	private Context context =null;
 	
-	 public CNetworkAdapter(final String serverIP,final int port,Application app){
+	 public CNetworkAdapter(final String serverIP,final int port,Context context){
 		super(serverIP,port);
-		this.app =app;
+		this.context =context;
 		connect(); 
 	 }
 
@@ -155,13 +158,13 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 			 switch (cp.pktSignal){
 			 case CPacketParser.SIGNAL_RE_LOGIN:
 				 int i =MsgEventHandler.c_rLogin(cp);
-				 msg.what =MSG_LOGIN;
+				 //msg.what =MSG_LOGIN;
 				 break;
 			 case CPacketParser.SIGNAL_PREPOSITION:
-				 System.out.println("pre pos");
 				 break;
 			 case CPacketParser.SIGNAL_POSCOMPLETE:
-				 
+				 msg.what =MSG_POSCOMPLETE;
+				 TrackApp.curHandler.sendMessage(msg);
 				 break;
 			 case CPacketParser.SIGNAL_RELAY:
 				 MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
@@ -177,7 +180,7 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_POSITION:
 					 CarState cs =MsgEventHandler.c_rGetCarPosition(mgp);
-					 if(cs.gprmc.latitude!=0&&cs.gprmc.longitude!=0){
+ 					 if(cs.gprmc.latitude!=0&&cs.gprmc.longitude!=0){
 						 for(int ii=0;ii<TrackApp.carList.length;ii++){
 							 if(cs.devid.equals(TrackApp.carList[ii].devId)){
 								 TrackApp.carList[ii].setLastState(cs);
@@ -191,7 +194,7 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 						 b.putString("ditant", cs.distant);
 						 b.putString("date", cs.gprmc.date);
 						 b.putString("devid", cs.devid);
-						 b.putString("voltage", cs.voltage);
+						 b.putString("voltage", cs.analogInput);
 						 b.putString("gsmStrength", cs.gsmStrength);
 						
 						 msg.setData(b);
@@ -208,9 +211,22 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					 TrackApp.curHandler.sendMessage(msg);
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_ALARM:
-					
-					 Alarm al = MsgEventHandler.c_rGetAlarmInfo(mgp);
-					 TrackApp.alarmList.add(al);
+					if(TrackApp.isLogin==true){
+						final Alarm al = MsgEventHandler.c_rGetAlarmInfo(mgp);
+						 TrackApp.alarmList.add(al);
+						
+						 new Thread(){
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								Looper.prepare();
+								Toast.makeText(context, al.termid+al.alarmType+al.alarmTime,Toast.LENGTH_SHORT).show();
+								Looper.loop();
+							}
+							 
+						 }.start();
+					}
 					 
 					 break;
 				 }

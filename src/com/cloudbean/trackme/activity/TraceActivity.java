@@ -1,5 +1,6 @@
 package com.cloudbean.trackme.activity;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
@@ -84,9 +85,10 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	String speed;
 	String distant;
 	String date;
-	String voltage;
+	String temperature;
 	String gsmStrength;
-	
+	String accState;
+	String voltage;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -103,8 +105,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		initPosition();
 		if(TrackApp.currentCar.lastState==null){
 			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
-			showProgressDialog("定位中...");
-			timerStart();  
+			showMessage("定位请求已发送");
 		}
 	}
 	
@@ -302,8 +303,8 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			break;
 		case R.id.bt_dev_position:
 			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
-			showProgressDialog("定位中...");
-			timerStart();
+			showMessage("定位请求已发送");
+			
 			break;
 		case R.id.bt_my_position:
 			
@@ -336,9 +337,22 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			lon = TrackApp.currentCar.lastState.gprmc.longitude;
 			speed = TrackApp.currentCar.lastState.gprmc.speed;
 			distant = TrackApp.currentCar.lastState.distant;
+			if (TrackApp.currentCar.devtype.equals("MT400")){
+				temperature  =  "无温度";
+				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.lastState.portState[1])[1]?"开":"关";
+			}else if(TrackApp.currentCar.devtype.equals("VT310")){
+				temperature  =  TrackApp.currentCar.lastState.temperature;
+				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.lastState.portState[0])[3]?"开":"关";
+			}else{
+				temperature  =  "无温度";
+				accState= "无状态";
+			}
+			
 			date = format.format(new Date());
-			voltage =  ""+ByteHexUtil.byteToShort(ByteHexUtil.hexStringToBytes(TrackApp.currentCar.lastState.voltage.split(",")[0]));
+			
 			gsmStrength = ""+ByteHexUtil.hexStringToBytes(TrackApp.currentCar.lastState.gsmStrength)[0] ;
+			voltage = TrackApp.currentCar.lastState.voltage;
+			DecimalFormat formatter = new DecimalFormat("##0.000000");
 			double[] correctCoordinate = new double[2];
 			GpsCorrect.transform(lat, lon, correctCoordinate);
 			mMoveMarker.setPosition(new LatLng(correctCoordinate[0], correctCoordinate[1]));
@@ -346,16 +360,19 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			mMoveMarker.setTitle("设备信息");
 			mMoveMarker.setSnippet(
 				"设备名称："+TrackApp.currentCar.name+"\n"+
-				"坐标：纬度"+Double.toString(lat).substring(0, 6)+"经度"+Double.toString(lon).substring(0, 6)+"\n"+
-				"速度："+speed.substring(0,4)+"km/h"+"\n"+
+				"坐标：纬度"+formatter.format(lat)+"经度"+formatter.format(lon)+"\n"+
+				"速度："+speed+"km/h"+"\n"+
 				"里程："+distant+"km"+"\n"+
 				"更新时间："+date+"\n"+
+				"温度："+temperature+"度\n"+
 				"电压："+voltage+"V\n"+
+				"ACC状态："+accState+"\n"+
 				"信号强度:"+gsmStrength);
+			mMoveMarker.showInfoWindow();
 		}else{
 			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
-			showProgressDialog("定位中...");
-			timerStart();  
+			showMessage("定位请求已发送");
+			
 		}
 	}
 
@@ -411,8 +428,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			dismissProgressDialog();
         	showMessage("获取数据错误或数据库无数据");
          }else if (msg.what==TIME_OUT){
-        	dismissProgressDialog();
-        	showMessage("设备关机或网络状况导致数据返回超时");
+
         	return;
          }
 	}

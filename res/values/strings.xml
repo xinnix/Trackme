@@ -12,5 +12,8 @@
     <string name="title_activity_set_command">SetCommandActivity</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_base">BaseActivity</string>
+    <string name="title_activity_time_background">TimeBackgroundActivity</string>
+    <string name="title_activity_set_def">SetDefActivity</string>
+    <string name="title_activity_other_command">OtherCommandActivity</string>
 
 </resources>

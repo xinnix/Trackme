@@ -6,10 +6,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.cloudbean.trackme.activity.SetCommandActivity" >
+    tools:context="com.cloudbean.trackme.activity.SetDefActivity" >
 
     <LinearLayout
-        android:id="@+id/ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -17,25 +16,19 @@
         android:layout_alignParentTop="true"
         android:orientation="vertical" >
 
-       
-
         <Button
-            android:id="@+id/discon_circuit"
+            android:id="@+id/set_def"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="断开油路" />
+            android:text="设防" />
 
         <Button
-            android:id="@+id/conn_circuit"
+            android:id="@+id/cancel_def"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="恢复油路" />
+            android:text="撤防" />
+
+      
     </LinearLayout>
-
-    <ListView
-        android:id="@+id/loglist"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-		android:layout_below ="@id/ll" />
 
 </RelativeLayout>

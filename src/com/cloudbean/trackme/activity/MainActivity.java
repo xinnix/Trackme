@@ -51,7 +51,8 @@ public class MainActivity extends BaseActivity {
 	
 	private CheckBox ckRemPassword = null;
 	private int flag = 0;
-
+	
+	private Login login=null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -124,26 +125,27 @@ public class MainActivity extends BaseActivity {
 	@Override
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
-	
+		
 		if(msg.what==NetworkAdapter.MSG_LOGIN){
     		Bundle b = msg.getData();
-        	Login l = (Login) b.get("login");
+    		login = (Login) b.get("login");
         	
-        	if(l.isLogin==Login.LOGIN_SUCCESS){
-        		TrackApp.login = l;
+        	if(login.isLogin==Login.LOGIN_SUCCESS){
+        		TrackApp.login = login;
         		dismissProgressDialog();
-        		timerStop();
+        		
         		if(ckRemPassword.isChecked()){
         			saveUserInfo(etUsername.getText().toString(),etPassword.getText().toString());
         		}
-        		showMessage("登录成功");
-        		networkService.hreatBeat();
         		
-        		MsgEventHandler.sGetCarInfo(l.userid,"");
-        		MsgEventHandler.sGetCarGroup(l.userid,"");
+        		networkService.hreatBeat();
         		showProgressDialog("加载基础数据");
+        		MsgEventHandler.sGetCarInfo(login.userid,"");
+        		
+        		
         		TrackApp.curPassword = etPassword.getText().toString();
-	            
+        		TrackApp.curUsername = etUsername.getText().toString();
+        		
 				
         	}else{
         		dismissProgressDialog();
@@ -154,25 +156,27 @@ public class MainActivity extends BaseActivity {
         	dismissProgressDialog();// 关闭ProgressDialog
     		//Toast.makeText(MainActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
     	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
-    		flag++;
+    		MsgEventHandler.c_sGetAllLastPosition();
     		
     	}else if(msg.what == NetworkAdapter.MSG_CARINFO){
-    		flag++;
+    		MsgEventHandler.sGetCarGroup(login.userid,"");
 		
+    	}else if(msg.what == CNetworkAdapter.MSG_POSCOMPLETE){
+    		timerStop();
+    		dismissProgressDialog();
+    		showMessage("登录成功");
+    		TrackApp.isLogin = true;
+			Intent intent = new Intent();
+			intent.setClass(MainActivity.this, MenuActivity.class);
+			intent.putExtra("userId",TrackApp.login.userid);
+			startActivity(intent);
     	}else if (msg.what==TIME_OUT){
     		dismissProgressDialog();
        	 	showMessage("设备关机或网络状况导致数据返回超时");
        	 	return;
 		}
 		
-		if(flag == 2){
-			dismissProgressDialog();
-			MsgEventHandler.c_sGetAllLastPosition();
-			Intent intent = new Intent();
-			intent.setClass(MainActivity.this, MenuActivity.class);
-			intent.putExtra("userId",TrackApp.login.userid);
-			startActivity(intent);
-		}
+		
 	}
 	
 	

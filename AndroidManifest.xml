@@ -26,43 +26,45 @@
     <application
         android:name=".TrackApp"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:hardwareAccelerated="true">
+        android:theme="@style/AppTheme" >
         <activity
-            android:name="com.cloudbean.trackme.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.CarGroupListActivity"
+            android:name=".activity.CarGroupListActivity"
             android:label="@string/title_activity_car_list" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.TraceActivity"
+            android:name=".activity.TraceActivity"
             android:label="@string/title_activity_map" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.TimeChooseActivity"
-            android:label="@string/title_activity_map" >
+            android:name=".activity.TimeChooseActivity"
+            android:label="@string/title_activity_map"
+            android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.ReplayActivity"
+            android:name=".activity.ReplayActivity"
             android:label="@string/title_activity_reply" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.MenuActivity"
+            android:name=".activity.MenuActivity"
             android:label="@string/title_activity_menu" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.AlarmListActivity"
+            android:name=".activity.AlarmListActivity"
             android:label="@string/title_activity_alarm_list" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.SetCommandActivity"
+            android:name=".activity.SetCommandActivity"
             android:label="@string/title_activity_set_command" >
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.SplashActivity"
+            android:name=".activity.SplashActivity"
             android:label="@string/title_activity_splash" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -71,10 +73,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.cloudbean.trackme.activity.BaseActivity"
+            android:name=".activity.BaseActivity"
             android:label="@string/title_activity_base" >
         </activity>
-        <service android:name="com.cloudbean.trackme.server.NetWorkService"></service>
+
+        <service android:name=".server.NetWorkService" >
+        </service>
+
+        <activity
+            android:name=".TimeBackgroundActivity"
+            android:label="@string/title_activity_time_background" >
+        </activity>
+        <activity
+            android:name=".activity.SetDefActivity"
+            android:label="@string/title_activity_set_def" >
+        </activity>
+        <activity
+            android:name="com.cloudbean.trackme.activity.OtherCommandActivity"
+            android:label="@string/title_activity_other_command" >
+        </activity>
     </application>
 
 </manifest>
