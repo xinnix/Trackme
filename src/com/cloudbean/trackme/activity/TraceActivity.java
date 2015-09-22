@@ -22,6 +22,9 @@ import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
+import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
@@ -44,6 +47,7 @@ import com.cloudbean.trackme.R.menu;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -78,7 +82,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	private Button btTrace;
 	private Button btNavi;
 	
-	
+	int trackFlag =1;
 	
 	double lat;
 	double lon;
@@ -89,6 +93,10 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	String gsmStrength;
 	String accState;
 	String voltage;
+	
+	
+	PolylineOptions polylineOptions = null;
+	Polyline poly = null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -288,6 +296,18 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		btTrace.setOnClickListener(this);
 		btNavi.setOnClickListener(this);
 		
+		//定位层设置
+		MyLocationStyle myLocationStyle = new MyLocationStyle();
+		myLocationStyle.myLocationIcon(BitmapDescriptorFactory
+				.fromResource(R.drawable.location_marker));// 设置小蓝点的图标
+		myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
+		myLocationStyle.radiusFillColor(Color.argb(100, 0, 0, 180));// 设置圆形的填充颜色
+		// myLocationStyle.anchor(int,int)//设置小蓝点的锚点
+		myLocationStyle.strokeWidth(0.1f);// 设置圆形的边框粗细
+		aMap.getUiSettings().setMyLocationButtonEnabled(true);
+		aMap.setMyLocationStyle(myLocationStyle);
+		aMap.setMyLocationRotateAngle(180);
+		aMap.setLocationSource(this);// 设置定位监听
 	}
 
 	@Override
@@ -309,17 +329,33 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		case R.id.bt_my_position:
 			
 			aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-			aMap.setMyLocationType(AMap.LOCATION_TYPE_MAP_ROTATE);//设置定位类型
+			//设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种 
+			aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
 			break;
 		case R.id.bt_trace:
-			mAMapLocationManager.requestLocationData(
-					LocationProviderProxy.AMapNetwork, 2000, 10, this);
-			Thread t = new Thread(){
-				public void run(){
-					
-				}
-			};
-			handler.postDelayed(t, 12000);// 设置超过12秒还没有定位到就停止定位
+//			mAMapLocationManager.requestLocationData(
+//					LocationProviderProxy.AMapNetwork, 2000, 10, this);
+//			Thread t = new Thread(){
+//				public void run(){
+//					
+//				}
+//			};
+//			handler.postDelayed(t, 12000);// 设置超过12秒还没有定位到就停止定位
+			
+			trackFlag = (trackFlag==0)?1:0;
+			if(trackFlag==0){
+				polylineOptions = new PolylineOptions();
+				polylineOptions.width(8);
+				polylineOptions.color(Color.RED);
+				showMessage("开始跟踪");
+			}else{
+				
+				poly.setVisible(false); 
+				poly.remove();
+				showMessage("取消跟踪");
+			}
+			
+			
 			break;
 		case R.id.bt_navi:
 			
@@ -356,7 +392,8 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			double[] correctCoordinate = new double[2];
 			GpsCorrect.transform(lat, lon, correctCoordinate);
 			mMoveMarker.setPosition(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-			aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]), 14)); 
+			
+			aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]),18)); 
 			mMoveMarker.setTitle("设备信息");
 			mMoveMarker.setSnippet(
 				"设备名称："+TrackApp.currentCar.name+"\n"+
@@ -385,6 +422,14 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			 String devid = b.getString("devid");
 			 if(devid.equals(TrackApp.currentCar.devId)){
 				 	initPosition();
+				 	if(trackFlag == 0){
+				 		double lat = TrackApp.currentCar.lastState.gprmc.latitude;
+				 		double lon = TrackApp.currentCar.lastState.gprmc.longitude;
+				 		double[] correctCoordinate = new double[2];
+						GpsCorrect.transform(lat, lon, correctCoordinate);
+				 		polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+				 		poly = aMap.addPolyline(polylineOptions);
+				 	}
 //					 lat = b.getDouble("lat");
 //		        	 lon = b.getDouble("lon");
 //		        	 speed = b.getString("speed");
@@ -435,13 +480,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 
 	
 	
-	private void setUpMap() {
-		aMap.setLocationSource(this);// 设置定位监听
-		aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-		aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-		//设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种 
-		aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
-	}
+	
 	@Override
 	public void activate(OnLocationChangedListener listener) {
 		// TODO Auto-generated method stub
@@ -454,9 +493,10 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			 * API定位采用GPS和网络混合定位方式
 			 * ，第一个参数是定位provider，第二个参数时间最短是2000毫秒，第三个参数距离间隔单位是米，第四个参数是定位监听者
 			 */
-			mAMapLocationManager.requestLocationData(
-					LocationProviderProxy.AMapNetwork, 2000, 10, this);
+			
 		}
+		
+		mAMapLocationManager.requestLocationData(LocationProviderProxy.AMapNetwork, 2000, 10, this);
 	}
 
 	@Override
@@ -473,7 +513,13 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	@Override
 	public void onLocationChanged(Location aLocation) {
 		// TODO Auto-generated method stub
-		
+		if (mListener != null && aLocation != null) {
+			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
+			mMoveMarker.setPosition(new LatLng(aLocation.getLatitude(), aLocation
+					.getLongitude()));// 定位雷达小图标
+			float bearing = aMap.getCameraPosition().bearing;
+			aMap.setMyLocationRotateAngle(bearing);// 设置小蓝点旋转角度
+		}
 	}
 
 	@Override

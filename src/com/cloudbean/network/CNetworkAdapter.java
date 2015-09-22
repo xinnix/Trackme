@@ -149,7 +149,8 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 	@Override
 	public void recivePacket() throws Exception {
 		// TODO Auto-generated method stub
-		try{		  			 			 
+		try{
+			final String res;
 		 	byte[] packetByte  = preParser();
 		 	Message msg = TrackApp.curHandler.obtainMessage();
 		 	Bundle b = new Bundle();
@@ -171,12 +172,23 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 				 
 				 switch(mgp.msgType){
 				 case MsgGPRSParser.MSG_TYPE_DEF:
-					
-					 b.putString("devid", mgp.msgTermID);
-					 b.putString("res", mgp.msgData);
-					 msg.what =MSG_DEF;
-					 msg.setData(b);
-					 TrackApp.curHandler.sendMessage(msg);
+					 res = mgp.msgData.equals("00")?"设防/撤防失败":"设防/撤防成功";
+					 new Thread(){
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Looper.prepare();
+							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+							Looper.loop();
+						}
+						 
+					 }.start();
+//					 b.putString("devid", mgp.msgTermID);
+//					 b.putString("res", mgp.msgData);
+//					 msg.what =MSG_DEF;
+//					 msg.setData(b);
+//					 TrackApp.curHandler.sendMessage(msg);
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_POSITION:
 					 CarState cs =MsgEventHandler.c_rGetCarPosition(mgp);
@@ -229,6 +241,93 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					}
 					 
 					 break;
+				 case MsgGPRSParser.MSG_TYPE_PHONE:
+						
+							res = mgp.msgData.equals("00")?"监听号码设置失败":"监听号码设置成功";
+							 new Thread(){
+
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									Looper.prepare();
+									Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+									Looper.loop();
+								}
+								 
+							 }.start();
+						
+						 
+					break;
+				 case MsgGPRSParser.MSG_TYPE_GPSREBOOT:
+						
+						 res = mgp.msgData.equals("00")?"GPS重置失败":"GPS重置成功";
+						 new Thread(){
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								Looper.prepare();
+								Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+								Looper.loop();
+							}
+							 
+						 }.start();
+					
+					 
+					 break;
+				 case MsgGPRSParser.MSG_TYPE_GPSHEARTBEAT:
+						
+					 res = mgp.msgData.equals("00")?"GPS心跳间隔设置失败":"GPS心跳间隔设置成功";
+					 new Thread(){
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Looper.prepare();
+							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+							Looper.loop();
+						}
+						 
+					 }.start();
+				
+				 
+				 break;
+				 
+				 case MsgGPRSParser.MSG_TYPE_EXPANDCOMMAND:
+						
+					 res = mgp.msgData.equals("00")?"扩展命令执行失败":"扩展命令执行成功";
+					 new Thread(){
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Looper.prepare();
+							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+							Looper.loop();
+						}
+						 
+					 }.start();
+				
+				 
+				 break;
+				 
+				 case MsgGPRSParser.MSG_TYPE_TRACEINTERVAL:
+						
+					 res = mgp.msgData.equals("00")?"设置定时追踪执行失败":"设置定时追踪执行成功";
+					 new Thread(){
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Looper.prepare();
+							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+							Looper.loop();
+						}
+						 
+					 }.start();
+				
+				 
+				 break;
 				 }
 			
 

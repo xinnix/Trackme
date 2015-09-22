@@ -433,7 +433,38 @@ public class MsgEventHandler {
 		c_sCommand(car,MsgGPRSParser.MSG_TYPE_CIRCUIT,data);
 	}
 	
-	public static String c_sCommand(Car car,short commandType,String data){
+	
+	public static void c_sSetPhone(Car car,String data){	
+		
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_PHONE,data);
+		
+	}
+	
+	public static void c_sGPSReboot(Car car,String data){	
+		
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_GPSREBOOT,data);
+		
+	}
+	
+	public static void c_sExpandCommand(Car car,String data){	
+		
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_EXPANDCOMMAND,data);
+		
+	}
+	
+	public static void c_sGPSHeartBeat(Car car,String data){	
+		
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_GPSHEARTBEAT,data);
+		
+	}
+	
+	public static void c_sTraceInterval(Car car,String data){	
+		
+		c_sCommand(car,MsgGPRSParser.MSG_TYPE_GPSHEARTBEAT,data);
+		
+	}
+	
+	private static String c_sCommand(Car car,short commandType,String data){
 		String devid = car.devId;
 		for(int i = (14-devid.length());i>0;i--){
 			devid=devid.concat("f");

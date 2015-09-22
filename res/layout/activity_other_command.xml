@@ -8,9 +8,54 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cloudbean.trackme.activity.OtherCommandActivity" >
 
-    <TextView
+     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/set_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="设置监听号码" />
+
+        <Button
+            android:id="@+id/gps_reboot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GPS模块重启" />
+        
+		<Button
+            android:id="@+id/set_gps_time_interval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="设置GPS时间间隔" />
+
+      <Button
+            android:id="@+id/set_gps_heartbeat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="设置GPS心跳包" />
+      
+      <Button
+            android:id="@+id/set_sleep_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="设置休眠时间" />
+      <Button
+            android:id="@+id/set_re_sms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="设置打电话回短信" />
+      <Button
+            android:id="@+id/cancel_re_sms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="取消打电话回短信" />
+      
+    </LinearLayout>
 
 </RelativeLayout>

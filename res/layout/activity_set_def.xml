@@ -27,6 +27,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="撤防" />
+        
+		<Button
+            android:id="@+id/set_power_supply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="设置掉电报警" />
+		<Button
+            android:id="@+id/cancel_power_supply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="取消掉电报警" />
 
       
     </LinearLayout>
