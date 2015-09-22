@@ -202,26 +202,6 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
  
 
 
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.map, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
 	@Override
 	public void onGeocodeSearched(GeocodeResult arg0, int arg1) {
 		// TODO Auto-generated method stub
@@ -236,6 +216,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 					&& result.getRegeocodeAddress().getFormatAddress() != null) {
 				addressName = result.getRegeocodeAddress().getFormatAddress()
 						+ "附近";
+				showMessage(addressName);
 				handler.sendEmptyMessage(ADDRESS_COMPLETE);
 			} else {
 				Toast.makeText(TraceActivity.this, "无地址数据返回",Toast.LENGTH_SHORT).show();
@@ -308,6 +289,13 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		aMap.setMyLocationStyle(myLocationStyle);
 		aMap.setMyLocationRotateAngle(180);
 		aMap.setLocationSource(this);// 设置定位监听
+		
+		
+		//地理转换初始化
+		geocoderSearch = new GeocodeSearch(this); 
+		geocoderSearch.setOnGeocodeSearchListener(this);
+		
+		
 	}
 
 	@Override
@@ -406,6 +394,9 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 				"ACC状态："+accState+"\n"+
 				"信号强度:"+gsmStrength);
 			mMoveMarker.showInfoWindow();
+			LatLonPoint latLonPoint =new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
+			RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200,GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
+			geocoderSearch.getFromLocationAsyn(query);// 设置同步逆地理编码请求
 		}else{
 			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
 			showMessage("定位请求已发送");

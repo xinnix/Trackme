@@ -15,9 +15,7 @@
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
-    <meta-data
-        android:name="com.amap.api.v2.apikey"
-        android:value="8a5c4e51795aa5e9495b8006e91e77b9" />
+   
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -30,6 +28,11 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
+         <meta-data
+        android:name="com.amap.api.v2.apikey"
+        android:value="7a2f451cbb6d12de3e8fb5298c33e9f9" />
+        
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name" >
