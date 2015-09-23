@@ -281,7 +281,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		MyLocationStyle myLocationStyle = new MyLocationStyle();
 		myLocationStyle.myLocationIcon(BitmapDescriptorFactory
 				.fromResource(R.drawable.location_marker));// 设置小蓝点的图标
-		myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
+//		myLocationStyle.strokeColor(Color.BLACK);// 设置圆形的边框颜色
 		myLocationStyle.radiusFillColor(Color.argb(100, 0, 0, 180));// 设置圆形的填充颜色
 		// myLocationStyle.anchor(int,int)//设置小蓝点的锚点
 		myLocationStyle.strokeWidth(0.1f);// 设置圆形的边框粗细
@@ -329,20 +329,20 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 //				}
 //			};
 //			handler.postDelayed(t, 12000);// 设置超过12秒还没有定位到就停止定位
-			
-			trackFlag = (trackFlag==0)?1:0;
-			if(trackFlag==0){
-				polylineOptions = new PolylineOptions();
-				polylineOptions.width(8);
-				polylineOptions.color(Color.RED);
-				showMessage("开始跟踪");
-			}else{
-				
-				poly.setVisible(false); 
-				poly.remove();
-				showMessage("取消跟踪");
-			}
-			
+//			
+//			trackFlag = (trackFlag==0)?1:0;
+//			if(trackFlag==0){
+			polylineOptions = new PolylineOptions();
+			polylineOptions.width(8);
+			polylineOptions.color(Color.RED);
+			showMessage("开始跟踪");
+//			}else{
+//				
+//				poly.setVisible(false); 
+//				poly.remove();
+//				showMessage("取消跟踪");
+//			}
+//			
 			
 			break;
 		case R.id.bt_navi:
@@ -355,18 +355,18 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	
 
 	private void initPosition(){
-		if (TrackApp.currentCar.lastState!=null){
+		if (TrackApp.currentCar.curState!=null){
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			lat = TrackApp.currentCar.lastState.gprmc.latitude;
-			lon = TrackApp.currentCar.lastState.gprmc.longitude;
-			speed = TrackApp.currentCar.lastState.gprmc.speed;
-			distant = TrackApp.currentCar.lastState.distant;
+			lat = TrackApp.currentCar.curState.gprmc.latitude;
+			lon = TrackApp.currentCar.curState.gprmc.longitude;
+			speed = TrackApp.currentCar.curState.gprmc.speed;
+			distant = TrackApp.currentCar.curState.distant;
 			if (TrackApp.currentCar.devtype.equals("MT400")){
 				temperature  =  "无温度";
-				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.lastState.portState[1])[1]?"开":"关";
+				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[1])[1]?"开":"关";
 			}else if(TrackApp.currentCar.devtype.equals("VT310")){
-				temperature  =  TrackApp.currentCar.lastState.temperature;
-				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.lastState.portState[0])[3]?"开":"关";
+				temperature  =  TrackApp.currentCar.curState.temperature;
+				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[0])[3]?"开":"关";
 			}else{
 				temperature  =  "无温度";
 				accState= "无状态";
@@ -374,12 +374,23 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			
 			date = format.format(new Date());
 			
-			gsmStrength = ""+ByteHexUtil.hexStringToBytes(TrackApp.currentCar.lastState.gsmStrength)[0] ;
-			voltage = TrackApp.currentCar.lastState.voltage;
+			gsmStrength = ""+ByteHexUtil.hexStringToBytes(TrackApp.currentCar.curState.gsmStrength)[0] ;
+			voltage = TrackApp.currentCar.curState.voltage;
 			DecimalFormat formatter = new DecimalFormat("##0.000000");
 			double[] correctCoordinate = new double[2];
+			double[] correctCoordinateLast = new double[2];
 			GpsCorrect.transform(lat, lon, correctCoordinate);
-			mMoveMarker.setPosition(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+			
+			LatLng curLatLng = new  LatLng(correctCoordinate[0], correctCoordinate[1]);
+			
+			
+			if(TrackApp.currentCar.lastState!=null&&Double.parseDouble(TrackApp.currentCar.curState.gprmc.speed)>6){
+				GpsCorrect.transform(TrackApp.currentCar.lastState.gprmc.latitude, TrackApp.currentCar.lastState.gprmc.longitude, correctCoordinateLast);
+				LatLng lastLatLng = new  LatLng(correctCoordinateLast[0], correctCoordinateLast[1]);
+				mMoveMarker.setRotateAngle((float) getAngle(lastLatLng,curLatLng));
+			}
+			
+			mMoveMarker.setPosition(curLatLng);
 			
 			aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]),18)); 
 			mMoveMarker.setTitle("设备信息");
@@ -414,8 +425,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			 if(devid.equals(TrackApp.currentCar.devId)){
 				 	initPosition();
 				 	if(trackFlag == 0){
-				 		double lat = TrackApp.currentCar.lastState.gprmc.latitude;
-				 		double lon = TrackApp.currentCar.lastState.gprmc.longitude;
+				 		double lat = TrackApp.currentCar.curState.gprmc.latitude;
 				 		double[] correctCoordinate = new double[2];
 						GpsCorrect.transform(lat, lon, correctCoordinate);
 				 		polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
@@ -542,6 +552,38 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 
 	
 	
+	/**
+	 * 根据两点算取图标转的角度
+	 */
+	private double getAngle(LatLng fromPoint, LatLng toPoint) {
+		double slope = getSlope(fromPoint, toPoint);
+		if (slope == Double.MAX_VALUE) {
+			if (toPoint.latitude > fromPoint.latitude) {
+				return 0;
+			} else {
+				return 180;
+			}
+		}
+		float deltAngle = 0;
+		if ((toPoint.latitude - fromPoint.latitude) * slope < 0) {
+			deltAngle = 180;
+		}
+		double radio = Math.atan(slope);
+		double angle = 180 * (radio / Math.PI) + deltAngle - 90;
+		return angle;
+	}
+	
+	/**
+	 * 算斜率
+	 */
+	private double getSlope(LatLng fromPoint, LatLng toPoint) {
+		if (toPoint.longitude == fromPoint.longitude) {
+			return Double.MAX_VALUE;
+		}
+		double slope = ((toPoint.latitude - fromPoint.latitude) / (toPoint.longitude - fromPoint.longitude));
+		return slope;
+
+	}
 
 	
 //	/**

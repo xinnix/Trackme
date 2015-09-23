@@ -195,7 +195,8 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
  					 if(cs.gprmc.latitude!=0&&cs.gprmc.longitude!=0){
 						 for(int ii=0;ii<TrackApp.carList.length;ii++){
 							 if(cs.devid.equals(TrackApp.carList[ii].devId)){
-								 TrackApp.carList[ii].setLastState(cs);
+								 TrackApp.carList[ii].setLastState(TrackApp.carList[ii].getCurState());
+								 TrackApp.carList[ii].setCurState(cs);
 								 TrackApp.carList[ii].alive++;
 							 }
 						 }

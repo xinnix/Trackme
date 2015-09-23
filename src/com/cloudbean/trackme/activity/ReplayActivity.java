@@ -185,22 +185,11 @@ public class ReplayActivity extends BaseActivity {
 	    		
 	    	}
 	    	
-	    	
-	    	
-	    	
-	    	
-	    	
-	    	
-			
-
 			polylineOptions.width(8);
 			polylineOptions.color(Color.RED);
 			mVirtureRoad = mAmap.addPolyline(polylineOptions);
 			Log.i("track", ""+mVirtureRoad.getPoints().size());
-			
-			
-			
-			
+
 			//markerOptions.position(polylineOptions.getPoints().get(0));
 			mMoveMarker = mAmap.addMarker(markerOptions);
 			if(polylineOptions.getPoints().size()>1){
