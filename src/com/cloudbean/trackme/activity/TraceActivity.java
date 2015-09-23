@@ -68,13 +68,13 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
     private Marker mMoveMarker = null;
 	private ProgressDialog pd = null;
 	private ToggleButton tbSatelite = null;
-	private String addressName = null;
+	private String addressName = "等待地址解析";
 	private GeocodeSearch geocoderSearch = null;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	
 	
-	private final int ADDRESS_COMPLETE = 0x3001;
+	private final int ADDRESS_COMPLETE = 0x9901;
 	
 	
 	private Button btMyPos;
@@ -216,7 +216,10 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 					&& result.getRegeocodeAddress().getFormatAddress() != null) {
 				addressName = result.getRegeocodeAddress().getFormatAddress()
 						+ "附近";
-				showMessage(addressName);
+//				showMessage(addressName);
+				TrackApp.currentCar.curAddress = addressName;
+				
+				
 				handler.sendEmptyMessage(ADDRESS_COMPLETE);
 			} else {
 				Toast.makeText(TraceActivity.this, "无地址数据返回",Toast.LENGTH_SHORT).show();
@@ -395,26 +398,30 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]),18)); 
 			mMoveMarker.setTitle("设备信息");
 			mMoveMarker.setSnippet(
-				"设备名称："+TrackApp.currentCar.name+"\n"+
-				"坐标：纬度"+formatter.format(lat)+"经度"+formatter.format(lon)+"\n"+
-				"速度："+speed+"km/h"+"\n"+
-				"里程："+distant+"km"+"\n"+
-				"更新时间："+date+"\n"+
-				"温度："+temperature+"度\n"+
-				"电压："+voltage+"V\n"+
-				"ACC状态："+accState+"\n"+
-				"信号强度:"+gsmStrength);
+					"设备名称："+TrackApp.currentCar.name+"\n"+
+					"坐标：纬度"+formatter.format(lat)+"经度"+formatter.format(lon)+"\n"+
+					"速度："+speed+"km/h"+"\n"+
+					"里程："+distant+"km"+"\n"+
+					"更新时间："+date+"\n"+
+					"温度："+temperature+"度\n"+
+					"电压："+voltage+"V\n"+
+					"ACC状态："+accState+"\n"+
+					"信号强度:"+gsmStrength+"\n"+
+					"地址："+addressName);
 			mMoveMarker.showInfoWindow();
 			LatLonPoint latLonPoint =new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
-			RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200,GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
-			geocoderSearch.getFromLocationAsyn(query);// 设置同步逆地理编码请求
+			getAddress(latLonPoint);
 		}else{
 			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
 			showMessage("定位请求已发送");
 			
 		}
 	}
-
+	public void getAddress(final LatLonPoint latLonPoint) {
+		RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 200,
+				GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
+		geocoderSearch.getFromLocationAsyn(query);// 设置同步逆地理编码请求
+	}
 	@Override
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
@@ -462,12 +469,24 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 //						"电压："+voltage+"\n"+
 //						"信号强度"+gsmStrength);
 //					
-					timerStop();
-					dismissProgressDialog();
+//					timerStop();
+//					dismissProgressDialog();
 			 }
 					
          }else if (msg.what==ADDRESS_COMPLETE){
-        	 	
+        	 DecimalFormat formatter = new DecimalFormat("##0.000000");
+        	 mMoveMarker.setSnippet(
+ 					"设备名称："+TrackApp.currentCar.name+"\n"+
+ 					"坐标：纬度"+formatter.format(lat)+"经度"+formatter.format(lon)+"\n"+
+ 					"速度："+speed+"km/h"+"\n"+
+ 					"里程："+distant+"km"+"\n"+
+ 					"更新时间："+date+"\n"+
+ 					"温度："+temperature+"度\n"+
+ 					"电压："+voltage+"V\n"+
+ 					"ACC状态："+accState+"\n"+
+ 					"信号强度:"+gsmStrength+"\n"+
+ 					"地址："+addressName);
+ 			mMoveMarker.showInfoWindow();
          }
          else if (msg.what==NetworkAdapter.MSG_FAIL){
         	timerStop();

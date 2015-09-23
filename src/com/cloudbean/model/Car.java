@@ -14,7 +14,7 @@ public class Car  implements Parcelable {
 	public int alive = 0;
 	public CarState lastState;
 	public CarState curState;
-	
+	public String curAddress;
 	
 	
 	public CarState getCurState() {
