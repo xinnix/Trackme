@@ -55,7 +55,8 @@ public class AlarmListActivity extends BaseActivity {
 	        for (Iterator l =alarmList.iterator();l.hasNext();){
 	        	Alarm al = (Alarm) l.next();
 	        	Map<String, Object> map = new HashMap<String, Object>();
-	        	map.put("alarmCarName", al.termid);
+	        	map.put("alarmCarName", getDevName(al.termid));
+	        	map.put("alarmId", al.termid);
 	        	map.put("alarmType", al.alarmType);
 	        	map.put("alarmTime", al.alarmTime);
 	        	list.add(map);
@@ -65,6 +66,16 @@ public class AlarmListActivity extends BaseActivity {
 
 	        return list;
 
+	 }
+	 
+	 private String getDevName(String devid){
+		 String res = null;
+		 for (int jj=0;jj<TrackApp.carList.length;jj++){
+     		if(devid.equals(TrackApp.carList[jj].devId)){
+     			res = TrackApp.carList[jj].name;
+     		}
+     	}
+		 return res;
 	 }
 	  
 //	  private  Handler handler = new Handler() {  
@@ -122,8 +133,8 @@ public class AlarmListActivity extends BaseActivity {
 			
 				data= getData(TrackApp.alarmList);
 	       	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
-		                new String[]{"alarmCarName","alarmType","alarmTime"},
-		                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
+		                new String[]{"alarmId","alarmCarName","alarmType","alarmTime"},
+		                new int[]{R.id.alarmId,R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
 	       	 lv.setAdapter(adapter);
 //			Date date= new Date();
 //			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
