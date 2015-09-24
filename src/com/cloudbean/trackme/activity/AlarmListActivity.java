@@ -14,6 +14,7 @@ import java.util.TimerTask;
 import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
+import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackme.AppManager;
@@ -35,6 +36,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -42,6 +46,9 @@ import android.widget.Toast;
 public class AlarmListActivity extends BaseActivity {
 	private ListView lv =null;
 	private Button btClearAlarmList = null;
+	
+	private CheckBox cbSetMute = null;
+	
 	SimpleAdapter adapter = null;
 	List data = new ArrayList<Map<String,?>>();  
 	@Override
@@ -55,7 +62,7 @@ public class AlarmListActivity extends BaseActivity {
 	        for (Iterator l =alarmList.iterator();l.hasNext();){
 	        	Alarm al = (Alarm) l.next();
 	        	Map<String, Object> map = new HashMap<String, Object>();
-	        	map.put("alarmCarName", getDevName(al.termid));
+	        	map.put("alarmCarName", al.termName);
 	        	map.put("alarmId", al.termid);
 	        	map.put("alarmType", al.alarmType);
 	        	map.put("alarmTime", al.alarmTime);
@@ -68,15 +75,7 @@ public class AlarmListActivity extends BaseActivity {
 
 	 }
 	 
-	 private String getDevName(String devid){
-		 String res = null;
-		 for (int jj=0;jj<TrackApp.carList.length;jj++){
-     		if(devid.equals(TrackApp.carList[jj].devId)){
-     			res = TrackApp.carList[jj].name;
-     		}
-     	}
-		 return res;
-	 }
+	
 	  
 //	  private  Handler handler = new Handler() {  
 //	        @Override  
@@ -131,7 +130,9 @@ public class AlarmListActivity extends BaseActivity {
 			super.onResume(); 
 			
 			
-				data= getData(TrackApp.alarmList);
+			cbSetMute.setChecked(TrackApp.isMute);
+			
+			data= getData(TrackApp.alarmList);
 	       	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
 		                new String[]{"alarmId","alarmCarName","alarmType","alarmTime"},
 		                new int[]{R.id.alarmId,R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
@@ -143,24 +144,7 @@ public class AlarmListActivity extends BaseActivity {
 //			timerStart();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.alarm_list, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+	
 
 	@Override
 	public void initWidget() {
@@ -168,7 +152,21 @@ public class AlarmListActivity extends BaseActivity {
 		setContentView(R.layout.activity_alarm_list);
 		lv = (ListView) findViewById(R.id.alarmList);
 		btClearAlarmList = (Button) findViewById(R.id.bt_clearAlarmList);
+		cbSetMute = (CheckBox) findViewById(R.id.cb_setmute);
 		btClearAlarmList.setOnClickListener(this);
+		
+		cbSetMute.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+
+			@Override
+			public void onCheckedChanged(CompoundButton cb, boolean ischecked) {
+				// TODO Auto-generated method stub
+				
+				TrackApp.setMute(ischecked);
+				TrackApp.isMute = ischecked;
+				
+			}
+			
+		});
 	}
 
 	@Override
@@ -177,8 +175,15 @@ public class AlarmListActivity extends BaseActivity {
 		switch(v.getId()){
 		case R.id.bt_clearAlarmList:
 			TrackApp.alarmList.clear();
+			data= getData(TrackApp.alarmList);
+			 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
+		                new String[]{"alarmId","alarmCarName","alarmType","alarmTime"},
+		                new int[]{R.id.alarmId,R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
+	       	 lv.setAdapter(adapter);
 			adapter.notifyDataSetChanged();
 			break;
+		
+	
 	
 		}
 	}
@@ -186,21 +191,13 @@ public class AlarmListActivity extends BaseActivity {
 	@Override
 	public void handleMsg(Message msg) {
 //		// TODO Auto-generated method stub
-//		if( msg.what==NetworkAdapter.MSG_ALARM){
-//	   		 dismissProgressDialog();
-//	       	 timerStop();
-//	       	 Bundle b = msg.getData();
-//	       	 Alarm[] alarmList = (Alarm[]) b.getParcelableArray("alarmlist");
-//	       	 data= getData(alarmList);
-//	       	 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
-//		                new String[]{"alarmCarName","alarmType","alarmTime"},
-//		                new int[]{R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
-//	       	 lv.setAdapter(adapter);
-//       	//adapter.notifyDataSetChanged();  
-//	   	}else if (msg.what==TIME_OUT){
-//	   		dismissProgressDialog();
-//		   	showMessage("设备关机或网络状况导致数据返回超时");
-//		   	return;
-//	    }
+		if( msg.what==CNetworkAdapter.MSG_ALARM){
+			data= getData(TrackApp.alarmList);
+			 adapter = new SimpleAdapter(AlarmListActivity.this,data,R.layout.alarm_detail_list,
+		                new String[]{"alarmId","alarmCarName","alarmType","alarmTime"},
+		                new int[]{R.id.alarmId,R.id.alarmCarName,R.id.alarmType,R.id.alarmTime});
+	       	 lv.setAdapter(adapter);
+	   		adapter.notifyDataSetChanged();
+	    }
 	}
 }

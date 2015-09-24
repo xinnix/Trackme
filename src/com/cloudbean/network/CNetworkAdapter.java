@@ -167,6 +167,34 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 				 msg.what =MSG_POSCOMPLETE;
 				 TrackApp.curHandler.sendMessage(msg);
 				 break;
+			 case CPacketParser.SIGNAL_CENTERALARM:
+				 //final Alarm alarm = null;
+				 TrackApp.playAlarmSound();
+				 String alarmtype = null;
+				 if(cp.pktBuffer[9]==3){
+					 if(cp.pktBuffer[19]==1){
+						 alarmtype ="进入区域报警";
+					 }else{
+						 alarmtype = "出区域报警";
+					 }
+				 }
+				 final Alarm alarm = new Alarm(cp.pktFakeIP,alarmtype);
+				 TrackApp.alarmList.add(alarm);
+				 if(alarm.alarmType != null){
+					 new Thread(){
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								Looper.prepare();
+								Toast.makeText(context,alarm.termName+"发生"+alarm.alarmType ,Toast.LENGTH_SHORT).show();
+								Looper.loop();
+							}	 
+						 }.start();
+				 }
+				 
+				msg.what =MSG_ALARM;
+				TrackApp.curHandler.sendMessage(msg);
+				 break;
 			 case CPacketParser.SIGNAL_RELAY:
 				 MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
 				 
@@ -224,16 +252,18 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					 TrackApp.curHandler.sendMessage(msg);
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_ALARM:
-					if(TrackApp.isLogin==true){
+					
+					 if(TrackApp.isLogin==true){
 						final Alarm al = MsgEventHandler.c_rGetAlarmInfo(mgp);
-						 TrackApp.alarmList.add(al);
-						
+						TrackApp.alarmList.add(al);
+						TrackApp.playAlarmSound();
 						 new Thread(){
 
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
 								Looper.prepare();
+								
 								Toast.makeText(context, al.termid+al.alarmType+al.alarmTime,Toast.LENGTH_SHORT).show();
 								Looper.loop();
 							}
@@ -256,8 +286,6 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 								}
 								 
 							 }.start();
-						
-						 
 					break;
 				 case MsgGPRSParser.MSG_TYPE_GPSREBOOT:
 						

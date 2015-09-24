@@ -25,12 +25,22 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
+import com.amap.api.maps.overlay.WalkRouteOverlay;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.GeocodeSearch.OnGeocodeSearchListener;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
+import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DriveRouteResult;
+import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkPath;
+import com.amap.api.services.route.RouteSearch.BusRouteQuery;
+import com.amap.api.services.route.RouteSearch.DriveRouteQuery;
+import com.amap.api.services.route.RouteSearch.OnRouteSearchListener;
+import com.amap.api.services.route.RouteSearch.WalkRouteQuery;
+import com.amap.api.services.route.WalkRouteResult;
 import com.cloudbean.model.Track;
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.MsgEventHandler;
@@ -61,7 +71,8 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class TraceActivity extends BaseActivity implements OnGeocodeSearchListener,LocationSource,AMapLocationListener {
+public class TraceActivity extends BaseActivity implements OnGeocodeSearchListener,
+LocationSource,AMapLocationListener,OnRouteSearchListener {
 	
 	private MapView mapView = null;
     private AMap aMap = null;
@@ -72,11 +83,11 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	private GeocodeSearch geocoderSearch = null;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
-	
-	
+	private RouteSearch routeSearch;
+	private WalkRouteResult walkRouteResult;
 	private final int ADDRESS_COMPLETE = 0x9901;
-	
-	
+	private LatLonPoint endpoint;
+	private Marker startMk, targetMk;
 	private Button btMyPos;
 	private Button btDevPos;
 	private Button btTrace;
@@ -111,10 +122,10 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		super.onResume();
 		mapView.onResume();
 		initPosition();
-		if(TrackApp.currentCar.lastState==null){
-			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
-			showMessage("定位请求已发送");
-		}
+//		if(TrackApp.currentCar.lastState==null){
+//			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
+//			showMessage("定位请求已发送");
+//		}
 	}
 	
 	/**
@@ -242,7 +253,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		btMyPos=(Button) findViewById(R.id.bt_my_position);
 		btDevPos=(Button) findViewById(R.id.bt_dev_position);
 		btTrace=(Button) findViewById(R.id.bt_trace);
-		btNavi=(Button) findViewById(R.id.bt_navi);
+		
 	    aMap.setOnMarkerClickListener(new OnMarkerClickListener(){
 
 			@Override
@@ -278,7 +289,7 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		btMyPos.setOnClickListener(this);
 		btDevPos.setOnClickListener(this);
 		btTrace.setOnClickListener(this);
-		btNavi.setOnClickListener(this);
+	
 		
 		//定位层设置
 		MyLocationStyle myLocationStyle = new MyLocationStyle();
@@ -298,7 +309,9 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		geocoderSearch = new GeocodeSearch(this); 
 		geocoderSearch.setOnGeocodeSearchListener(this);
 		
-		
+		//路径规划
+		routeSearch = new RouteSearch(this);
+		routeSearch.setRouteSearchListener(this);
 	}
 
 	@Override
@@ -314,11 +327,16 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			break;
 		case R.id.bt_dev_position:
 			MsgEventHandler.c_sGetCarPosition(TrackApp.currentCar);
-			showMessage("定位请求已发送");
+			
+			showMessage("获取设备最新位置");
+			if(TrackApp.currentCar.curState!=null){
+				initPosition();
+			}
+			
 			
 			break;
 		case R.id.bt_my_position:
-			
+			showProgressDialog("路径规划中，请稍后");
 			aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
 			//设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种 
 			aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
@@ -346,9 +364,6 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 //				showMessage("取消跟踪");
 //			}
 //			
-			
-			break;
-		case R.id.bt_navi:
 			
 			break;
 		}
@@ -381,11 +396,12 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 			voltage = TrackApp.currentCar.curState.voltage;
 			DecimalFormat formatter = new DecimalFormat("##0.000000");
 			double[] correctCoordinate = new double[2];
+			
 			double[] correctCoordinateLast = new double[2];
 			GpsCorrect.transform(lat, lon, correctCoordinate);
 			
 			LatLng curLatLng = new  LatLng(correctCoordinate[0], correctCoordinate[1]);
-			
+			endpoint = new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
 			
 			if(TrackApp.currentCar.lastState!=null&&Double.parseDouble(TrackApp.currentCar.curState.gprmc.speed)>6){
 				GpsCorrect.transform(TrackApp.currentCar.lastState.gprmc.latitude, TrackApp.currentCar.lastState.gprmc.longitude, correctCoordinateLast);
@@ -533,13 +549,11 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	@Override
 	public void onLocationChanged(Location aLocation) {
 		// TODO Auto-generated method stub
-		if (mListener != null && aLocation != null) {
-			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
-			mMoveMarker.setPosition(new LatLng(aLocation.getLatitude(), aLocation
-					.getLongitude()));// 定位雷达小图标
-			float bearing = aMap.getCameraPosition().bearing;
-			aMap.setMyLocationRotateAngle(bearing);// 设置小蓝点旋转角度
-		}
+//		if (mListener != null && aLocation != null) {
+//			//mListener.onLocationChanged(aLocation);// 显示系统小蓝点
+//			LatLonPoint startpoint = new LatLonPoint(aLocation.getLatitude(), aLocation.getLongitude());// 定位雷达小图标
+//			searchRouteResult(startpoint,endpoint);
+//		}
 	}
 
 	@Override
@@ -564,7 +578,9 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 	public void onLocationChanged(AMapLocation aLocation) {
 		// TODO Auto-generated method stub
 		if (mListener != null && aLocation != null) {
-			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
+			aMap.setMyLocationEnabled(false);
+			LatLonPoint startpoint = new LatLonPoint(aLocation.getLatitude(), aLocation.getLongitude());// 定位雷达小图标
+			searchRouteResult(startpoint,endpoint);
 		
 		}
 	}
@@ -602,6 +618,62 @@ public class TraceActivity extends BaseActivity implements OnGeocodeSearchListen
 		double slope = ((toPoint.latitude - fromPoint.latitude) / (toPoint.longitude - fromPoint.longitude));
 		return slope;
 
+	}
+	
+	/**
+	 * 开始搜索路径规划方案
+	 */
+	public void searchRouteResult(LatLonPoint startPoint, LatLonPoint endPoint) {
+		LatLonPoint l = new LatLonPoint(22.601888190152657 ,114.05940618447902);
+		final RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+				startPoint, endPoint);
+		
+		WalkRouteQuery query = new WalkRouteQuery(fromAndTo, RouteSearch.WalkDefault);
+		routeSearch.calculateWalkRouteAsyn(query);// 异步路径规划步行模式查询
+		
+	}
+	
+	
+	
+
+	@Override
+	public void onBusRouteSearched(BusRouteResult arg0, int arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDriveRouteSearched(DriveRouteResult arg0, int arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onWalkRouteSearched(WalkRouteResult result, int rCode) {
+		// TODO Auto-generated method stub
+		dismissProgressDialog();
+		if (rCode == 0) {
+			if (result != null && result.getPaths() != null
+					&& result.getPaths().size() > 0) {
+				walkRouteResult = result;
+				WalkPath walkPath = walkRouteResult.getPaths().get(0);
+				aMap.clear();// 清理地图上的所有覆盖物
+				WalkRouteOverlay walkRouteOverlay = new WalkRouteOverlay(this,
+						aMap, walkPath, walkRouteResult.getStartPos(),
+						walkRouteResult.getTargetPos());
+				walkRouteOverlay.removeFromMap();
+				walkRouteOverlay.addToMap();
+				walkRouteOverlay.zoomToSpan();
+			} else {
+				showMessage("没有路径结果");
+			}
+		} else if (rCode == 27) {
+			showMessage("网络错误");
+		} else if (rCode == 32) {
+			showMessage("秘钥错误");
+		} else {
+			showMessage("其他错误");
+		}
 	}
 
 	

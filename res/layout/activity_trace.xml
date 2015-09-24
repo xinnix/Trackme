@@ -46,22 +46,16 @@
             android:id="@+id/bt_my_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="我的位置" 
+            android:text="导航到设备" 
             android:textColor="#fff"/>
 
         <Button
             android:id="@+id/bt_trace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="跟踪"
+            android:text="跟踪设备"
             android:textColor="#fff" />
 
-        <Button
-            android:id="@+id/bt_navi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="导航" 
-            android:textColor="#fff"/>
     </LinearLayout>
 
     

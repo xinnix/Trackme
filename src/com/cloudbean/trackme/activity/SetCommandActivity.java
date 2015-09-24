@@ -208,13 +208,13 @@ public class SetCommandActivity extends BaseActivity {
 		switch(v.getId()){
 		case R.id.discon_circuit:
 			MsgEventHandler.c_sSetCircuit(TrackApp.currentCar, "0002020202");
-			curCommand = btConnCircuit.getText().toString();
+			curCommand = btDisconCircuit.getText().toString();
 			showProgressDialog("发送中...");
 			timerStart();
 			break;
 		case R.id.conn_circuit:
 			MsgEventHandler.c_sSetCircuit(TrackApp.currentCar, "0102020202");
-			curCommand = btDisconCircuit.getText().toString();
+			curCommand = btConnCircuit.getText().toString();
 			showProgressDialog("发送中...");
 			timerStart();
 			break;

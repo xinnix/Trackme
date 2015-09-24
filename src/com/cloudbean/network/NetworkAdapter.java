@@ -209,15 +209,13 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 					 msg.what = MSG_TRACK;
 					 TrackApp.curHandler.sendMessage(msg);
 					 break;
-//				 case DPacketParser.SIGNAL_RE_GETALARMLIST:
-//					 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
-//					 msg = TrackApp.curHandler.obtainMessage(); 
-//					 bundle = new Bundle();
-//					 bundle.putParcelableArray("alarmlist", alarmList);
-//					 msg.setData(bundle);
-//					 msg.what = MSG_ALARM;
-//					 TrackApp.curHandler.sendMessage(msg);
-//					 break;	
+				 case DPacketParser.SIGNAL_RE_GETALARMLIST:
+					 Alarm[] alarmList = MsgEventHandler.rGetAlarmList(dp);	
+					 for (int ii=0;ii<alarmList.length;ii++){
+						 TrackApp.alarmList.add(alarmList[ii]);
+					 }
+					 TrackApp.curHandler.sendMessage(msg);
+					 break;	
 				 case DPacketParser.SIGNAL_FAIL:
 					 Fail f = MsgEventHandler.rFail(dp);
 					 msg = TrackApp.curHandler.obtainMessage();

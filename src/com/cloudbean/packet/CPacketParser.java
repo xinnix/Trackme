@@ -18,6 +18,8 @@ public class CPacketParser {
 
 	public final static byte SIGNAL_RELAY = (byte)0xaa; 
 	public final static byte SIGNAL_POSCOMPLETE = (byte)0xa9; 
+	public final static byte SIGNAL_CENTERALARM = (byte)0xf2;
+	
 	
 	public final static byte SIGNAL_PREPOSITION = (byte)0xbb; 
 	

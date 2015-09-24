@@ -294,23 +294,19 @@ public class MsgEventHandler {
 		
 	}
 	
-//	public static Alarm[] rGetAlarmList(DPacketParser dp){
-//		 
-//		Alarm[] al = new Alarm[dp.dataTable.table.length];
-//		for (int ii=0;ii<al.length;ii++){
-//			al[ii] = new Alarm((Integer)dp.dataTable.table[ii][0],
-//					(String)dp.dataTable.table[ii][1],
-//					(String)dp.dataTable.table[ii][2],
-//					(Double)dp.dataTable.table[ii][3],
-//					(Double)dp.dataTable.table[ii][4],
-//					(Integer)dp.dataTable.table[ii][5],
-//					(Integer)dp.dataTable.table[ii][6],
-//					(String)dp.dataTable.table[ii][7]);
-//		}
-//
-//		return al;
-//		
-//	}
+	public static Alarm[] rGetAlarmList(DPacketParser dp){
+		 
+		Alarm[] al = new Alarm[dp.dataTable.table.length];
+		for (int ii=0;ii<al.length;ii++){
+			al[ii] = new Alarm((Integer)dp.dataTable.table[ii][0],
+					(String)dp.dataTable.table[ii][1],
+					(String)dp.dataTable.table[ii][2]
+					);
+		}
+
+		return al;
+		
+	}
 	
 	
 	
@@ -417,9 +413,16 @@ public class MsgEventHandler {
 	}
 	
 	public static Alarm c_rGetAlarmInfo(MsgGPRSParser mgp){
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		//SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		int alarmType = ByteHexUtil.hexStringToBytes(mgp.msgData.substring(0, 2))[0];
-		Alarm al = new Alarm(mgp.msgTermID,format.format(new Date()),alarmMap.get(alarmType));
+		String alarm = alarmMap.get(alarmType);
+		if(alarm!=null){
+			
+		}else{
+			alarm = "未知报警类型";
+		}
+		
+		Alarm al = new Alarm(mgp.msgTermID,alarm);
 		return al;
 	}
 

@@ -32,13 +32,13 @@
             android:id="@+id/set_gps_time_interval"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="设置GPS时间间隔" />
+            android:text="设置GPRS定时追踪时间间隔" />
 
       <Button
             android:id="@+id/set_gps_heartbeat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="设置GPS心跳包" />
+            android:text="设置GPRS心跳包间隔" />
       
       <Button
             android:id="@+id/set_sleep_time"

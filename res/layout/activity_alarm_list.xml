@@ -14,12 +14,35 @@
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent" />
 
-    <Button
-        android:id="@+id/bt_clearAlarmList"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:text="清空报警列表" />
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical" >
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" >
+
+        
+
+        <Button
+            android:id="@+id/bt_clearAlarmList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="清空报警列表" />
+        
+        <CheckBox
+            android:id="@+id/cb_setmute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关闭报警音" />
+        
+    </LinearLayout>
 
 </RelativeLayout>

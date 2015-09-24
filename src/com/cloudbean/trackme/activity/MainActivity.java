@@ -2,9 +2,13 @@ package com.cloudbean.trackme.activity;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.HeartBeat;
@@ -165,6 +169,10 @@ public class MainActivity extends BaseActivity {
     		timerStop();
     		dismissProgressDialog();
     		showMessage("登录成功");
+    		Date date= new Date();
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String carListId = getCarListIdString(TrackApp.carList);
+			MsgEventHandler.sGetAlarmList(carListId,subDateMinute(format.format(date),5), format.format(date), "");
     		TrackApp.isLogin = true;
 			Intent intent = new Intent();
 			intent.setClass(MainActivity.this, MenuActivity.class);
@@ -180,6 +188,41 @@ public class MainActivity extends BaseActivity {
 	}
 	
 	
+	private String getCarListIdString(Car[] carList){
+		String res = "";
+		if(carList!=null){
+			for(int jj=0 ; jj<carList.length; jj++){
+				res = res+carList[jj].id+",";
+			}
+		}
+		
+		return res.substring(0,res.length()-1);
+	}
+	
+	private static String subDateMinute(String day, int x)//返回的是字符串型的时间，输入的 
+	//是String day, int x 
+	 {    
+	        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 24小时制   
+	//引号里面个格式也可以是 HH:mm:ss或者HH:mm等等，很随意的，不过在主函数调用时，要和输入的变 
+	//量day格式一致 
+	        Date date = null;    
+	        try {    
+	            date = format.parse(day);    
+	        } catch (Exception ex) {    
+	            ex.printStackTrace();    
+	        }    
+	        if (date == null)    
+	            return "";    
+	        //System.out.println("front:" + format.format(date)); //显示输入的日期   
+	        Calendar cal = Calendar.getInstance();    
+	        cal.setTime(date);    
+	        cal.add(Calendar.MINUTE, -x);// 24小时制    
+	        date = cal.getTime();    
+	        //System.out.println("after:" + format.format(date));  //显示更新后的日期  
+	        cal = null;    
+	        return format.format(date);    
+	   
+	 }   
 	
 	
 }
