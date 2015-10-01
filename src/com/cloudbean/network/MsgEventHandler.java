@@ -414,15 +414,17 @@ public class MsgEventHandler {
 	
 	public static Alarm c_rGetAlarmInfo(MsgGPRSParser mgp){
 		//SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		Alarm al = null;
 		int alarmType = ByteHexUtil.hexStringToBytes(mgp.msgData.substring(0, 2))[0];
 		String alarm = alarmMap.get(alarmType);
+		
 		if(alarm!=null){
-			
+			al = new Alarm(mgp.msgTermID,alarm);
 		}else{
-			alarm = "未知报警类型";
+			
 		}
 		
-		Alarm al = new Alarm(mgp.msgTermID,alarm);
+		
 		return al;
 	}
 
@@ -448,6 +450,16 @@ public class MsgEventHandler {
 		c_sCommand(car,MsgGPRSParser.MSG_TYPE_GPSREBOOT,data);
 		
 	}
+	
+	public static void c_sSavePower(Car car,String data){	
+		
+		
+		String res = c_sCommand(car,MsgGPRSParser.MSG_TYPE_SAVEPOWER,data);
+		System.out.println(res);
+		
+	}
+	
+	
 	
 	public static void c_sExpandCommand(Car car,String data){	
 		

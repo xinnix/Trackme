@@ -18,11 +18,13 @@ import com.cloudbean.trackme.AppManager;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
 import com.cloudbean.trackme.dialog.IPDialog;
+import com.cloudbean.trackme.server.NetWorkService;
 import com.cloudbean.trackme.R.id;
 import com.cloudbean.trackme.R.layout;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -85,6 +87,19 @@ public class MainActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onResume();
 	}
+	
+
+	
+	
+	
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		
+	}
+
 
 	@Override
 	public void initWidget() {
@@ -110,6 +125,9 @@ public class MainActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		switch(v.getId()){
 			case R.id.login:
+//				bindService(new Intent(MainActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
+			
+	            
 				MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
 				MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
 				showProgressDialog("µÇÂ¼ÖÐ");

@@ -270,22 +270,27 @@ public class CarGroupListActivity extends BaseActivity{
 			 * 设置相应控件的内容
 			 */
 			// 设置要显示的文本信息
-			child_carDevType.setText(carTable.get(groupPosition).get(childPosition).devtype);
+			if(carTable.get(groupPosition).get(childPosition).devtype.equals("VT310")){
+				child_carDevType.setText("智能车载GPS");
+			}else{
+				child_carDevType.setText(carTable.get(groupPosition).get(childPosition).devtype);
+			}
+			
 			child_carName.setText(carTable.get(groupPosition).get(childPosition).name);
 			child_carDevId.setText(carTable.get(groupPosition).get(childPosition).devId);
 			int carImg = 0;
 			int alive = carTable.get(groupPosition).get(childPosition).getAlive();
 			String online = "离线";
 			if(alive==0){
-				carImg  = R.drawable.car_offline;
+				carImg  = R.drawable.offline_flag;
 			}else if(alive == 1){
-				carImg = R.drawable.car_online;
+				carImg = R.drawable.online_flag_1;
 				online = "有最后位置";
 			}else if(alive >1){
-				carImg = R.drawable.car_online2;
+				carImg = R.drawable.online_flag;
 				online = "在线";
 			}else{
-				carImg  = R.drawable.car_offline;
+				carImg  = R.drawable.offline_flag;
 			}
 			
 			child_isOnline.setText(online);

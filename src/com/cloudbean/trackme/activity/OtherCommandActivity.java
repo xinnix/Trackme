@@ -88,7 +88,7 @@ public class OtherCommandActivity extends BaseActivity {
 		case R.id.set_gps_time_interval:
 			final EditText etTrackInterval = new EditText(this);
 			new AlertDialog.Builder(this)
-			.setTitle("请输入定时追中时间间隔（单位为10秒 ）：")
+			.setTitle("请输入定时追踪时间间隔（单位为10秒 ）：")
 			.setView(etTrackInterval)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				
@@ -114,7 +114,7 @@ public class OtherCommandActivity extends BaseActivity {
 				@Override
 				public void onClick(DialogInterface arg0, int arg1) {
 					// TODO Auto-generated method stub
-					showMessage("设置GPS心跳命令已发送");
+					showMessage("设置GPRS心跳命令已发送");
 					MsgEventHandler.c_sGPSHeartBeat(TrackApp.currentCar, etGPSHeartBeat.getText().toString());
 				}
 			})
@@ -123,6 +123,21 @@ public class OtherCommandActivity extends BaseActivity {
 			
 			break;
 		case R.id.set_sleep_time:
+			final EditText etSleepTime = new EditText(this);
+			new AlertDialog.Builder(this)
+			.setTitle("请输入休眠时间（分钟 ）：")
+			.setView(etSleepTime)
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					// TODO Auto-generated method stub
+					showMessage("设置休眠模式命令已发送");
+					MsgEventHandler.c_sSavePower(TrackApp.currentCar, etSleepTime.getText().toString());
+				}
+			})
+			.setNegativeButton("取消", null)
+			.show();
 			
 			break;
 		case R.id.set_re_sms:

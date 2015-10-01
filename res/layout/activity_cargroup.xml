@@ -10,7 +10,7 @@
         android:layout_height="45dip"
         android:layout_alignParentTop="true"
         android:gravity="center_vertical|center_horizontal"
-        android:text="车组列表"
+        android:text="设备列表"
         android:textSize="40dip"
         android:textColor="#000"></TextView>
  

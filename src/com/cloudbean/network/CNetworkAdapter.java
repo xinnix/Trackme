@@ -255,20 +255,23 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					
 					 if(TrackApp.isLogin==true){
 						final Alarm al = MsgEventHandler.c_rGetAlarmInfo(mgp);
-						TrackApp.alarmList.add(al);
-						TrackApp.playAlarmSound();
-						 new Thread(){
+						if(al!=null){
+							TrackApp.alarmList.add(al);
+							TrackApp.playAlarmSound();
+							 new Thread(){
 
-							@Override
-							public void run() {
-								// TODO Auto-generated method stub
-								Looper.prepare();
-								
-								Toast.makeText(context, al.termid+al.alarmType+al.alarmTime,Toast.LENGTH_SHORT).show();
-								Looper.loop();
-							}
-							 
-						 }.start();
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									Looper.prepare();
+									
+									Toast.makeText(context, al.termid+al.alarmType+al.alarmTime,Toast.LENGTH_SHORT).show();
+									Looper.loop();
+								}
+								 
+							 }.start();
+						}
+						
 					}
 					 
 					 break;
@@ -306,7 +309,7 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_GPSHEARTBEAT:
 						
-					 res = mgp.msgData.equals("00")?"GPS心跳间隔设置失败":"GPS心跳间隔设置成功";
+					 res = mgp.msgData.equals("00")?"GPRS心跳间隔设置失败":"GPRS心跳间隔设置成功";
 					 new Thread(){
 
 						@Override
@@ -357,6 +360,24 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 				
 				 
 				 break;
+				 case MsgGPRSParser.MSG_TYPE_SAVEPOWER:
+						
+					 res = mgp.msgData.equals("00")?"设置休眠失败":"设置休眠成功";
+					 new Thread(){
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Looper.prepare();
+							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+							Looper.loop();
+						}
+						 
+					 }.start();
+				
+				 
+				 break;
+				 
 				 }
 			
 

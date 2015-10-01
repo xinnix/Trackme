@@ -10,37 +10,37 @@
         android:id="@+id/group_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp" 
+        android:paddingTop="15dp" 
+        android:paddingBottom="5dp" 
         android:background="@drawable/corners_bg">
 
         <ImageView
             android:id="@+id/group_state"
             android:layout_width="40dip"
             android:layout_height="40dip"
-            android:scaleType="centerInside"
+            android:layout_marginLeft="5dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignTop="@+id/group_title"/>
+            android:layout_centerVertical="true"
+            android:scaleType="centerInside" />
+
         <TextView
             android:id="@+id/gt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/group_state"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="48dp"
-            android:textSize="20dip"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="50dp"
+            android:text="设备组："
             android:textColor="#fff"
-            android:text = "车组：" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/group_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/gt"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="48dp"
-            android:textSize="20dip"
-            android:textColor="#fff" />
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/gt"
+            android:textColor="#fff"
+            android:textSize="20sp" />
 
     </RelativeLayout>
 

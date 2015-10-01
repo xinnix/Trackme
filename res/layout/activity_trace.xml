@@ -40,20 +40,21 @@
             android:id="@+id/bt_dev_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设备位置" 
+            android:text="查询位置" 
             android:textColor="#fff"/>
         <Button
             android:id="@+id/bt_my_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="导航到设备" 
+            android:visibility="gone"
             android:textColor="#fff"/>
 
         <Button
             android:id="@+id/bt_trace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="跟踪设备"
+            android:text="实时轨迹"
             android:textColor="#fff" />
 
     </LinearLayout>

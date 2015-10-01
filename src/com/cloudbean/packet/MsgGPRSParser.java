@@ -28,6 +28,8 @@ public class MsgGPRSParser {
 	public final static short MSG_TYPE_EXPANDCOMMAND = 0x4108;
 	public final static short MSG_TYPE_GPSHEARTBEAT = 0x5199;
 	public final static short MSG_TYPE_TRACEINTERVAL = 0x4102;
+	public final static short MSG_TYPE_SAVEPOWER = 0x4126;
+	
 	
 	public final static short MSG_TYPE_ALARM = (short) 0x9999;
 	
@@ -79,7 +81,7 @@ public class MsgGPRSParser {
 		byte[] data;
 		int datalen;
 		
-		if (this.msgType == MSG_TYPE_PHONE||this.msgType == MSG_TYPE_GPSHEARTBEAT){
+		if (this.msgType == MSG_TYPE_PHONE||this.msgType == MSG_TYPE_GPSHEARTBEAT||this.msgType == MSG_TYPE_SAVEPOWER){
 				data = this.msgData.getBytes();
 				datalen = (data==null)?0:data.length;
 		}else if (this.msgType == MSG_TYPE_TRACEINTERVAL){

@@ -23,13 +23,13 @@
             android:id="@+id/discon_circuit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="断开油路" />
+            android:text="恢复油路" />
 
         <Button
             android:id="@+id/conn_circuit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="恢复油路" />
+            android:text="断开油路" />
     </LinearLayout>
 
     <ListView

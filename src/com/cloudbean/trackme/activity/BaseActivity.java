@@ -141,7 +141,10 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
             requestWindowFeature(Window.FEATURE_NO_TITLE); // 取消标题
         }
         AppManager.getAppManager().addActivity(this);
-        bindService(new Intent(BaseActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
+//    	Intent startIntent = new Intent(this, NetWorkService.class);  
+//        startService(startIntent); 
+        
+      bindService(new Intent(BaseActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
         initWidget();
 	}
 	
@@ -184,8 +187,11 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	        super.onDestroy();
 	        activityState = ACTIVITY_DESTROY;
 	        unbindService(conn);
+//	        Intent stopIntent = new Intent(this, NetWorkService.class);  
+//	        stopService(stopIntent);  
 	        Log.i(this.getClass().getName(), "----onDestroy");
 	        AppManager.getAppManager().finishActivity(this);
+	        
 	        
 	    }
 	

@@ -1,5 +1,8 @@
 package com.cloudbean.trackme.activity;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -58,7 +61,7 @@ public class ReplayActivity extends BaseActivity {
 	private String isTimeSelected =null;
 	
 	// 通过设置间隔时间和距离可以控制速度和图标移动的距离
-	private static int TIME_INTERVAL = 200;
+	private static int TIME_INTERVAL = 100;
 	private static final double DISTANCE = 0.0001;
 	private Track[] trackList = null;
 	
@@ -525,6 +528,26 @@ public class ReplayActivity extends BaseActivity {
        	 return;
         }
      }
+	
+	
+	private long subDate(String d1,String d2){
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		long min = 0;
+		try
+		{
+		    Date dd1 = df.parse(d1);
+		    Date dd2 = df.parse(d2);
+		    long diff = dd1.getTime() - dd2.getTime();
+		    min = diff / (1000 * 60 );
+		}
+		catch (Exception e)
+		{
+
+		}
+		
+		return min;
+	}
+	
 	
 	
 //	public void moveLooper() {

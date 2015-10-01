@@ -25,6 +25,7 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
+import com.amap.api.maps.overlay.DrivingRouteOverlay;
 import com.amap.api.maps.overlay.WalkRouteOverlay;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeResult;
@@ -33,6 +34,7 @@ import com.amap.api.services.geocoder.GeocodeSearch.OnGeocodeSearchListener;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DrivePath;
 import com.amap.api.services.route.DriveRouteResult;
 import com.amap.api.services.route.RouteSearch;
 import com.amap.api.services.route.WalkPath;
@@ -83,8 +85,12 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 	private GeocodeSearch geocoderSearch = null;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
+	
 	private RouteSearch routeSearch;
 	private WalkRouteResult walkRouteResult;
+	private DriveRouteResult driveRouteResult;// 驾车模式查询结果
+	
+	
 	private final int ADDRESS_COMPLETE = 0x9901;
 	private LatLonPoint endpoint;
 	private Marker startMk, targetMk;
@@ -299,7 +305,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 		myLocationStyle.radiusFillColor(Color.argb(100, 0, 0, 180));// 设置圆形的填充颜色
 		// myLocationStyle.anchor(int,int)//设置小蓝点的锚点
 		myLocationStyle.strokeWidth(0.1f);// 设置圆形的边框粗细
-		aMap.getUiSettings().setMyLocationButtonEnabled(true);
+		//aMap.getUiSettings().setMyLocationButtonEnabled(true);
 		aMap.setMyLocationStyle(myLocationStyle);
 		aMap.setMyLocationRotateAngle(180);
 		aMap.setLocationSource(this);// 设置定位监听
@@ -380,13 +386,13 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 			speed = TrackApp.currentCar.curState.gprmc.speed;
 			distant = TrackApp.currentCar.curState.distant;
 			if (TrackApp.currentCar.devtype.equals("MT400")){
-				temperature  =  "无温度";
+				temperature  =  "0";
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[1])[1]?"开":"关";
 			}else if(TrackApp.currentCar.devtype.equals("VT310")){
 				temperature  =  TrackApp.currentCar.curState.temperature;
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[0])[3]?"开":"关";
 			}else{
-				temperature  =  "无温度";
+				temperature  =  "0";
 				accState= "无状态";
 			}
 			
@@ -423,7 +429,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 					"电压："+voltage+"V\n"+
 					"ACC状态："+accState+"\n"+
 					"信号强度:"+gsmStrength+"\n"+
-					"地址："+addressName);
+					"地址："+formatAddress(addressName));
 			mMoveMarker.showInfoWindow();
 			LatLonPoint latLonPoint =new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
 			getAddress(latLonPoint);
@@ -626,10 +632,11 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 	public void searchRouteResult(LatLonPoint startPoint, LatLonPoint endPoint) {
 		LatLonPoint l = new LatLonPoint(22.601888190152657 ,114.05940618447902);
 		final RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
-				startPoint, endPoint);
+				l, endPoint);
 		
-		WalkRouteQuery query = new WalkRouteQuery(fromAndTo, RouteSearch.WalkDefault);
-		routeSearch.calculateWalkRouteAsyn(query);// 异步路径规划步行模式查询
+		DriveRouteQuery query = new DriveRouteQuery(fromAndTo, RouteSearch.DrivingDefault,
+				null, null, "");// 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+		routeSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
 		
 	}
 	
@@ -643,27 +650,21 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 	}
 
 	@Override
-	public void onDriveRouteSearched(DriveRouteResult arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onWalkRouteSearched(WalkRouteResult result, int rCode) {
+	public void onDriveRouteSearched(DriveRouteResult result, int rCode) {
 		// TODO Auto-generated method stub
 		dismissProgressDialog();
 		if (rCode == 0) {
 			if (result != null && result.getPaths() != null
 					&& result.getPaths().size() > 0) {
-				walkRouteResult = result;
-				WalkPath walkPath = walkRouteResult.getPaths().get(0);
+				driveRouteResult = result;
+				DrivePath drivePath = driveRouteResult.getPaths().get(0);
 				aMap.clear();// 清理地图上的所有覆盖物
-				WalkRouteOverlay walkRouteOverlay = new WalkRouteOverlay(this,
-						aMap, walkPath, walkRouteResult.getStartPos(),
-						walkRouteResult.getTargetPos());
-				walkRouteOverlay.removeFromMap();
-				walkRouteOverlay.addToMap();
-				walkRouteOverlay.zoomToSpan();
+				DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
+						this, aMap, drivePath, driveRouteResult.getStartPos(),
+						driveRouteResult.getTargetPos());
+				drivingRouteOverlay.removeFromMap();
+				drivingRouteOverlay.addToMap();
+				drivingRouteOverlay.zoomToSpan();
 			} else {
 				showMessage("没有路径结果");
 			}
@@ -676,6 +677,27 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 		}
 	}
 
+	@Override
+	public void onWalkRouteSearched(WalkRouteResult result, int rCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	
+	private String formatAddress(String address){
+		String res="";
+		int length = 15;
+		int a = address.length()/length;
+		
+		for (int i=0; i<a; i++){
+			res = res+address.substring(i*15,i*15+15)+"\n";
+		}
+		
+		
+		return address;
+		
+	}
 	
 //	/**
 //	 * 循环进行移动逻辑

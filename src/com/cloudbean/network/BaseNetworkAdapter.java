@@ -74,14 +74,16 @@ public abstract class BaseNetworkAdapter extends Thread{
 								 } 
 							 }
 						 }catch(Exception e ){
+							
 							 e.printStackTrace();
+							
 							 break;
 						 }// end of try		
 				
 				}// end of while
 				
 				try {
-					sleep(100);
+					sleep(1000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
