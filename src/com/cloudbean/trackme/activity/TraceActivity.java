@@ -49,6 +49,7 @@ import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackerUtil.ByteHexUtil;
 import com.cloudbean.trackerUtil.GpsCorrect;
+import com.cloudbean.trackerUtil.StringUtil;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
 import com.cloudbean.trackme.R.drawable;
@@ -231,8 +232,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 		if (rCode == 0) {
 			if (result != null && result.getRegeocodeAddress() != null
 					&& result.getRegeocodeAddress().getFormatAddress() != null) {
-				addressName = result.getRegeocodeAddress().getFormatAddress()
-						+ "附近";
+				addressName = result.getRegeocodeAddress().getFormatAddress();
 //				showMessage(addressName);
 				TrackApp.currentCar.curAddress = addressName;
 				
@@ -389,7 +389,8 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 				temperature  =  "0";
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[1])[1]?"开":"关";
 			}else if(TrackApp.currentCar.devtype.equals("VT310")){
-				temperature  =  TrackApp.currentCar.curState.temperature;
+				temperature  =  Integer.parseInt(TrackApp.currentCar.curState.temperature)>200?TrackApp.currentCar.curState.temperature:"0";
+				
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[0])[3]?"开":"关";
 			}else{
 				temperature  =  "0";
@@ -429,7 +430,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 					"电压："+voltage+"V\n"+
 					"ACC状态："+accState+"\n"+
 					"信号强度:"+gsmStrength+"\n"+
-					"地址："+formatAddress(addressName));
+					"地址："+addressName);
 			mMoveMarker.showInfoWindow();
 			LatLonPoint latLonPoint =new LatLonPoint(correctCoordinate[0], correctCoordinate[1]);
 			getAddress(latLonPoint);
@@ -507,7 +508,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
  					"电压："+voltage+"V\n"+
  					"ACC状态："+accState+"\n"+
  					"信号强度:"+gsmStrength+"\n"+
- 					"地址："+addressName);
+ 					"地址："+StringUtil.getStringByEnter(15,addressName));
  			mMoveMarker.showInfoWindow();
          }
          else if (msg.what==NetworkAdapter.MSG_FAIL){
@@ -685,19 +686,19 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 
 	
 	
-	private String formatAddress(String address){
-		String res="";
-		int length = 15;
-		int a = address.length()/length;
-		
-		for (int i=0; i<a; i++){
-			res = res+address.substring(i*15,i*15+15)+"\n";
-		}
-		
-		
-		return address;
-		
-	}
+//	private String formatAddress(String address){
+//		String res="";
+//		int length = 15;
+//		int a = address.length()/length;
+//		
+//		for (int i=0; i<a; i++){
+//			res = res+address.substring(i*15,i*15+15)+"\n";
+//		}
+//		
+//		
+//		return res;
+//		
+//	}
 	
 //	/**
 //	 * 循环进行移动逻辑

@@ -161,14 +161,16 @@ public class NetworkAdapter extends BaseNetworkAdapter {
 				 DPacketParser dp = new DPacketParser(packetByte);
 				 switch (dp.pktSignal){
 				 case DPacketParser.SIGNAL_RE_LOGIN:
+					 if(TrackApp.login==null){
+						 Login l = MsgEventHandler.rLogin(dp);	
+						 msg = TrackApp.curHandler.obtainMessage(); 
+						 bundle = new Bundle();
+						 bundle.putParcelable("login", l);
+						 msg.setData(bundle);
+						 msg.what = MSG_LOGIN;
+						 TrackApp.curHandler.sendMessage(msg);
+					 }
 					 
-					 Login l = MsgEventHandler.rLogin(dp);	
-					 msg = TrackApp.curHandler.obtainMessage(); 
-					 bundle = new Bundle();
-					 bundle.putParcelable("login", l);
-					 msg.setData(bundle);
-					 msg.what = MSG_LOGIN;
-					 TrackApp.curHandler.sendMessage(msg);
 					
 					 break;
 				 case DPacketParser.SIGNAL_RE_HEARTBEAT:

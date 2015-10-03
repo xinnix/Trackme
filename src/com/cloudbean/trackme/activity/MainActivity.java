@@ -161,7 +161,7 @@ public class MainActivity extends BaseActivity {
         		}
         		
         		networkService.hreatBeat();
-        		showProgressDialog("加载基础数据");
+
         		MsgEventHandler.sGetCarInfo(login.userid,"");
         		
         		
@@ -175,15 +175,12 @@ public class MainActivity extends BaseActivity {
             	showMessage("登录失败");
             	return;
         	}
-        	dismissProgressDialog();// 关闭ProgressDialog
+        	
     		//Toast.makeText(MainActivity.this, "获取数据错误或数据库无数据",Toast.LENGTH_SHORT).show();
-    	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
-    		MsgEventHandler.c_sGetAllLastPosition();
-    		
     	}else if(msg.what == NetworkAdapter.MSG_CARINFO){
     		MsgEventHandler.sGetCarGroup(login.userid,"");
 		
-    	}else if(msg.what == CNetworkAdapter.MSG_POSCOMPLETE){
+    	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
     		timerStop();
     		dismissProgressDialog();
     		showMessage("登录成功");
@@ -192,6 +189,7 @@ public class MainActivity extends BaseActivity {
 			String carListId = getCarListIdString(TrackApp.carList);
 			MsgEventHandler.sGetAlarmList(carListId,subDateMinute(format.format(date),5), format.format(date), "");
     		TrackApp.isLogin = true;
+    		MsgEventHandler.c_sGetAllLastPosition();
 			Intent intent = new Intent();
 			intent.setClass(MainActivity.this, MenuActivity.class);
 			intent.putExtra("userId",TrackApp.login.userid);
