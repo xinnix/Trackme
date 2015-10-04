@@ -194,6 +194,7 @@ public class MainActivity extends BaseActivity {
 			intent.setClass(MainActivity.this, MenuActivity.class);
 			intent.putExtra("userId",TrackApp.login.userid);
 			startActivity(intent);
+			finish();
     	}else if (msg.what==TIME_OUT){
     		dismissProgressDialog();
        	 	showMessage("设备关机或网络状况导致数据返回超时");
