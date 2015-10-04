@@ -14,6 +14,7 @@ import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackme.server.NetWorkService;
+import com.wilddog.client.Wilddog;
 
 import android.app.Application;
 import android.content.Intent;
@@ -38,6 +39,8 @@ public class TrackApp extends Application{
 	
 	public static String curCommand = null;
 	
+	
+	public static Wilddog rootRef = new Wilddog("https://trace.wilddogio.com/");
 	
 	public static boolean isLogin = false;
 	public static boolean isMute = false;
@@ -98,6 +101,7 @@ public class TrackApp extends Application{
         super.onCreate();
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects().detectLeakedClosableObjects().penaltyLog().penaltyDeath().build());
+        Wilddog.setAndroidContext(this);
         initSound();
         
     }

@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.cloudbean.model.Alarm;
 import com.cloudbean.model.Car;
@@ -17,6 +19,7 @@ import com.cloudbean.packet.DPacketParser;
 import com.cloudbean.packet.MsgGPRSParser;
 import com.cloudbean.trackerUtil.ByteHexUtil;
 import com.cloudbean.trackme.TrackApp;
+import com.wilddog.client.Wilddog;
 
 import android.app.Application;
 import android.content.Context;
@@ -37,7 +40,7 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 	public static int MSG_POSCOMPLETE = 0x2006;
 	
 	private Context context =null;
-	
+	Map<String, CarState> carPosition=new HashMap<String, CarState>();
 	 public CNetworkAdapter(final String serverIP,final int port,Context context){
 		super(serverIP,port);
 		this.context =context;
@@ -236,6 +239,11 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 								 TrackApp.carList[ii].alive++;
 							 }
 						 }
+						 
+						 carPosition.put(cs.devid, cs);
+						 Wilddog devRef = TrackApp.rootRef.child("position");
+						 devRef.setValue(carPosition);
+						 
 						 
 						 b.putDouble("lat", cs.gprmc.latitude);
 						 b.putDouble("lon", cs.gprmc.longitude);
