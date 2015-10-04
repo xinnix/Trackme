@@ -389,7 +389,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 				temperature  =  "0";
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[1])[1]?"开":"关";
 			}else if(TrackApp.currentCar.devtype.equals("VT310")){
-				temperature  =  Integer.parseInt(TrackApp.currentCar.curState.temperature)>200?TrackApp.currentCar.curState.temperature:"0";
+				temperature  =  Float.parseFloat(TrackApp.currentCar.curState.temperature)<200?TrackApp.currentCar.curState.temperature:"0";
 				
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[0])[3]?"开":"关";
 			}else{
