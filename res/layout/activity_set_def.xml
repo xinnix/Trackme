@@ -9,6 +9,7 @@
     tools:context="com.cloudbean.trackme.activity.SetDefActivity" >
 
     <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -27,19 +28,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="撤防" />
-        
-		<Button
+
+        <Button
             android:id="@+id/set_power_supply"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="设置掉电报警" />
-		<Button
+            android:text="设置掉电报警"
+            android:visibility="gone" />
+
+        <Button
             android:id="@+id/cancel_power_supply"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="取消掉电报警" />
-
-      
+            android:text="取消掉电报警"
+            android:visibility="gone" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageViewDef"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/lock_open" />
 
 </RelativeLayout>

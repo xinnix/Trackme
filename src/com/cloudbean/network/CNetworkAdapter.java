@@ -200,7 +200,15 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 				 
 				 switch(mgp.msgType){
 				 case MsgGPRSParser.MSG_TYPE_DEF:
-					 res = mgp.msgData.equals("00")?"…Ë∑¿/≥∑∑¿ ß∞‹":"…Ë∑¿/≥∑∑¿≥…π¶";
+					 if(TrackApp.curCommand.equals("…Ë∑¿")){
+						 res = mgp.msgData.equals("00")?"…Ë∑¿ ß∞‹":"…Ë∑¿≥…π¶";
+					 }else{
+						 res = mgp.msgData.equals("00")?"≥∑∑¿ ß∞‹":"≥∑∑¿≥…π¶";
+					 }
+					 
+					 b.putString("result", res);
+					 msg.setData(b);
+					 msg.what = MsgGPRSParser.MSG_TYPE_DEF;
 					 new Thread(){
 
 						@Override
@@ -216,7 +224,7 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 //					 b.putString("res", mgp.msgData);
 //					 msg.what =MSG_DEF;
 //					 msg.setData(b);
-//					 TrackApp.curHandler.sendMessage(msg);
+					 TrackApp.curHandler.sendMessage(msg);
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_POSITION:
 					 CarState cs =MsgEventHandler.c_rGetCarPosition(mgp);

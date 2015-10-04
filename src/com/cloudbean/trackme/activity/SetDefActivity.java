@@ -2,6 +2,7 @@ package com.cloudbean.trackme.activity;
 
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.MsgEventHandler;
+import com.cloudbean.packet.MsgGPRSParser;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
 import com.cloudbean.trackme.R.id;
@@ -15,13 +16,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 public class SetDefActivity extends BaseActivity {
 	private Button btSetDef = null;
 	private Button btCancelDef = null;
 	private Button btSetPowerSupply = null;
 	private Button btCancelPowerSupply = null;
-	
+	private ImageView imageViewDef = null;
 	private String curCommand = null;
 	
 	
@@ -41,6 +43,8 @@ public class SetDefActivity extends BaseActivity {
 		btCancelDef = (Button)findViewById(R.id.cancel_def);
 		btSetPowerSupply = (Button)findViewById(R.id.set_power_supply);
 		btCancelPowerSupply = (Button)findViewById(R.id.cancel_power_supply);
+		imageViewDef = (ImageView)findViewById(R.id.imageViewDef);
+		
 		btCancelPowerSupply.setOnClickListener(this);
 		btSetPowerSupply.setOnClickListener(this);
 		btSetDef.setOnClickListener(this);
@@ -54,14 +58,14 @@ public class SetDefActivity extends BaseActivity {
 		case R.id.set_def:
 			showMessage("设防命令发送");
 			MsgEventHandler.c_sSetDef(TrackApp.currentCar, "01");
-//			curCommand = btSetDef.getText().toString();
+			TrackApp.curCommand = btSetDef.getText().toString();
 //			showProgressDialog(curCommand+"发送中...");
 //			timerStart();
 			break;
 		case R.id.cancel_def:
 			showMessage("撤防命令发送");
 			MsgEventHandler.c_sSetDef(TrackApp.currentCar, "00");
-//			curCommand = btCancelDef.getText().toString();
+			TrackApp.curCommand = btCancelDef.getText().toString();
 //			showProgressDialog(curCommand+"发送中...");
 //			timerStart();
 			break;
@@ -79,7 +83,18 @@ public class SetDefActivity extends BaseActivity {
 	@Override
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
-//		if( msg.what==CNetworkAdapter.MSG_DEF){
+		
+		if( msg.what==MsgGPRSParser.MSG_TYPE_DEF){
+			
+			String res = msg.getData().getString("result");
+			if(res.equals("设防成功")){
+				
+					imageViewDef.setImageResource(R.drawable.lock);
+				
+				
+			}else if(res.equals("撤防成功")){
+				imageViewDef.setImageResource(R.drawable.lock_open);
+			}
 //    		timerStop();
 //    		 Bundle b = msg.getData();
 //    		 String devid = b.getString("devid");
@@ -100,6 +115,6 @@ public class SetDefActivity extends BaseActivity {
 //					
 //			 }
 //    	
-//    	}
+    	}
 	}
 }

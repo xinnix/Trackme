@@ -35,6 +35,10 @@ public class TrackApp extends Application{
 	public static Car currentCar = null;
 	public static String curUsername = null;
 	public static String curPassword = null;
+	
+	public static String curCommand = null;
+	
+	
 	public static boolean isLogin = false;
 	public static boolean isMute = false;
 	public static List<Alarm> alarmList = new ArrayList<Alarm>();

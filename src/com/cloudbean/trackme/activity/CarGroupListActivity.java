@@ -100,9 +100,10 @@ public class CarGroupListActivity extends BaseActivity{
 				Car car  = carTable.get(child_groupId).get(child_childId);
 				
 				TrackApp.currentCar = car;
-				bundle.putInt("carid", Integer.parseInt(car.id));
-				intent.putExtras(bundle);
-				startActivity(intent);
+//				bundle.putInt("carid", Integer.parseInt(car.id));
+//				intent.putExtras(bundle);
+//				startActivity(intent);
+				finish();
 				// Ë¢ÐÂ½çÃæ
 				
 				
