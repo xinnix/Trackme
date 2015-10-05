@@ -48,6 +48,7 @@ public class IPDialog extends Dialog{
              public void onClick(View v) {
                   TrackApp.dServerAddr =  dip.getText().toString();
                   TrackApp.cServerAddr =  cip.getText().toString();
+                  
                   IPDialog.this.dismiss();
              }
      };

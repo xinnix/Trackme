@@ -240,9 +240,9 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 							 }
 						 }
 						 
-						 carPosition.put(cs.devid, cs);
-						 Wilddog devRef = TrackApp.rootRef.child("position");
-						 devRef.setValue(carPosition);
+//						 carPosition.put(cs.devid, cs);
+//						 Wilddog devRef = ref.child("position");
+//						 devRef.setValue(carPosition);
 						 
 						 
 						 b.putDouble("lat", cs.gprmc.latitude);

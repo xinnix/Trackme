@@ -10,6 +10,7 @@ import java.util.TimerTask;
 
 import com.cloudbean.model.Car;
 import com.cloudbean.model.Login;
+import com.cloudbean.network.BaseNetworkAdapter;
 import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.MsgEventHandler;
@@ -118,6 +119,8 @@ public class MainActivity extends BaseActivity {
 		btLogin.setOnClickListener(this);
 		btExit.setOnClickListener(this);
 		btSetServer.setOnClickListener(this);
+		
+		
 	}
 
 	@Override
@@ -126,10 +129,9 @@ public class MainActivity extends BaseActivity {
 		switch(v.getId()){
 			case R.id.login:
 //				bindService(new Intent(MainActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
-			
-	            
-				MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
-				MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
+				
+				connNetwork();
+				
 				showProgressDialog("µÇÂ¼ÖÐ");
 				timerStart();
 				break;
@@ -160,7 +162,7 @@ public class MainActivity extends BaseActivity {
         			saveUserInfo(etUsername.getText().toString(),etPassword.getText().toString());
         		}
         		
-        		networkService.hreatBeat();
+//        		TrackApp.hb.start();
 
         		MsgEventHandler.sGetCarInfo(login.userid,"");
         		
@@ -180,6 +182,10 @@ public class MainActivity extends BaseActivity {
     	}else if(msg.what == NetworkAdapter.MSG_CARINFO){
     		MsgEventHandler.sGetCarGroup(login.userid,"");
 		
+    	}else if(msg.what == BaseNetworkAdapter.NETWORK_CONNECTED){
+    		
+    		MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
+			MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
     	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
     		timerStop();
     		dismissProgressDialog();
@@ -239,7 +245,26 @@ public class MainActivity extends BaseActivity {
 	        cal = null;    
 	        return format.format(date);    
 	   
-	 }   
+	 }  
 	
+	public  void connNetwork(){
+		String[] d = decodeAddr(TrackApp.dServerAddr);
+		String[] c = decodeAddr(TrackApp.cServerAddr);
+		
+		String dip = d[0];
+		int dport = Integer.parseInt(d[1]);
+		
+		String cip = c[0];
+		int cport = Integer.parseInt(c[1]);
+		Context context = getApplicationContext();
+		TrackApp.na = new NetworkAdapter(dip,dport);
+		TrackApp.cna = new CNetworkAdapter(cip,cport,context);
+		TrackApp.hb = new HeartBeat();
+		MsgEventHandler.config(TrackApp.na, TrackApp.cna);
+	}
+	public  String[] decodeAddr(String addr){
+		return addr.split(":");
+		
+	}
 	
 }
