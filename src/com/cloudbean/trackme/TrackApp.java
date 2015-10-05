@@ -14,8 +14,10 @@ import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
 import com.cloudbean.trackme.server.NetWorkService;
+import com.wilddog.client.Wilddog;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -37,6 +39,9 @@ public class TrackApp extends Application{
 	public static String curPassword = null;
 	
 	public static String curCommand = null;
+	public static NetworkAdapter na = null;
+	public static CNetworkAdapter cna = null;
+	public static HeartBeat hb = null;
 	
 	
 	public static boolean isLogin = false;
@@ -98,6 +103,7 @@ public class TrackApp extends Application{
         super.onCreate();
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects().detectLeakedClosableObjects().penaltyLog().penaltyDeath().build());
+//        Wilddog.setAndroidContext(this);
         initSound();
         
     }

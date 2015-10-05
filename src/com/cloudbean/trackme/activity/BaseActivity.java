@@ -46,7 +46,7 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	
 	protected ProgressDialog pd = null;
 	
-	NetWorkService networkService;
+	//NetWorkService networkService;
 	
 	public  Handler handler =  new Handler() {  
         // handler接收到消息后就会执行此方法  
@@ -57,21 +57,21 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
         	
 	};
 	
-	
-	public ServiceConnection conn = new ServiceConnection() {
-
-		@Override
-		public void onServiceConnected(ComponentName arg0, IBinder service) {
-			// TODO Auto-generated method stub
-			networkService = ((NetWorkService.NetworkBinder)service).getService();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			// TODO Auto-generated method stub
-			networkService = null;
-		}
-	};
+//	
+//	public ServiceConnection conn = new ServiceConnection() {
+//
+//		@Override
+//		public void onServiceConnected(ComponentName arg0, IBinder service) {
+//			// TODO Auto-generated method stub
+//			networkService = ((NetWorkService.NetworkBinder)service).getService();
+//		}
+//
+//		@Override
+//		public void onServiceDisconnected(ComponentName arg0) {
+//			// TODO Auto-generated method stub
+//			networkService = null;
+//		}
+//	};
 	
 	
 	private Timer timer = null;
@@ -144,7 +144,7 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 //    	Intent startIntent = new Intent(this, NetWorkService.class);  
 //        startService(startIntent); 
         
-      bindService(new Intent(BaseActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
+//      bindService(new Intent(BaseActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
         initWidget();
 	}
 	
@@ -186,7 +186,7 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	    protected void onDestroy() {
 	        super.onDestroy();
 	        activityState = ACTIVITY_DESTROY;
-	        unbindService(conn);
+//	        unbindService(conn);
 //	        Intent stopIntent = new Intent(this, NetWorkService.class);  
 //	        stopService(stopIntent);  
 	        Log.i(this.getClass().getName(), "----onDestroy");

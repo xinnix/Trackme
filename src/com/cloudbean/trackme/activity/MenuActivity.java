@@ -1,5 +1,6 @@
 package com.cloudbean.trackme.activity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import com.cloudbean.model.CarGroup;
 import com.cloudbean.model.Login;
 import com.cloudbean.model.User;
 import com.cloudbean.network.MsgEventHandler;
+import com.cloudbean.trackme.AppManager;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
 import com.cloudbean.trackme.R.drawable;
@@ -99,7 +101,8 @@ public class MenuActivity extends BaseActivity {
                         		intent.setClass(MenuActivity.this, MainActivity.class);
                         		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
                         		initApp();
-                        		finish();
+                        		AppManager.getAppManager().finishAllActivity();
+//                        		System.exit(0);
                         		break;
                         		
                         	}
@@ -129,6 +132,9 @@ public class MenuActivity extends BaseActivity {
 				// 显示对话框
 			isExit.show();
 	
+		}else if (keyCode == KeyEvent.KEYCODE_HOME){
+			moveTaskToBack(true);  
+			return true; 
 		}
 		
 		return false;
@@ -143,7 +149,7 @@ public class MenuActivity extends BaseActivity {
 			{
 				case AlertDialog.BUTTON_POSITIVE:// "确认"按钮退出程序
 					initApp();
-					finish();
+					System.exit(0);
 				break;
 				case AlertDialog.BUTTON_NEGATIVE:// "取消"第二个按钮取消对话框
 				break;
@@ -164,7 +170,12 @@ public class MenuActivity extends BaseActivity {
 		TrackApp.currentCar = null;
 		TrackApp.curUsername = null;
 		TrackApp.curPassword = null;
+		TrackApp.na.reconnThread.interrupt();
+		TrackApp.cna.reconnThread.interrupt();
+	
 		
+		TrackApp.na = null;
+		TrackApp.cna = null;
     }
     
 //    @Override

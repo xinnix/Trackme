@@ -11,11 +11,12 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import com.cloudbean.trackme.TrackApp;
+import com.wilddog.client.Wilddog;
 
 public abstract class BaseNetworkAdapter extends Thread{
-	private static final int NETWORK_CONNECTED = 0;
-	private static final int NETWORK_DISCONNECT = 1;
-	
+	public static final int NETWORK_CONNECTED = 0x1111;
+	public static final int NETWORK_DISCONNECT = 0x1112;
+//	public static Wilddog ref = new Wilddog("https://trace.wilddogio.com/"); 
 	private int networkState;
 
 	public int getNetworkState() {
@@ -29,7 +30,7 @@ public abstract class BaseNetworkAdapter extends Thread{
 	public  Socket socket;
 	public  OutputStream outputStream;
 	public  InputStream inputStream;
-	
+	public Thread reconnThread;
 	
 	public  DataInputStream dis;
 	 
@@ -45,6 +46,7 @@ public abstract class BaseNetworkAdapter extends Thread{
 		super();
 		this.serverIP = serverIP;
 		this.port = port;
+		
 	}
 	public BaseNetworkAdapter(byte[] packet){
 		 super();
@@ -52,45 +54,55 @@ public abstract class BaseNetworkAdapter extends Thread{
 	 }
 	
 	public void connect(){
-		 new Thread () {
-			 public void run(){
-				 while(true){
-						 try{
-							 socket = new Socket(InetAddress.getByName(serverIP),port);
-							 outputStream = socket.getOutputStream();
-							 inputStream = socket.getInputStream();
-							 dis =  new DataInputStream((new BufferedInputStream(inputStream)));
-							 setNetworkState(NETWORK_CONNECTED);
-							 if(TrackApp.curUsername!=null){
-								MsgEventHandler.sLogin(TrackApp.curUsername, TrackApp.curPassword);
-								MsgEventHandler.c_sLogin(TrackApp.curUsername, TrackApp.curPassword);
-							 }
-							 while(true){
-								 try{
-									 recivePacket(); 
-								 }catch(Exception  e){
-									 e.printStackTrace();
-									 break;
-								 } 
-							 }
-						 }catch(Exception e ){
-							
-							 e.printStackTrace();
-							
-							 break;
-						 }// end of try		
-				
-				}// end of while
-				
-				try {
-					sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
-		 }
-	}.start();
-	}
+		reconnThread = new Thread () {
+			public void run(){
+				try{
+					while(!isInterrupted()){
+						while(true){
+							try{
+								socket = new Socket(InetAddress.getByName(serverIP),port);
+								outputStream = socket.getOutputStream();
+								inputStream = socket.getInputStream();
+								dis =  new DataInputStream((new BufferedInputStream(inputStream)));
+								setNetworkState(NETWORK_CONNECTED);
+								if(TrackApp.curUsername!=null){
+									MsgEventHandler.sLogin(TrackApp.curUsername, TrackApp.curPassword);
+									MsgEventHandler.c_sLogin(TrackApp.curUsername, TrackApp.curPassword);
+								}
+								TrackApp.curHandler.sendEmptyMessage(NETWORK_CONNECTED);
+								while(true){
+									try{
+										recivePacket(); 
+									}catch(EOFException  e){
+										e.printStackTrace();
+										break;
+									}
+								}
+							}catch(Exception e ){
+								
+								e.printStackTrace();
+								
+								break;
+							 }// end of try		
+							 
+					}// end of while
+					
+					try {
+						sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						break;
+					}
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			
+		}
+	};
+		reconnThread.start();
+}
 	 public void sendPacket(byte[] packet){
 		 try{
 			 this.sendBuffer = packet;

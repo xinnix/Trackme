@@ -9,6 +9,86 @@ public class CarState {
 	
 	
 	
+	public GPRMC getGprmc() {
+		return gprmc;
+	}
+	public void setGprmc(GPRMC gprmc) {
+		this.gprmc = gprmc;
+	}
+	public String getPosAccuracy() {
+		return posAccuracy;
+	}
+	public void setPosAccuracy(String posAccuracy) {
+		this.posAccuracy = posAccuracy;
+	}
+	public String getHeight() {
+		return height;
+	}
+	public void setHeight(String height) {
+		this.height = height;
+	}
+	public byte[] getPortState() {
+		return portState;
+	}
+	public void setPortState(byte[] portState) {
+		this.portState = portState;
+	}
+	public String getAnalogInput() {
+		return analogInput;
+	}
+	public void setAnalogInput(String analogInput) {
+		this.analogInput = analogInput;
+	}
+	public String getTemperature() {
+		return temperature;
+	}
+	public void setTemperature(String temperature) {
+		this.temperature = temperature;
+	}
+	public String getBaseStation() {
+		return baseStation;
+	}
+	public void setBaseStation(String baseStation) {
+		this.baseStation = baseStation;
+	}
+	public String getGsmStrength() {
+		return gsmStrength;
+	}
+	public void setGsmStrength(String gsmStrength) {
+		this.gsmStrength = gsmStrength;
+	}
+	public String getDistant() {
+		return distant;
+	}
+	public void setDistant(String distant) {
+		this.distant = distant;
+	}
+	public CarState() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public CarState(String devid, GPRMC gprmc, String posAccuracy, String height, byte[] portState, String analogInput,
+			String temperature, String baseStation, String gsmStrength, String distant, String voltage) {
+		super();
+		this.devid = devid;
+		this.gprmc = gprmc;
+		this.posAccuracy = posAccuracy;
+		this.height = height;
+		this.portState = portState;
+		this.analogInput = analogInput;
+		this.temperature = temperature;
+		this.baseStation = baseStation;
+		this.gsmStrength = gsmStrength;
+		this.distant = distant;
+		this.voltage = voltage;
+	}
+	public String getVoltage() {
+		return voltage;
+	}
+	public void setVoltage(String voltage) {
+		this.voltage = voltage;
+	}
+
 	public class GPRMC {
 		public String utc;
 		public String locateState;
@@ -18,6 +98,162 @@ public class CarState {
 		public String EorW;
 		public String speed;
 		public String direction;
+		public GPRMC() {
+			super();
+			// TODO Auto-generated constructor stub
+		}
+
+
+		public GPRMC(String utc, String locateState, double latitude, String norS, double longitude, String eorW,
+				String speed, String direction, String date, String declination, String mDirection, String separator,
+				String check) {
+			super();
+			this.utc = utc;
+			this.locateState = locateState;
+			this.latitude = latitude;
+			NorS = norS;
+			this.longitude = longitude;
+			EorW = eorW;
+			this.speed = speed;
+			this.direction = direction;
+			this.date = date;
+			this.declination = declination;
+			this.mDirection = mDirection;
+			this.separator = separator;
+			this.check = check;
+		}
+
+
+		public String getUtc() {
+			return utc;
+		}
+
+
+		public void setUtc(String utc) {
+			this.utc = utc;
+		}
+
+
+		public String getLocateState() {
+			return locateState;
+		}
+
+
+		public void setLocateState(String locateState) {
+			this.locateState = locateState;
+		}
+
+
+		public double getLatitude() {
+			return latitude;
+		}
+
+
+		public void setLatitude(double latitude) {
+			this.latitude = latitude;
+		}
+
+
+		public String getNorS() {
+			return NorS;
+		}
+
+
+		public void setNorS(String norS) {
+			NorS = norS;
+		}
+
+
+		public double getLongitude() {
+			return longitude;
+		}
+
+
+		public void setLongitude(double longitude) {
+			this.longitude = longitude;
+		}
+
+
+		public String getEorW() {
+			return EorW;
+		}
+
+
+		public void setEorW(String eorW) {
+			EorW = eorW;
+		}
+
+
+		public String getSpeed() {
+			return speed;
+		}
+
+
+		public void setSpeed(String speed) {
+			this.speed = speed;
+		}
+
+
+		public String getDirection() {
+			return direction;
+		}
+
+
+		public void setDirection(String direction) {
+			this.direction = direction;
+		}
+
+
+		public String getDate() {
+			return date;
+		}
+
+
+		public void setDate(String date) {
+			this.date = date;
+		}
+
+
+		public String getDeclination() {
+			return declination;
+		}
+
+
+		public void setDeclination(String declination) {
+			this.declination = declination;
+		}
+
+
+		public String getmDirection() {
+			return mDirection;
+		}
+
+
+		public void setmDirection(String mDirection) {
+			this.mDirection = mDirection;
+		}
+
+
+		public String getSeparator() {
+			return separator;
+		}
+
+
+		public void setSeparator(String separator) {
+			this.separator = separator;
+		}
+
+
+		public String getCheck() {
+			return check;
+		}
+
+
+		public void setCheck(String check) {
+			this.check = check;
+		}
+
+
 		public String date;
 		public String declination;
 		public String mDirection;
