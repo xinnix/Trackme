@@ -231,33 +231,38 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_POSITION:
 					 CarState cs =MsgEventHandler.c_rGetCarPosition(mgp);
- 					 if(cs.gprmc.latitude!=0&&cs.gprmc.longitude!=0){
-						 for(int ii=0;ii<TrackApp.carList.length;ii++){
-							 if(cs.devid.equals(TrackApp.carList[ii].devId)){
-								 TrackApp.carList[ii].setLastState(TrackApp.carList[ii].getCurState());
-								 TrackApp.carList[ii].setCurState(cs);
-								 TrackApp.carList[ii].alive++;
+					 if(cs!=null){
+						 if(cs.gprmc.latitude!=0&&cs.gprmc.longitude!=0){
+							 for(int ii=0;ii<TrackApp.carList.length;ii++){
+								 if(cs.devid.equals(TrackApp.carList[ii].devId)){
+									 TrackApp.carList[ii].setLastState(TrackApp.carList[ii].getCurState());
+									 TrackApp.carList[ii].setCurState(cs);
+									 TrackApp.carList[ii].alive++;
+									 break;
+								 }
 							 }
+							 
+//							 carPosition.put(cs.devid, cs);
+//							 Wilddog devRef = ref.child("position");
+//							 devRef.setValue(carPosition);
+							 
+							 
+							 b.putDouble("lat", cs.gprmc.latitude);
+							 b.putDouble("lon", cs.gprmc.longitude);
+							 b.putString("speed", cs.gprmc.speed);
+							 b.putString("ditant", cs.distant);
+							 b.putString("date", cs.gprmc.date);
+							 b.putString("devid", cs.devid);
+							 b.putString("voltage", cs.analogInput);
+							 b.putString("gsmStrength", cs.gsmStrength);
+							
+							 msg.setData(b);
+							 msg.what = MSG_POSITION;
+							 TrackApp.curHandler.sendMessage(msg);
 						 }
 						 
-//						 carPosition.put(cs.devid, cs);
-//						 Wilddog devRef = ref.child("position");
-//						 devRef.setValue(carPosition);
-						 
-						 
-						 b.putDouble("lat", cs.gprmc.latitude);
-						 b.putDouble("lon", cs.gprmc.longitude);
-						 b.putString("speed", cs.gprmc.speed);
-						 b.putString("ditant", cs.distant);
-						 b.putString("date", cs.gprmc.date);
-						 b.putString("devid", cs.devid);
-						 b.putString("voltage", cs.analogInput);
-						 b.putString("gsmStrength", cs.gsmStrength);
-						
-						 msg.setData(b);
-						 msg.what = MSG_POSITION;
-						 TrackApp.curHandler.sendMessage(msg);
 					 }
+ 					 
 					 break;
 				 case MsgGPRSParser.MSG_TYPE_CIRCUIT:
 					 String test = ByteHexUtil.bytesToHexString(mgp.msgByteBuf);

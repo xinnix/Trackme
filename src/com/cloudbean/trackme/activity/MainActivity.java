@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity {
 				timerStart();
 				break;
 			case R.id.exit:
-				AppManager.getAppManager().finishAllActivity();
+				System.exit(0);
 				break;
 			case R.id.setServer:
 				IPDialog ipd = new IPDialog(this);
@@ -202,6 +202,8 @@ public class MainActivity extends BaseActivity {
 			startActivity(intent);
 			finish();
     	}else if (msg.what==TIME_OUT){
+    		TrackApp.na.reconnThread.interrupt();
+    		TrackApp.cna.reconnThread.interrupt();
     		dismissProgressDialog();
        	 	showMessage("设备关机或网络状况导致数据返回超时");
        	 	return;

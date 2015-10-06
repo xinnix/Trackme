@@ -378,14 +378,14 @@ public class MsgEventHandler {
 	}
 	
 	
-	public static CarState c_rGetAllCarPosition(CPacketParser cp){
-		MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
-		CarState cs = new CarState(mgp.msgData);
-		
-		return cs;
-		
-	}
-	
+//	public static CarState c_rGetAllCarPosition(CPacketParser cp){
+//		MsgGPRSParser mgp =  new MsgGPRSParser(Arrays.copyOfRange(cp.pktData, 4, cp.pktData.length));
+//		CarState cs = new CarState(mgp.msgData);
+//		
+//		return cs;
+//		
+//	}
+//	
 	
 	public static void c_sGetCarPosition(Car car){
 		
@@ -395,19 +395,25 @@ public class MsgEventHandler {
 	
 	
 	public static CarState c_rGetCarPosition(MsgGPRSParser mgp){
-
-		CarState cs = new CarState(mgp.msgData);
-		int i  = mgp.msgTermID.indexOf("f");
-		
-		
-		if(i!=0){
-			cs.setDevid(mgp.msgTermID.substring(0, i));
-		}else{
-			cs.setDevid(mgp.msgTermID);
+		CarState cs = null;
+		try{
+			cs = new CarState(mgp.msgData);
+			int i  = mgp.msgTermID.indexOf("f");
+			
+			
+			if(i!=0){
+				cs.setDevid(mgp.msgTermID.substring(0, i));
+			}else{
+				cs.setDevid(mgp.msgTermID);
+			}
+			
+			
+			return cs;
+		}catch(Exception e ){
+			return null;
 		}
 		
 		
-		return cs;
 		
 			
 	}
