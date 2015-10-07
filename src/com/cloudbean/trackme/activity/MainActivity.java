@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity {
 				timerStart();
 				break;
 			case R.id.exit:
-				System.exit(0);
+				AppManager.getAppManager().finishAllActivity();
 				break;
 			case R.id.setServer:
 				IPDialog ipd = new IPDialog(this);
@@ -192,8 +192,8 @@ public class MainActivity extends BaseActivity {
     		showMessage("µÇÂ¼³É¹¦");
     		Date date= new Date();
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String carListId = getCarListIdString(TrackApp.carList);
-			MsgEventHandler.sGetAlarmList(carListId,subDateMinute(format.format(date),5), format.format(date), "");
+//			String carListId = getCarListIdString(TrackApp.carList);
+//			MsgEventHandler.sGetAlarmList(carListId,subDateMinute(format.format(date),5), format.format(date), "");
     		TrackApp.isLogin = true;
     		MsgEventHandler.c_sGetAllLastPosition();
 			Intent intent = new Intent();
