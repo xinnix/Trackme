@@ -58,43 +58,37 @@ public abstract class BaseNetworkAdapter extends Thread{
 			public void run(){
 				try{
 					while(!isInterrupted()){
-						while(true){
-							try{
-								socket = new Socket(InetAddress.getByName(serverIP),port);
-								outputStream = socket.getOutputStream();
-								inputStream = socket.getInputStream();
-								dis =  new DataInputStream((new BufferedInputStream(inputStream)));
-								setNetworkState(NETWORK_CONNECTED);
-								if(TrackApp.curUsername!=null){
-									MsgEventHandler.sLogin(TrackApp.curUsername, TrackApp.curPassword);
-									MsgEventHandler.c_sLogin(TrackApp.curUsername, TrackApp.curPassword);
+						
+						try{
+							socket = new Socket(InetAddress.getByName(serverIP),port);
+							outputStream = socket.getOutputStream();
+							inputStream = socket.getInputStream();
+							dis =  new DataInputStream((new BufferedInputStream(inputStream)));
+							setNetworkState(NETWORK_CONNECTED);
+							if(TrackApp.curUsername!=null){
+								MsgEventHandler.sLogin(TrackApp.curUsername, TrackApp.curPassword);
+								MsgEventHandler.c_sLogin(TrackApp.curUsername, TrackApp.curPassword);
+							}
+							TrackApp.curHandler.sendEmptyMessage(NETWORK_CONNECTED);
+							while(true){
+								try{
+									recivePacket(); 
+								}catch(EOFException  e){
+									e.printStackTrace();
+									break;
 								}
-								TrackApp.curHandler.sendEmptyMessage(NETWORK_CONNECTED);
-								while(true){
-									try{
-										recivePacket(); 
-									}catch(EOFException  e){
-										e.printStackTrace();
-										break;
-									}
-								}
-							}catch(Exception e ){
-								
-								e.printStackTrace();
-								
-								break;
-							 }// end of try		
-							 
-					}// end of while
-					
-					try {
-						sleep(1000);
-					} catch (InterruptedException e) {
+							}
+						}catch (InterruptedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
-						break;
-					}
-				}
+							e.printStackTrace();
+							break;
+						}catch(Exception e ){
+							e.printStackTrace();
+						}// end of try		 
+						
+						sleep(1000);
+						
+				}// end of while
 			}catch(Exception e){
 				e.printStackTrace();
 			}

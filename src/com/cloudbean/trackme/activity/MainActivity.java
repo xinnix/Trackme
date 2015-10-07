@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity {
 				timerStart();
 				break;
 			case R.id.exit:
-				System.exit(0);
+				AppManager.getAppManager().finishAllActivity();
 				break;
 			case R.id.setServer:
 				IPDialog ipd = new IPDialog(this);
