@@ -261,8 +261,11 @@ public class CarState {
 		public String check;
 		
 		
-		GPRMC(String orgString){
+		GPRMC(String orgString) throws Exception{
 			String org[] = orgString.split(",");
+			if(org.length<12){
+				throw new Exception("gprmc struct error");
+			}
 			this.utc = org[0];
 			this.locateState = org[1];
 			if(this.locateState.equals("A")){
@@ -311,9 +314,12 @@ public class CarState {
 		return this.devid;
 	}
 	
-	public CarState(String orgString){
+	public CarState(String orgString) throws Exception{
 		String[] org = orgString.split("\\|");
+		
 		this.gprmc = new GPRMC(org[0]);
+		
+		
 		this.posAccuracy = org[1];
 		this.height	= org[2];
 		this.portState	= ByteHexUtil.hexStringToBytes(org[3].trim());
