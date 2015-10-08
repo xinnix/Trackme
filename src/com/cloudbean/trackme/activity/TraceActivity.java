@@ -399,11 +399,22 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 			if (TrackApp.currentCar.devtype.equals("MT400")){
 				temperature  =  "0";
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[0])[6]?"开":"关";
+				int voltageInt = TrackApp.currentCar.curState.voltage;
+				double res = (voltageInt*3.2*16)/4096;
+				DecimalFormat formatter = new DecimalFormat("##0.0");
+				voltage = formatter.format(res);
 			}else if(TrackApp.currentCar.devtype.equals("VT310")){
 				temperature  =  Float.parseFloat(TrackApp.currentCar.curState.temperature)<200?TrackApp.currentCar.curState.temperature:"0";
-				
 				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[0])[3]?"开":"关";
+				int voltageInt = TrackApp.currentCar.curState.voltage;
+				double res = (voltageInt*3.2*16)/4096;
+				DecimalFormat formatter = new DecimalFormat("##0.0");
+				voltage = formatter.format(res);
 			}else{
+				int voltageInt = TrackApp.currentCar.curState.voltage;
+				double res = (voltageInt*3.3)/2048+0.5;
+				DecimalFormat formatter = new DecimalFormat("##0.0");
+				voltage = formatter.format(res);
 				temperature  =  "0";
 				accState= "无状态";
 			}
@@ -411,7 +422,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 			date = format.format(new Date());
 			
 			gsmStrength = ""+ByteHexUtil.hexStringToBytes(TrackApp.currentCar.curState.gsmStrength)[0] ;
-			voltage = TrackApp.currentCar.curState.voltage;
+			
 			DecimalFormat formatter = new DecimalFormat("##0.000000");
 			double[] correctCoordinate = new double[2];
 			

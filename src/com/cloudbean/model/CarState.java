@@ -68,7 +68,7 @@ public class CarState {
 		// TODO Auto-generated constructor stub
 	}
 	public CarState(String devid, GPRMC gprmc, String posAccuracy, String height, byte[] portState, String analogInput,
-			String temperature, String baseStation, String gsmStrength, String distant, String voltage) {
+			String temperature, String baseStation, String gsmStrength, String distant, int voltage) {
 		super();
 		this.devid = devid;
 		this.gprmc = gprmc;
@@ -82,10 +82,10 @@ public class CarState {
 		this.distant = distant;
 		this.voltage = voltage;
 	}
-	public String getVoltage() {
+	public int getVoltage() {
 		return voltage;
 	}
-	public void setVoltage(String voltage) {
+	public void setVoltage(int voltage) {
 		this.voltage = voltage;
 	}
 
@@ -303,7 +303,7 @@ public class CarState {
 	public String baseStation;
 	public String gsmStrength;
 	public String distant;
-	public String voltage;
+	public int voltage;
 	
 	public void setDevid(String devid){
 		
@@ -328,7 +328,7 @@ public class CarState {
 		this.baseStation = org[5];
 		this.gsmStrength = org[6];
 		this.distant = decodeDistant(org[7]);
-		this.voltage =decodeVoltage(org[8]);
+		this.voltage = decodeVoltage(org[8]);
 		
 	}
 	
@@ -355,13 +355,10 @@ public class CarState {
 		double b = Double.parseDouble(lat.substring(3, lat.length()))/60;
 		return a+b;
 	}
-	private String decodeVoltage(String voltage){
+	private int decodeVoltage(String voltage){
 		byte[] voltageByte = ByteHexUtil.hexStringToBytes(voltage); 
 		int voltageInt  = ByteHexUtil.byteToShort(voltageByte);
-		double res = (voltageInt*3.2*16)/4096;
-		DecimalFormat formatter = new DecimalFormat("##0.0");
-		
-		return formatter.format(res);
+		return voltageInt;
 		
 	}
 	

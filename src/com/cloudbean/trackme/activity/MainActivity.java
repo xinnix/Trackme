@@ -206,7 +206,7 @@ public class MainActivity extends BaseActivity {
     		TrackApp.na.reconnThread.interrupt();
     		TrackApp.cna.reconnThread.interrupt();
     		dismissProgressDialog();
-       	 	showMessage("设备关机或网络状况导致数据返回超时");
+       	 	showMessage("网络状况导致数据返回超时");
        	 	return;
 		}
 		
