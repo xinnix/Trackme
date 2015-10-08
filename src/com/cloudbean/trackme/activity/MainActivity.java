@@ -187,9 +187,7 @@ public class MainActivity extends BaseActivity {
     		MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
 			MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
     	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
-    		timerStop();
-    		dismissProgressDialog();
-    		showMessage("登录成功");
+    		
     		Date date= new Date();
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //			String carListId = getCarListIdString(TrackApp.carList);
@@ -199,6 +197,9 @@ public class MainActivity extends BaseActivity {
 			Intent intent = new Intent();
 			intent.setClass(MainActivity.this, MenuActivity.class);
 			intent.putExtra("userId",TrackApp.login.userid);
+			timerStop();
+    		dismissProgressDialog();
+    		showMessage("登录成功");
 			startActivity(intent);
 			finish();
     	}else if (msg.what==TIME_OUT){
