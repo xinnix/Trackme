@@ -11,6 +11,7 @@ import com.cloudbean.trackme.server.NetWorkService;
 import com.cloudbean.trackme.server.NetWorkService.NetworkBinder;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,6 +23,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -194,6 +196,18 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	        
 	        
 	    }
+	    
+	    @Override
+		public boolean onKeyDown(int keyCode, KeyEvent event)
+		{
+			if (keyCode == KeyEvent.KEYCODE_HOME){
+				moveTaskToBack(true);  
+				return true; 
+			}
+			
+			return false;
+			
+		}
 	
 
 	
