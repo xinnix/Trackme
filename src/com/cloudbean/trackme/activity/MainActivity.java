@@ -156,7 +156,7 @@ public class MainActivity extends BaseActivity {
         	
         	if(login.isLogin==Login.LOGIN_SUCCESS){
         		TrackApp.login = login;
-        		dismissProgressDialog();
+        		
         		
         		if(ckRemPassword.isChecked()){
         			saveUserInfo(etUsername.getText().toString(),etPassword.getText().toString());

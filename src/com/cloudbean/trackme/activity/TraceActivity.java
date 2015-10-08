@@ -2,7 +2,9 @@ package com.cloudbean.trackme.activity;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -357,19 +359,26 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 //			};
 //			handler.postDelayed(t, 12000);// 设置超过12秒还没有定位到就停止定位
 //			
-//			trackFlag = (trackFlag==0)?1:0;
-//			if(trackFlag==0){
-			polylineOptions = new PolylineOptions();
-			polylineOptions.width(8);
-			polylineOptions.color(Color.RED);
-			showMessage("开始跟踪");
-//			}else{
-//				
+			trackFlag = (trackFlag==0)?1:0;
+			if(trackFlag==0){
+				polylineOptions = new PolylineOptions();
+				polylineOptions.width(8);
+				polylineOptions.color(Color.GRAY);
+				polylineOptions.setDottedLine(true);
+//				double lat = TrackApp.currentCar.curState.gprmc.latitude;
+//		 		double lon = TrackApp.currentCar.curState.gprmc.longitude;
+		 		double[] correctCoordinate = new double[2];
+				GpsCorrect.transform(lat, lon, correctCoordinate);
+		 		polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+		 		aMap.addPolyline(polylineOptions);
+		 		showMessage("开始跟踪");
+			}else{
+				
 //				poly.setVisible(false); 
-//				poly.remove();
-//				showMessage("取消跟踪");
-//			}
-//			
+//				poly.setPoints(new ArrayList<LatLng>());
+				showMessage("取消跟踪");
+			}
+			
 			
 			break;
 		}
@@ -455,7 +464,8 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 			 if(devid.equals(TrackApp.currentCar.devId)){
 				 	initPosition();
 				 	if(trackFlag == 0){
-				 		double lat = TrackApp.currentCar.curState.gprmc.latitude;
+//				 		double lat = TrackApp.currentCar.curState.gprmc.latitude;
+//				 		double lon = TrackApp.currentCar.curState.gprmc.longitude;
 				 		double[] correctCoordinate = new double[2];
 						GpsCorrect.transform(lat, lon, correctCoordinate);
 				 		polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
