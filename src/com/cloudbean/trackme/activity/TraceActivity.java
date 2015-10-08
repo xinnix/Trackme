@@ -387,7 +387,7 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 			distant = TrackApp.currentCar.curState.distant;
 			if (TrackApp.currentCar.devtype.equals("MT400")){
 				temperature  =  "0";
-				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[1])[1]?"开":"关";
+				accState = ByteHexUtil.getBooleanArray(TrackApp.currentCar.curState.portState[0])[6]?"开":"关";
 			}else if(TrackApp.currentCar.devtype.equals("VT310")){
 				temperature  =  Float.parseFloat(TrackApp.currentCar.curState.temperature)<200?TrackApp.currentCar.curState.temperature:"0";
 				
