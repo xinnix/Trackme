@@ -370,11 +370,13 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 		 		double[] correctCoordinate = new double[2];
 				GpsCorrect.transform(lat, lon, correctCoordinate);
 		 		polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-		 		aMap.addPolyline(polylineOptions);
+		 		poly = aMap.addPolyline(polylineOptions);
+		 		btTrace.setText("取消跟踪");
 		 		showMessage("开始跟踪");
 			}else{
-				
-//				poly.setVisible(false); 
+				polylineOptions.visible(false);
+				btTrace.setText("实时轨迹");
+				//poly.setVisible(false); 
 //				poly.setPoints(new ArrayList<LatLng>());
 				showMessage("取消跟踪");
 			}
