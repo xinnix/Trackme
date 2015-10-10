@@ -83,7 +83,7 @@ public class ReplayActivity extends BaseActivity {
 		String startDate = intent.getStringExtra("startDate");
 		String endDate = intent.getStringExtra("endDate");
 		moveThread=new MyThread();
-// 		moveThread.setSuspend(true);
+ 		moveThread.setSuspend(true);
  		
 		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
 		showProgressDialog("历史轨迹获取中...");
@@ -171,10 +171,10 @@ public class ReplayActivity extends BaseActivity {
 								stopPointList= new  ArrayList<Track>();
 							}
 							GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
-//							MarkerOptions point = new MarkerOptions();
-//							point.icon(BitmapDescriptorFactory.fromResource(R.drawable.point_marker));
-//					    	point.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-//					    	mAmap.addMarker(point);
+							MarkerOptions point = new MarkerOptions();
+							point.icon(BitmapDescriptorFactory.fromResource(R.drawable.point_marker));
+					    	point.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+					    	mAmap.addMarker(point);
 							polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
 							
 						}
@@ -406,14 +406,10 @@ public class ReplayActivity extends BaseActivity {
 							}
 							mMoveMarker.setPosition(latLng);
 							mAmap.moveCamera(CameraUpdateFactory.changeLatLng(latLng));
-							
-							
-							
+	
 						}
 						progress++;
-						if( progress > mVirtureRoad.getPoints().size()-2){
-				        	  progress = 0;
-				        }
+						
 						
 						try {
 							Thread.sleep(TIME_INTERVAL);
@@ -426,6 +422,13 @@ public class ReplayActivity extends BaseActivity {
 						
 					
 		            }
+		            
+		            if(progress == mVirtureRoad.getPoints().size() - 1){
+		            	//showMessage("播放完毕");
+		            	progress = 0;
+		            	this.setSuspend(true);
+		            }
+		            
 		            
 		          }
 		          

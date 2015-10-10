@@ -171,8 +171,8 @@ public class TimeChooseActivity extends BaseActivity{
 			String endDate=DateTimeUtil.subDateHour(startDate,Integer.parseInt(period.substring(0, period.length()-2)));
 			
 //			int carId = TimeChooseActivity.this.carId;
-			startDate = DateTimeUtil.string2TimezoneDefault(startDate, "GMT");
-			endDate = DateTimeUtil.string2TimezoneDefault(endDate, "GMT");
+//			startDate = DateTimeUtil.string2TimezoneDefault(startDate, "GMT");
+//			endDate = DateTimeUtil.string2TimezoneDefault(endDate, "GMT");
 			Intent intent = new Intent();
 			intent.setClass(TimeChooseActivity.this, ReplayActivity.class);
 			intent.putExtra("startDate", startDate);
