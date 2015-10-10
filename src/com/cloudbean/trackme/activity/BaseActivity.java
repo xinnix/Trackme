@@ -40,7 +40,7 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	
 	
 	protected static final int TIME_OUT = 0x5001;
-	private static final int TIME_LIMIT = 10000;
+	private static final int TIME_LIMIT = 15000;
 	
 	public int activityState;
 	private boolean mAllowFullScreen = true;

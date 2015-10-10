@@ -61,6 +61,8 @@ public class MainActivity extends BaseActivity {
 	private int flag = 0;
 	
 	private Login login=null;
+	
+	private int netflag = 0;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,6 +91,7 @@ public class MainActivity extends BaseActivity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		netflag = 0;
 	}
 	
 
@@ -185,8 +188,12 @@ public class MainActivity extends BaseActivity {
 		
     	}else if(msg.what == BaseNetworkAdapter.NETWORK_CONNECTED){
     		
-    		MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
-			MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
+    		if(netflag == 1){
+    			MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
+    			MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
+    		}
+    		netflag++;
+    		
     	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
     		
     		

@@ -32,6 +32,7 @@ import com.cloudbean.trackme.TrackApp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -39,6 +40,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,6 +65,10 @@ public class ReplayActivity extends BaseActivity {
 	private GridLayout la = null;
 	private String isTimeSelected =null;
 	
+	private int btFlag = 1;
+	
+	private static int REPLAY_COMPLETE = 0x8888;
+	
 	// 通过设置间隔时间和距离可以控制速度和图标移动的距离
 	private static int TIME_INTERVAL = 300;
 	private static final double DISTANCE = 0.0001;
@@ -82,8 +88,7 @@ public class ReplayActivity extends BaseActivity {
 		int carId = intent.getIntExtra("carId", 0);
 		String startDate = intent.getStringExtra("startDate");
 		String endDate = intent.getStringExtra("endDate");
-		moveThread=new MyThread();
- 		moveThread.setSuspend(true);
+		
  		
 		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
 		showProgressDialog("历史轨迹获取中...");
@@ -143,6 +148,10 @@ public class ReplayActivity extends BaseActivity {
 	    		for(int i=0;i<num;i++)
 				{
 	    			GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+	    			MarkerOptions point = new MarkerOptions();
+					point.icon(BitmapDescriptorFactory.fromResource(R.drawable.point_marker));
+			    	point.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+			    	mAmap.addMarker(point);
 	    			polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
 				}
 	    	}else{
@@ -287,7 +296,14 @@ public class ReplayActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		mMapView.onResume();
+		if(moveThread == null){
+			moveThread=new MyThread();
+		}else{
+			moveThread.stop = false;
+			moveThread.setSuspend(true);
+		}
 		
+ 		
 	
 		
 	}
@@ -299,6 +315,16 @@ public class ReplayActivity extends BaseActivity {
 	protected void onPause() {
 		super.onPause();
 		mMapView.onPause();
+		
+		if(moveThread!=null&&moveThread.isSuspend()){
+			moveThread.stop = true;
+			moveThread.interrupt();
+		}else{
+			moveThread.interrupt();
+			moveThread.stop = true;
+			moveThread.interrupt();
+		}
+		
 	}
 
 	/**
@@ -336,15 +362,19 @@ public class ReplayActivity extends BaseActivity {
 		
 		return dis;
 	}
+	
+	
+	
 
 	/**
 	 * 循环进行移动逻辑
 	 */
 	
 	class MyThread extends Thread{
-		private boolean suspend = false; 
+		private boolean suspend = true; 
 		private String control = ""; // 只是需要一个对象而已，这个对象没有实际意义  
 		private int progress = 0;
+		private boolean stop = false;
 //		public void setControl(int c){
 //			control=c;
 //		}
@@ -369,15 +399,16 @@ public class ReplayActivity extends BaseActivity {
 		}
 		
 		public void run() {  
-	        while (true) {  
+	        while (!stop) {  
 		            synchronized (control) {  
 		                if (suspend) {  
 		                    try {  
 		                        control.wait();  
 		                    } catch (InterruptedException e) {  
-		                        e.printStackTrace();  
+		                        e.printStackTrace();
+		                        break;
 		                    }  
-		                }  
+		            }  
 		             
 		            for (; progress < mVirtureRoad.getPoints().size() - 1;) {
 		
@@ -427,6 +458,8 @@ public class ReplayActivity extends BaseActivity {
 		            	//showMessage("播放完毕");
 		            	progress = 0;
 		            	this.setSuspend(true);
+		            	TrackApp.curHandler.sendEmptyMessage(REPLAY_COMPLETE);
+		            	
 		            }
 		            
 		            
@@ -488,12 +521,20 @@ public class ReplayActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		switch(v.getId()){
 		case R.id.btPlay:
-			moveThread.setSuspend(false);
+			
+			if(tbPlay.getText().toString().equals("播放")){
+				moveThread.setSuspend(false);
+				tbPlay.setText("暂停");
+			}else{
+				moveThread.setSuspend(true);
+				moveThread.interrupt();
+				tbPlay.setText("播放");
+			}
 			break;
-		case R.id.btStop:
-			moveThread.setSuspend(true);
-			moveThread.interrupt();
-			break;
+//		case R.id.btStop:
+//			moveThread.setSuspend(true);
+//			moveThread.interrupt();
+//			break;
 		case R.id.btSatelite:
 			if(tbSatelite.isChecked()){
 				mAmap.setMapType(AMap.MAP_TYPE_SATELLITE);
@@ -508,7 +549,7 @@ public class ReplayActivity extends BaseActivity {
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
 		if(msg.what==NetworkAdapter.MSG_TRACK){
-       	 dismissProgressDialog();
+       	 
        	 timerStop();
        	 Bundle b = msg.getData();
        	 Track[] trackList = (Track[]) b.getParcelableArray("trackList");
@@ -520,16 +561,18 @@ public class ReplayActivity extends BaseActivity {
 		        showMessage("单击播放按钮回放历史轨迹");
 		     }else{
 		    	showMessage("这段时间处于停车状态");
-		        return;
+		       
 		     }
 	    		// 关闭ProgressDialog
-	    		
+		     dismissProgressDialog();	
         }else if (msg.what==NetworkAdapter.MSG_FAIL){
        	 	dismissProgressDialog();
        	 	timerStop();
        	 	Bundle b = msg.getData();
        	 	String reason = b.getString("reason");
        	 	showMessage(reason);
+        }else if (msg.what == REPLAY_COMPLETE){
+        	tbPlay.setText("播放");
         }else if (msg.what==TIME_OUT){
 	       	 dismissProgressDialog();
 	       	 showMessage("设备关机或网络状况导致数据返回超时");
@@ -537,7 +580,20 @@ public class ReplayActivity extends BaseActivity {
         }
      }
 	
-	
+//	@Override
+//	public boolean onKeyDown(int keyCode, KeyEvent event)
+//	{
+//		if (keyCode == KeyEvent.KEYCODE_BACK )
+//		{
+//			
+//				moveThread.interrupt();
+//			
+//	
+//		}
+//		
+//		return super.onKeyDown(keyCode, event);
+//		
+//	}
 
 
 
