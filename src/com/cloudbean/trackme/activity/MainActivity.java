@@ -15,6 +15,7 @@ import com.cloudbean.network.CNetworkAdapter;
 import com.cloudbean.network.HeartBeat;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackerUtil.DateTimeUtil;
 import com.cloudbean.trackme.AppManager;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
@@ -63,6 +64,7 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 	}
 	
 	
@@ -119,7 +121,6 @@ public class MainActivity extends BaseActivity {
 		btLogin.setOnClickListener(this);
 		btExit.setOnClickListener(this);
 		btSetServer.setOnClickListener(this);
-		
 		
 	}
 
@@ -188,13 +189,16 @@ public class MainActivity extends BaseActivity {
 			MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
     	}else if(msg.what == NetworkAdapter.MSG_CARGROUPINFO){
     		
+    		
+    		MsgEventHandler.c_sGetAllLastPosition();
+			
+    	}else if (msg.what == CNetworkAdapter.MSG_POSCOMPLETE){
     		Date date= new Date();
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //			String carListId = getCarListIdString(TrackApp.carList);
 //			MsgEventHandler.sGetAlarmList(carListId,subDateMinute(format.format(date),5), format.format(date), "");
     		TrackApp.isLogin = true;
-    		MsgEventHandler.c_sGetAllLastPosition();
-			Intent intent = new Intent();
+    		Intent intent = new Intent();
 			intent.setClass(MainActivity.this, MenuActivity.class);
 			intent.putExtra("userId",TrackApp.login.userid);
 			timerStop();

@@ -369,6 +369,10 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 //		 		double lon = TrackApp.currentCar.curState.gprmc.longitude;
 		 		double[] correctCoordinate = new double[2];
 				GpsCorrect.transform(lat, lon, correctCoordinate);
+				MarkerOptions point = new MarkerOptions();
+				point.icon(BitmapDescriptorFactory.fromResource(R.drawable.point_marker));
+		    	point.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+		    	aMap.addMarker(point);
 		 		polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
 		 		poly = aMap.addPolyline(polylineOptions);
 		 		btTrace.setText("È¡Ïû¸ú×Ù");
@@ -481,7 +485,11 @@ LocationSource,AMapLocationListener,OnRouteSearchListener {
 //				 		double lon = TrackApp.currentCar.curState.gprmc.longitude;
 				 		double[] correctCoordinate = new double[2];
 						GpsCorrect.transform(lat, lon, correctCoordinate);
-				 		polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+						MarkerOptions point = new MarkerOptions();
+						point.icon(BitmapDescriptorFactory.fromResource(R.drawable.point_marker));
+				    	point.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+				    	aMap.addMarker(point);
+						polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
 				 		poly = aMap.addPolyline(polylineOptions);
 				 	}
 //					 lat = b.getDouble("lat");

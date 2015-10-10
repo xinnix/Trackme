@@ -197,18 +197,19 @@ public abstract class BaseActivity extends Activity implements OnClickListener {
 	        
 	    }
 	    
-	    @Override
-		public boolean onKeyDown(int keyCode, KeyEvent event)
-		{
-			if (keyCode == KeyEvent.KEYCODE_HOME){
-				moveTaskToBack(true);  
-				return true; 
-			}
-			
-			return false;
-			
-		}
-	
+//	    @Override
+//		public boolean onKeyDown(int keyCode, KeyEvent event)
+//		{
+//	    	super.onKeyDown(keyCode, event);
+//			if (keyCode == KeyEvent.KEYCODE_HOME){
+//				moveTaskToBack(true);  
+//				return true; 
+//			}
+//			
+//			return false;
+//			
+//		}
+//	
 
 	
 	

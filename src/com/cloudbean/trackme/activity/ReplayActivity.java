@@ -2,7 +2,9 @@ package com.cloudbean.trackme.activity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,6 +22,7 @@ import com.cloudbean.model.Login;
 import com.cloudbean.model.Track;
 import com.cloudbean.network.MsgEventHandler;
 import com.cloudbean.network.NetworkAdapter;
+import com.cloudbean.trackerUtil.DateTimeUtil;
 import com.cloudbean.trackerUtil.GpsCorrect;
 import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.R.drawable;
@@ -61,7 +64,7 @@ public class ReplayActivity extends BaseActivity {
 	private String isTimeSelected =null;
 	
 	// 通过设置间隔时间和距离可以控制速度和图标移动的距离
-	private static int TIME_INTERVAL = 100;
+	private static int TIME_INTERVAL = 300;
 	private static final double DISTANCE = 0.0001;
 	private Track[] trackList = null;
 	
@@ -79,11 +82,14 @@ public class ReplayActivity extends BaseActivity {
 		int carId = intent.getIntExtra("carId", 0);
 		String startDate = intent.getStringExtra("startDate");
 		String endDate = intent.getStringExtra("endDate");
-		
+		moveThread=new MyThread();
+// 		moveThread.setSuspend(true);
+ 		
 		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
 		showProgressDialog("历史轨迹获取中...");
 		timerStart();
-		moveThread=new MyThread();
+		
+		
 		//mAmap.moveCamera(CameraUpdateFactory.zoomTo(10));
 		
 	}
@@ -120,43 +126,20 @@ public class ReplayActivity extends BaseActivity {
 //	        	
 //	 };
 	private void initRoadData(Track[] tracklist) {
-		// 116.504505 39.931057
-	//	double centerLatitude = 39.916049;
-	//	double centerLontitude = 116.399792;
 		if (tracklist.length>0){
 			double[] correctCoordinate = new double[2];
 			GpsCorrect.transform(tracklist[0].latitude, tracklist[0].longitude, correctCoordinate);
 			mAmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(correctCoordinate[0], correctCoordinate[1]), 18));
 			int num=tracklist.length;
-//			if(num>10)
-//			{
-//				
-//			}
-//			double centerLatitude = correctCoordinate[0];
-//			double centerLontitude = correctCoordinate[1];
-//			double deltaAngle = Math.PI / 180 * 5;
-//			double radius = 0.02;
 	    	PolylineOptions polylineOptions = new PolylineOptions();
-//			for (double i = 0; i < Math.PI * 2; i = i + deltaAngle) {
-//				float latitude = (float) (-Math.cos(i) * radius + centerLatitude);
-//				float longtitude = (float) (Math.sin(i) * radius + centerLontitude);
-//				polylineOptions.add(new LatLng(latitude, longtitude));
-//				if (i > Math.PI) {
-//					deltaAngle = Math.PI / 180 * 30;
-//				}
-//			}
-//			float latitude = (float) (-Math.cos(0) * radius + centerLatitude);
-//			float longtitude = (float) (Math.sin(0) * radius + centerLontitude);
-//			polylineOptions.add(new LatLng(latitude, longtitude));
-	    	//new LatLng(socket9.weidu.get(0),socket9.jingdu.get(0))
-			
 	    	MarkerOptions markerOptions = new MarkerOptions();
 			markerOptions.anchor(0.5f, 0.5f);
 	    	/*
 			 * 判断停车情况
 			 */
+			List<Track> stopPointList = new  ArrayList<Track>(); 
 	    	if(TrackApp.currentCar.devtype.equals("GT601")){
-	    		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_gt610));
+	    		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_gt610_r));
 	    		for(int i=0;i<num;i++)
 				{
 	    			GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
@@ -164,32 +147,57 @@ public class ReplayActivity extends BaseActivity {
 				}
 	    	}else{
 	    		markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car_track));
-	    		int stopFlag = 1;
+				
 		    	for(int i=0;i<num;i++)
 				{
-					if(tracklist[i].speed<6&&tracklist[i].isLocated&&(stopFlag==1)){
-						GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
-						 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-						 MarkerOptions mo = new MarkerOptions();
-						 mo.anchor(0.5f, 0.5f);
-						 mo.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
-						 int last = polylineOptions.getPoints().size()-1;
-						 mo.position(polylineOptions.getPoints().get(last));
-						 mAmap.addMarker(mo);
-						 stopFlag=0;
-					}
-					if (tracklist[i].status.equals(Track.ACC_START)&&tracklist[i].isLocated){
-						GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
-						 polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
-						 stopFlag=1;
-					}
-					
+		    		if(tracklist[i].isLocated){
+						if(tracklist[i].speed<6){
+//							GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+							 //polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+							stopPointList.add(tracklist[i]);
+							
+						}else{
+							if(stopPointList.size()>1){
+								String startStop =  stopPointList.get(0).sdate;
+								String endStop =  stopPointList.get(stopPointList.size()-1).sdate;
+								if(DateTimeUtil.minBetweenPoint(startStop,endStop)>10){
+									 MarkerOptions mo = new MarkerOptions();
+									 mo.anchor(0.5f, 0.5f);
+									 mo.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
+									 GpsCorrect.transform(stopPointList.get(0).latitude, stopPointList.get(0).longitude, correctCoordinate);
+									 mo.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+									 mAmap.addMarker(mo);
+								}
+								stopPointList= new  ArrayList<Track>();
+							}
+							GpsCorrect.transform(tracklist[i].latitude, tracklist[i].longitude, correctCoordinate);
+//							MarkerOptions point = new MarkerOptions();
+//							point.icon(BitmapDescriptorFactory.fromResource(R.drawable.point_marker));
+//					    	point.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+//					    	mAmap.addMarker(point);
+							polylineOptions.add(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+							
+						}
+		    		}
 				}
 	    		
 	    	}
-	    	
+	    	if(stopPointList.size()>1){
+				String startStop =  stopPointList.get(0).sdate;
+				String endStop =  stopPointList.get(stopPointList.size()-1).sdate;
+				if(DateTimeUtil.minBetweenPoint(startStop,endStop)>10){
+					 MarkerOptions mo = new MarkerOptions();
+					 mo.anchor(0.5f, 0.5f);
+					 mo.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
+					 GpsCorrect.transform(stopPointList.get(0).latitude, stopPointList.get(0).longitude, correctCoordinate);
+					 mo.position(new LatLng(correctCoordinate[0], correctCoordinate[1]));
+					 mAmap.addMarker(mo);
+				}
+				stopPointList= new  ArrayList<Track>();
+			}
 			polylineOptions.width(8);
-			polylineOptions.color(Color.RED);
+			polylineOptions.color(Color.DKGRAY);
+			polylineOptions.setDottedLine(true);
 			mVirtureRoad = mAmap.addPolyline(polylineOptions);
 			Log.i("track", ""+mVirtureRoad.getPoints().size());
 
@@ -334,12 +342,24 @@ public class ReplayActivity extends BaseActivity {
 	 */
 	
 	class MyThread extends Thread{
-		
-		private int control = 0; // 只是需要一个对象而已，这个对象没有实际意义  
+		private boolean suspend = false; 
+		private String control = ""; // 只是需要一个对象而已，这个对象没有实际意义  
 		private int progress = 0;
-		public void setControl(int c){
-			control=c;
+//		public void setControl(int c){
+//			control=c;
+//		}
+		public void setSuspend(boolean suspend) {  
+	        if (!suspend) {  
+		            synchronized (control) {  
+		                control.notifyAll();  
+		            }  
+		        }  
+		        this.suspend = suspend;  
 		}
+		
+		public boolean isSuspend() {  
+	        return this.suspend;  
+	    }
 		
 		public void setProgress(int c){
 			progress=c;
@@ -347,66 +367,72 @@ public class ReplayActivity extends BaseActivity {
 		public int getProgress(){
 			return progress;
 		}
-
-
-		public void run() {
-			while(true){
-				
-				for (; progress < mVirtureRoad.getPoints().size() - 1;) {
-
-					if(control == 1){
-							
-							LatLng startPoint = mVirtureRoad.getPoints().get(progress);
-							LatLng endPoint = mVirtureRoad.getPoints().get(progress + 1);
-							mMoveMarker.setPosition(startPoint);
-				
-							mMoveMarker.setRotateAngle((float) getAngle(startPoint,endPoint));
-				
-							double slope = getSlope(startPoint, endPoint);
-							//是不是正向的标示（向上设为正向）
-							boolean isReverse = (startPoint.latitude > endPoint.latitude);
-				
-							double intercept = getInterception(slope, startPoint);
-				
-							double xMoveDistance = isReverse ? getXMoveDistance(slope)
-									: -1 * getXMoveDistance(slope);
-				
-							
-							for (double j = startPoint.latitude;!((j > endPoint.latitude)^ isReverse);j = j-xMoveDistance) {
-								LatLng latLng = null;
-								if (slope != Double.MAX_VALUE) {
-									latLng = new LatLng(j, (j - intercept) / slope);
-								} else {
-									latLng = new LatLng(j, startPoint.longitude);
-								}
-								mMoveMarker.setPosition(latLng);
-								mAmap.moveCamera(CameraUpdateFactory.changeLatLng(latLng));
-								
-								
-								try {
-									Thread.sleep(TIME_INTERVAL);
-								}catch (InterruptedException e) {
-									e.printStackTrace();
-								}catch(Exception e){
-									e.printStackTrace();
-								}
-							}
-							progress++;
-					
-					}else{
-						
-					}
-					
-
-				}
-				
-				progress=0;
-				control=0;
-			}
-			
-
-		}
 		
+		public void run() {  
+	        while (true) {  
+		            synchronized (control) {  
+		                if (suspend) {  
+		                    try {  
+		                        control.wait();  
+		                    } catch (InterruptedException e) {  
+		                        e.printStackTrace();  
+		                    }  
+		                }  
+		             
+		            for (; progress < mVirtureRoad.getPoints().size() - 1;) {
+		
+						LatLng startPoint = mVirtureRoad.getPoints().get(progress);
+						LatLng endPoint = mVirtureRoad.getPoints().get(progress + 1);
+						mMoveMarker.setPosition(startPoint);
+			
+						mMoveMarker.setRotateAngle((float) getAngle(startPoint,endPoint));
+						
+						double slope = getSlope(startPoint, endPoint);
+						//是不是正向的标示（向上设为正向）
+						boolean isReverse = (startPoint.latitude > endPoint.latitude);
+			
+						double intercept = getInterception(slope, startPoint);
+			
+						double xMoveDistance = isReverse ? getXMoveDistance(slope)
+								: -1 * getXMoveDistance(slope);
+			
+						
+						for (double j = startPoint.latitude;!((j > endPoint.latitude)^ isReverse);j = j-xMoveDistance) {
+							LatLng latLng = null;
+							if (slope != Double.MAX_VALUE) {
+								latLng = new LatLng(j, (j - intercept) / slope);
+							} else {
+								latLng = new LatLng(j, startPoint.longitude);
+							}
+							mMoveMarker.setPosition(latLng);
+							mAmap.moveCamera(CameraUpdateFactory.changeLatLng(latLng));
+							
+							
+							
+						}
+						progress++;
+						if( progress > mVirtureRoad.getPoints().size()-2){
+				        	  progress = 0;
+				        }
+						
+						try {
+							Thread.sleep(TIME_INTERVAL);
+						}catch (InterruptedException e) {
+							e.printStackTrace();
+							break;
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+						
+					
+		            }
+		            
+		          }
+		          
+		        
+	        }
+	        
+	    }  
 
 	}
 	//画图线程
@@ -446,35 +472,11 @@ public class ReplayActivity extends BaseActivity {
 			
 		});
 		
+		tbPlay.setOnClickListener(this);
+		tbStop.setOnClickListener(this);
 		
-		tbSatelite.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				if(tbSatelite.isChecked()){
-					mAmap.setMapType(AMap.MAP_TYPE_SATELLITE);
-				}else{
-					mAmap.setMapType(AMap.MAP_TYPE_NORMAL);
-				}
-				
-			}
-			
-		});
 		
-		tbPlay.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				moveThread.setControl(1);
-			}
-			
-		});
-		tbStop.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				moveThread.setControl(0);
-			}
-			
-		});
+		
 		
 	}
 
@@ -483,10 +485,11 @@ public class ReplayActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		switch(v.getId()){
 		case R.id.btPlay:
-			moveThread.setControl(1);
+			moveThread.setSuspend(false);
 			break;
 		case R.id.btStop:
-			moveThread.setControl(0);
+			moveThread.setSuspend(true);
+			moveThread.interrupt();
 			break;
 		case R.id.btSatelite:
 			if(tbSatelite.isChecked()){
@@ -508,52 +511,31 @@ public class ReplayActivity extends BaseActivity {
        	 Track[] trackList = (Track[]) b.getParcelableArray("trackList");
        	 initRoadData(trackList);
 		     if (mVirtureRoad.getPoints().size()>1){
-		        moveThread.start();
+		    	
+//		    	 moveThread.start();
+		    	 moveThread.start();
 		        showMessage("单击播放按钮回放历史轨迹");
 		     }else{
-		    	 showMessage("这段时间处于停车状态");
+		    	showMessage("这段时间处于停车状态");
 		        return;
-		      }
+		     }
 	    		// 关闭ProgressDialog
 	    		
         }else if (msg.what==NetworkAdapter.MSG_FAIL){
-       	 dismissProgressDialog();
-       	 timerStop();
-       	 Bundle b = msg.getData();
-       	 String reason = b.getString("reason");
-       	 showMessage(reason);
+       	 	dismissProgressDialog();
+       	 	timerStop();
+       	 	Bundle b = msg.getData();
+       	 	String reason = b.getString("reason");
+       	 	showMessage(reason);
         }else if (msg.what==TIME_OUT){
-       	 dismissProgressDialog();
-       	 showMessage("设备关机或网络状况导致数据返回超时");
-       	 return;
+	       	 dismissProgressDialog();
+	       	 showMessage("设备关机或网络状况导致数据返回超时");
+	       	 return;
         }
      }
 	
 	
-	private long subDate(String d1,String d2){
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		long min = 0;
-		try
-		{
-		    Date dd1 = df.parse(d1);
-		    Date dd2 = df.parse(d2);
-		    long diff = dd1.getTime() - dd2.getTime();
-		    min = diff / (1000 * 60 );
-		}
-		catch (Exception e)
-		{
 
-		}
-		
-		return min;
-	}
-	
-	
-	
-//	public void moveLooper() {
-		
-		
-//	}
 
 
 	
