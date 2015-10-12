@@ -298,9 +298,11 @@ public class ReplayActivity extends BaseActivity {
 		mMapView.onResume();
 		if(moveThread == null){
 			moveThread=new MyThread();
+			
 		}else{
-			moveThread.stop = false;
-			moveThread.setSuspend(true);
+//			moveThread.stop = false;
+//			moveThread.setSuspend(true);
+//			moveThread.start();
 		}
 		
  		
@@ -316,13 +318,36 @@ public class ReplayActivity extends BaseActivity {
 		super.onPause();
 		mMapView.onPause();
 		
-		if(moveThread!=null&&moveThread.isSuspend()){
-			moveThread.stop = true;
-			moveThread.interrupt();
-		}else{
-			moveThread.interrupt();
-			moveThread.stop = true;
-			moveThread.interrupt();
+		if(moveThread!=null){
+			if(moveThread.isSuspend()){
+				
+				
+			}else{
+				moveThread.setSuspend(true);
+				moveThread.interrupt();
+				tbPlay.setText("播放");
+			}
+		}
+		
+	}
+	
+	
+	/**
+	 * 方法必须重写
+	 */
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mMapView.onDestroy();
+		if(moveThread!=null){
+			if(moveThread.isSuspend()){
+				moveThread.stop = true;
+				moveThread.interrupt();
+			}else{
+				moveThread.interrupt();
+				moveThread.stop = true;
+				moveThread.interrupt();
+			}
 		}
 		
 	}
@@ -336,14 +361,7 @@ public class ReplayActivity extends BaseActivity {
 		mMapView.onSaveInstanceState(outState);
 	}
 
-	/**
-	 * 方法必须重写
-	 */
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		mMapView.onDestroy();
-	}
+
 
 	/**
 	 * 计算x方向每次移动的距离
@@ -556,8 +574,8 @@ public class ReplayActivity extends BaseActivity {
        	 initRoadData(trackList);
 		     if (mVirtureRoad.getPoints().size()>1){
 		    	
-//		    	 moveThread.start();
 		    	 moveThread.start();
+//		    	 moveThread.start();
 		        showMessage("单击播放按钮回放历史轨迹");
 		     }else{
 		    	showMessage("这段时间处于停车状态");
