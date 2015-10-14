@@ -21,6 +21,7 @@ import com.cloudbean.trackme.R;
 import com.cloudbean.trackme.TrackApp;
 import com.cloudbean.trackme.dialog.IPDialog;
 import com.cloudbean.trackme.server.NetWorkService;
+import com.umeng.update.UmengUpdateAgent;
 import com.cloudbean.trackme.R.id;
 import com.cloudbean.trackme.R.layout;
 
@@ -66,7 +67,7 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		 UmengUpdateAgent.update(this);
 	}
 	
 	

@@ -9,5 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="D:/workspace/TrackMe/libs/MapApiServices.jar"/>
 	<classpathentry exported="true" kind="lib" path="D:/workspace/TrackMe/libs/AMap_ Location_v1.4.0_20150830.jar"/>
 	<classpathentry exported="true" kind="lib" path="D:/workspace/TrackMe/libs/wilddog-client-android-0.5.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/workspace/TrackMe/libs/umeng-update-v2.6.0.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
