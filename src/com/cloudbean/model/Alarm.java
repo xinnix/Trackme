@@ -2,6 +2,8 @@ package com.cloudbean.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.cloudbean.trackerUtil.IpUtil;
 import com.cloudbean.trackme.TrackApp;
@@ -10,6 +12,21 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Alarm implements Parcelable{
+	public static Map<Integer, String> alarmMap = new HashMap<Integer,String>(){{
+		put(0x64,"您的爱车在设防情况下非法启动");
+		put(0x11,"您已经超速行驶了，请主意行车安全");
+		put(0x12,"出围栏报警");
+		put(0x50,"GPS定位器外部电源切断报警");
+		put(0x12,"移动报警");
+		put(0x14,"欢迎使用GPS定位器");
+		put(0x01,"SOS紧急求救报警");
+		put(0x10,"你的设备电池电压低，请及时充电");
+		put(0x03,"接触成功");
+		put(0x33,"脱落报警");
+		put(0x66,"长时间停留报警");
+		put(0x67,"温度异常报警");
+		put(0x68,"您的爱车在设防的情况下震动报警");
+	}};
 	
 	public String termid;
 	public String termName;

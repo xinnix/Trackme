@@ -27,19 +27,19 @@ public class MsgEventHandler {
 	public static NetworkAdapter na;
 	public static CNetworkAdapter cna;
 	
-	public static Map<Integer, String> alarmMap = new HashMap<Integer,String>(){{
-		put(0x64,"非法点火报警");
-		put(0x11,"超速报警");
-		put(0x12,"出围栏报警");
-		put(0x50,"掉电报警");
-		put(0x12,"移动报警");
-		put(0x14,"终端开机报警");
-		put(0x01,"SOS报警");
-		put(0x10,"内置电池低电压报警");
-		put(0x03,"接触成功");
-		put(0x33,"脱落报警");
-		put(0x66,"长时间停留报警");
-	}};
+//	public static Map<Integer, String> alarmMap = new HashMap<Integer,String>(){{
+//		put(0x64,"非法点火报警");
+//		put(0x11,"超速报警");
+//		put(0x12,"出围栏报警");
+//		put(0x50,"掉电报警");
+//		put(0x12,"移动报警");
+//		put(0x14,"终端开机报警");
+//		put(0x01,"SOS报警");
+//		put(0x10,"内置电池低电压报警");
+//		put(0x03,"接触成功");
+//		put(0x33,"脱落报警");
+//		put(0x66,"长时间停留报警");
+//	}};
 	
 	
 	
@@ -422,7 +422,7 @@ public class MsgEventHandler {
 		//SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		Alarm al = null;
 		int alarmType = ByteHexUtil.hexStringToBytes(mgp.msgData.substring(0, 2))[0];
-		String alarm = alarmMap.get(alarmType);
+		String alarm = Alarm.alarmMap.get(alarmType);
 		
 		if(alarm!=null){
 			al = new Alarm(mgp.msgTermID,alarm);
