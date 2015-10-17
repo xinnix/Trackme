@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity {
 //				bindService(new Intent(MainActivity.this, NetWorkService.class),conn, Context.BIND_AUTO_CREATE);
 				
 				connNetwork();
-				
+				netflag=0;
 				showProgressDialog("µÇÂ¼ÖÐ");
 				timerStart();
 				break;
@@ -179,6 +179,9 @@ public class MainActivity extends BaseActivity {
         	}else{
         		dismissProgressDialog();
         		timerStop();
+        		TrackApp.na.reconnThread.interrupt();
+        		TrackApp.cna.reconnThread.interrupt();
+        		
             	showMessage("µÇÂ¼Ê§°Ü");
             	return;
         	}
@@ -189,7 +192,7 @@ public class MainActivity extends BaseActivity {
 		
     	}else if(msg.what == BaseNetworkAdapter.NETWORK_CONNECTED){
     		
-    		if(netflag == 1){
+    		if(netflag > 0){
     			MsgEventHandler.sLogin(etUsername.getText().toString(), etPassword.getText().toString());
     			MsgEventHandler.c_sLogin(etUsername.getText().toString(), etPassword.getText().toString());
     		}

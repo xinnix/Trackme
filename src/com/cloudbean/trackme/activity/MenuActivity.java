@@ -159,7 +159,7 @@ public class MenuActivity extends BaseActivity {
 		}
 	};	
 
-    private void initApp(){
+    public void initApp(){
     	TrackApp.isLogin = false;
 		TrackApp.alarmList= new ArrayList<Alarm>();
 		TrackApp.curHandler = null;
