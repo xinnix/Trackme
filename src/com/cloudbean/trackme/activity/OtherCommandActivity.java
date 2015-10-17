@@ -26,6 +26,7 @@ public class OtherCommandActivity extends BaseActivity {
 	private Button btGpsReboot;
 	private Button btSetGpsTimeInterval;
 	private Button btSetGpsHeartBeat;
+	private Button btSetSportMode;
 	private Button btSleepTime;
 	private Button btSetReSms;
 	private Button btCancelReSms;
@@ -48,6 +49,7 @@ public class OtherCommandActivity extends BaseActivity {
 		btSleepTime = (Button) findViewById(R.id.set_sleep_time);
 		btSetReSms = (Button) findViewById(R.id.set_re_sms);
 		btCancelReSms = (Button) findViewById(R.id.cancel_re_sms);
+		btSetSportMode = (Button) findViewById(R.id.set_sportmode);
 		btSetPhone.setOnClickListener(this);
 		btGpsReboot.setOnClickListener(this);
 		btSetGpsTimeInterval.setOnClickListener(this);
@@ -55,6 +57,7 @@ public class OtherCommandActivity extends BaseActivity {
 		btSleepTime.setOnClickListener(this);
 		btSetReSms.setOnClickListener(this);
 		btCancelReSms.setOnClickListener(this);
+		btSetSportMode.setOnClickListener(this);
 	}
 	
 	
@@ -84,6 +87,10 @@ public class OtherCommandActivity extends BaseActivity {
 		case R.id.gps_reboot:
 			showMessage("GPS重启命令已发送");
 			MsgEventHandler.c_sGPSReboot(TrackApp.currentCar, null);
+			break;
+		case R.id.set_sportmode:
+			showMessage("设置运动模式命令已发送");
+			MsgEventHandler.c_sSetSportMode(TrackApp.currentCar, null);
 			break;
 		case R.id.set_gps_time_interval:
 			final EditText etTrackInterval = new EditText(this);

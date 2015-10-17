@@ -328,6 +328,23 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 					
 					 
 					 break;
+				 case MsgGPRSParser.MSG_TYPE_SPORTMODE:
+						
+					 res = mgp.msgData.equals("00")?"运动模式设置失败":"运动模式设置成功";
+					 new Thread(){
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							Looper.prepare();
+							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+							Looper.loop();
+						}
+						 
+					 }.start();
+				
+				 
+				 break;
 				 case MsgGPRSParser.MSG_TYPE_GPSHEARTBEAT:
 						
 					 res = mgp.msgData.equals("00")?"GPRS心跳间隔设置失败":"GPRS心跳间隔设置成功";

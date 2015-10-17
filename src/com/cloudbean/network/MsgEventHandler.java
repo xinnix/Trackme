@@ -457,6 +457,13 @@ public class MsgEventHandler {
 		
 	}
 	
+	
+	public static void c_sSetSportMode(Car car,String data){	
+		
+		String res = c_sCommand(car,MsgGPRSParser.MSG_TYPE_SPORTMODE,data);
+		System.out.println(res);
+	}
+	
 	public static void c_sSavePower(Car car,String data){	
 		
 		

@@ -25,6 +25,7 @@ public class MsgGPRSParser {
 	public final static short MSG_TYPE_CIRCUIT = 0x5114;
 	public final static short MSG_TYPE_PHONE = 0x4130;
 	public final static short MSG_TYPE_GPSREBOOT = 0x4902;
+	public final static short MSG_TYPE_SPORTMODE = 0x6002;
 	public final static short MSG_TYPE_EXPANDCOMMAND = 0x4108;
 	public final static short MSG_TYPE_GPSHEARTBEAT = 0x5199;
 	public final static short MSG_TYPE_TRACEINTERVAL = 0x4102;
