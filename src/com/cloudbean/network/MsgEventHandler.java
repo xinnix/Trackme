@@ -464,11 +464,17 @@ public class MsgEventHandler {
 		System.out.println(res);
 	}
 	
+	public static void c_sReadGprsTimeInterval(Car car,String data){	
+		
+		String res = c_sCommand(car,MsgGPRSParser.MSG_TYPE_READTRACEINTERVAL,data);
+		System.out.println(res);
+	}
+	
 	public static void c_sSavePower(Car car,String data){	
 		
 		
-		String res = c_sCommand(car,MsgGPRSParser.MSG_TYPE_SAVEPOWER,data);
-		System.out.println(res);
+		 c_sCommand(car,MsgGPRSParser.MSG_TYPE_SAVEPOWER,data);
+		
 		
 	}
 	
@@ -488,7 +494,7 @@ public class MsgEventHandler {
 	
 	public static void c_sTraceInterval(Car car,String data){	
 		
-		c_sCommand(car,MsgGPRSParser.MSG_TYPE_GPSHEARTBEAT,data);
+		String res = c_sCommand(car,MsgGPRSParser.MSG_TYPE_TRACEINTERVAL,data);
 		
 	}
 	

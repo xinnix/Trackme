@@ -381,16 +381,33 @@ public class CNetworkAdapter extends BaseNetworkAdapter {
 				 
 				 break;
 				 
-				 case MsgGPRSParser.MSG_TYPE_TRACEINTERVAL:
+				 case MsgGPRSParser.MSG_TYPE_SETTRACEINTERVAL:
 						
 					 res = mgp.msgData.equals("00")?"设置定时追踪执行失败":"设置定时追踪执行成功";
+//					 new Thread(){
+//
+//						@Override
+//						public void run() {
+//							// TODO Auto-generated method stub
+//							Looper.prepare();
+//							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+//							Looper.loop();
+//						}
+//						 
+//					 }.start();
+				
+				 
+				 break;
+				 case MsgGPRSParser.MSG_TYPE_READTRACEINTERVAL:
+						
+					 res = "当前时间间隔为"+ByteHexUtil.byteToShort(ByteHexUtil.hexStringToBytes(mgp.msgData))+"秒";
 					 new Thread(){
 
 						@Override
 						public void run() {
 							// TODO Auto-generated method stub
 							Looper.prepare();
-							Toast.makeText(context,res ,Toast.LENGTH_SHORT).show();
+							Toast.makeText(context,res ,Toast.LENGTH_LONG).show();
 							Looper.loop();
 						}
 						 

@@ -30,7 +30,8 @@ public class MsgGPRSParser {
 	public final static short MSG_TYPE_GPSHEARTBEAT = 0x5199;
 	public final static short MSG_TYPE_TRACEINTERVAL = 0x4102;
 	public final static short MSG_TYPE_SAVEPOWER = 0x4126;
-	
+	public final static short MSG_TYPE_SETTRACEINTERVAL = 0x5100;
+	public final static short MSG_TYPE_READTRACEINTERVAL = (short) 0x9002;
 	
 	public final static short MSG_TYPE_ALARM = (short) 0x9999;
 	
@@ -86,7 +87,7 @@ public class MsgGPRSParser {
 				data = this.msgData.getBytes();
 				datalen = (data==null)?0:data.length;
 		}else if (this.msgType == MSG_TYPE_TRACEINTERVAL){
-				data = ByteHexUtil.intToByte(Integer.parseInt(this.msgData));
+				data = ByteHexUtil.shortToByte((short) (Integer.parseInt(this.msgData)/10));
 				datalen = (data==null)?0:data.length;
 		}else{
 				data = ByteHexUtil.hexStringToBytes(this.msgData);
