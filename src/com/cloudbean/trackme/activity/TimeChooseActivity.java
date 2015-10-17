@@ -62,25 +62,32 @@ public class TimeChooseActivity extends BaseActivity{
 		
 		
 		
-		etDateText.setOnTouchListener(new View.OnTouchListener(){
-			int touchFlag = 0;
+		etDateText.setOnClickListener(new View.OnClickListener(){
+//			int touchFlag = 0;
+//			@Override
+//			public boolean onTouch(View arg0, MotionEvent arg1) {
+//				// TODO Auto-generated method stub
+//				touchFlag++;
+//				if(touchFlag==2){
+//					touchFlag=0;
+//					DateTimePickDialogUtil dateTimePicKDialog = new DateTimePickDialogUtil(  
+//							TimeChooseActivity.this);  
+//					dateTimePicKDialog.dateTimePicKDialog(etDateText);  
+//				}
+//				
+//				return false;
+//			}
 			@Override
-			public boolean onTouch(View arg0, MotionEvent arg1) {
+			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				touchFlag++;
-				if(touchFlag==2){
-					touchFlag=0;
-					DateTimePickDialogUtil dateTimePicKDialog = new DateTimePickDialogUtil(  
-							TimeChooseActivity.this);  
-					dateTimePicKDialog.dateTimePicKDialog(etDateText);  
-				}
-				
-				return false;
+				DateTimePickDialogUtil dateTimePicKDialog = new DateTimePickDialogUtil(  
+						TimeChooseActivity.this);  
+				dateTimePicKDialog.dateTimePicKDialog(etDateText);
 			}
 	
 		});
 		
-		etPeriodText.setOnTouchListener(new View.OnTouchListener(){
+		etPeriodText.setOnClickListener(new View.OnClickListener(){
 //			int touchFlag = 0;
 			
 //			public boolean onTouch(View arg0, MotionEvent arg1) {
@@ -98,13 +105,48 @@ public class TimeChooseActivity extends BaseActivity{
 //	
 
 		
-			int touchFlag = 0;
+//			int touchFlag = 0;
+//			@Override
+//			public boolean onTouch(View arg0, MotionEvent arg1) {
+//				// TODO Auto-generated method stub
+//				touchFlag++;
+//				if(touchFlag==2){
+//					touchFlag=0;
+//				AlertDialog.Builder builder = new AlertDialog.Builder(
+//
+//                        TimeChooseActivity.this);
+//
+//               builder.setTitle("请选择轨迹参数");
+//
+//                 builder.setItems(periodItems, new DialogInterface.OnClickListener() {
+//
+//
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						// TODO Auto-generated method stub
+//						 etPeriodText.setText(periodItems[which]); 
+//					}
+//                 
+//                 });
+//
+//                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//
+//                     @Override
+//
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                        dialog.dismiss();
+//                    }
+//
+//                 });
+//
+//                builder.show();
+//				}
+//				return false;
+//			}
 			@Override
-			public boolean onTouch(View arg0, MotionEvent arg1) {
+			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				touchFlag++;
-				if(touchFlag==2){
-					touchFlag=0;
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 
                         TimeChooseActivity.this);
@@ -134,8 +176,6 @@ public class TimeChooseActivity extends BaseActivity{
                  });
 
                 builder.show();
-				}
-				return false;
 			}
 
 			
