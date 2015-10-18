@@ -66,6 +66,11 @@ public class ReplayActivity extends BaseActivity {
 	private String isTimeSelected =null;
 	
 	private int btFlag = 1;
+	private int isSameDay=0;
+	
+	private int carId;
+	private String startDate;
+	private String endDate;
 	
 	private static int REPLAY_COMPLETE = 0x8888;
 	
@@ -85,12 +90,18 @@ public class ReplayActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		mMapView.onCreate(savedInstanceState);
 		Intent intent = this.getIntent();
-		int carId = intent.getIntExtra("carId", 0);
-		String startDate = intent.getStringExtra("startDate");
-		String endDate = intent.getStringExtra("endDate");
+		carId = intent.getIntExtra("carId", 0);
+		startDate = intent.getStringExtra("startDate");
+		endDate = intent.getStringExtra("endDate");
 		
+ 		if(DateTimeUtil.isSameDay(startDate, endDate)){
+ 			MsgEventHandler.sGetCarTrack(carId,endDate,startDate);
  		
-		MsgEventHandler.sGetCarTrack(carId,endDate,startDate);//往起始日期之前查询
+ 		}else{
+ 			isSameDay = 1;
+ 			MsgEventHandler.sGetCarTrack(carId,endDate,DateTimeUtil.getEndTimeOfTheDay(endDate));
+ 		}
+		
 		showProgressDialog("历史轨迹获取中...");
 		timerStart();
 		
@@ -566,11 +577,29 @@ public class ReplayActivity extends BaseActivity {
 	@Override
 	public void handleMsg(Message msg) {
 		// TODO Auto-generated method stub
+		
+		timerStop();
+      	Bundle b = msg.getData();
 		if(msg.what==NetworkAdapter.MSG_TRACK){
+       	 if(isSameDay==0){
+       		if(trackList==null){
+       			trackList = (Track[]) b.getParcelableArray("trackList");
+       		}else{
+       			Track[] tmpTrackList1 = (Track[]) b.getParcelableArray("trackList");
+       			Track[] totalTrackList = new Track[trackList.length+tmpTrackList1.length];
+       			System.arraycopy(trackList, 0, totalTrackList, 0, trackList.length);
+       			System.arraycopy(tmpTrackList1, 0, totalTrackList, trackList.length, tmpTrackList1.length);
+       			trackList = totalTrackList;
+       		}
+       		
+       	 }else if(isSameDay==1){
+       		trackList = (Track[]) b.getParcelableArray("trackList");
+       		isSameDay--;
+       		MsgEventHandler.sGetCarTrack(carId,DateTimeUtil.getStartTimeOfTheDay(startDate),startDate);
+       		return;
+       	 }
        	 
-       	 timerStop();
-       	 Bundle b = msg.getData();
-       	 Track[] trackList = (Track[]) b.getParcelableArray("trackList");
+//       	 Track[] trackList = (Track[]) b.getParcelableArray("trackList");
        	 initRoadData(trackList);
 		     if (mVirtureRoad.getPoints().size()>1){
 		    	
@@ -584,11 +613,15 @@ public class ReplayActivity extends BaseActivity {
 	    		// 关闭ProgressDialog
 		     dismissProgressDialog();	
         }else if (msg.what==NetworkAdapter.MSG_FAIL){
+        	
        	 	dismissProgressDialog();
        	 	timerStop();
-       	 	Bundle b = msg.getData();
+       	 	b = msg.getData();
        	 	String reason = b.getString("reason");
-       	 	showMessage(reason);
+       	 	if(trackList==null&&isSameDay==0){
+       	 		showMessage(reason);
+       	 	}
+       	 	
         }else if (msg.what == REPLAY_COMPLETE){
         	tbPlay.setText("播放");
         }else if (msg.what==TIME_OUT){

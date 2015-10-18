@@ -56,6 +56,72 @@ public class DateTimeUtil {
 	        return min;    
 	   
 	 } 
+	
+	
+	public static String getStartTimeOfTheDay(String day)
+	{    
+	        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");    
+	        Date date1 = null;    
+	        Calendar cal1=Calendar.getInstance();
+	        try {    
+	            date1 = format.parse(day);
+	            cal1.setTime(date1);
+	            cal1.set(Calendar.HOUR_OF_DAY, 0); 
+	            cal1.set(Calendar.MINUTE, 0); 
+	            cal1.set(Calendar.SECOND, 0); 
+	            cal1.set(Calendar.MILLISECOND, 1); 
+	           
+	           
+	        } catch (Exception ex) {    
+	            ex.printStackTrace();    
+	        }
+	       
+	        return  format.format(cal1.getTime());    
+	 } 
+	
+	
+	public static boolean isSameDay(String start, String end)
+	{    
+	        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 24小时制   
+	//引号里面个格式也可以是 HH:mm:ss或者HH:mm等等，很随意的，不过在主函数调用时，要和输入的变 
+	//量day格式一致 
+	        Date date1 = null;    
+	        Date date2 = null;
+	        Calendar cal1=Calendar.getInstance();
+	        Calendar cal2=Calendar.getInstance();
+	        try {    
+	            date1 = format.parse(start);
+	            date2 = format.parse(end);
+	            cal1.setTime(date1);
+	            cal2.setTime(date2);
+	           
+	           
+	        } catch (Exception ex) {    
+	            ex.printStackTrace();    
+	        }        
+	        return (cal1.get(Calendar.DAY_OF_MONTH)==cal2.get(Calendar.DAY_OF_MONTH));    
+	 }
+	
+	public static String getEndTimeOfTheDay(String day)
+	{    
+		 	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");    
+	        Date date1 = null;    
+	        Calendar cal1=Calendar.getInstance();
+	        try {    
+	            date1 = format.parse(day);
+	            cal1.setTime(date1);
+	            cal1.set(Calendar.HOUR_OF_DAY, 23); 
+	            cal1.set(Calendar.MINUTE, 59); 
+	            cal1.set(Calendar.SECOND, 59); 
+	            cal1.set(Calendar.MILLISECOND, 0); 
+	           
+	           
+	        } catch (Exception ex) {    
+	            ex.printStackTrace();    
+	        }
+	       
+	        return  format.format(cal1.getTime());
+	 }
 
     /**  
      * 对日期(时间)中的日进行加减计算. <br>  

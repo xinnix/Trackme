@@ -153,7 +153,7 @@ public class TimeChooseActivity extends BaseActivity{
 
                builder.setTitle("ÇëÑ¡Ôñ¹ì¼£²ÎÊý");
 
-                 builder.setItems(periodItems, new DialogInterface.OnClickListener() {
+               builder.setItems(periodItems, new DialogInterface.OnClickListener() {
 
 
 					@Override
