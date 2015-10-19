@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.cloudbean.model.Car;
+import com.cloudbean.model.Fail;
 import com.cloudbean.model.Login;
 import com.cloudbean.network.BaseNetworkAdapter;
 import com.cloudbean.network.CNetworkAdapter;
@@ -163,17 +164,14 @@ public class MainActivity extends BaseActivity {
         		TrackApp.login = login;
         		
         		
-        		if(ckRemPassword.isChecked()){
-        			saveUserInfo(etUsername.getText().toString(),etPassword.getText().toString());
-        		}
+        		
         		
 //        		TrackApp.hb.start();
 
         		MsgEventHandler.sGetCarInfo(login.userid,"");
         		
         		
-        		TrackApp.curPassword = etPassword.getText().toString();
-        		TrackApp.curUsername = etUsername.getText().toString();
+        	
         		
 				
         	}else{
@@ -182,7 +180,7 @@ public class MainActivity extends BaseActivity {
         		TrackApp.na.reconnThread.interrupt();
         		TrackApp.cna.reconnThread.interrupt();
         		
-            	showMessage("登录失败");
+            	showMessage("用户名或密码错误");
             	return;
         	}
         	
@@ -214,14 +212,31 @@ public class MainActivity extends BaseActivity {
 			intent.putExtra("userId",TrackApp.login.userid);
 			timerStop();
     		dismissProgressDialog();
+    		if(ckRemPassword.isChecked()){
+    			saveUserInfo(etUsername.getText().toString(),etPassword.getText().toString());
+    		}
+    		TrackApp.curPassword = etPassword.getText().toString();
+    		TrackApp.curUsername = etUsername.getText().toString();
     		showMessage("登录成功");
 			startActivity(intent);
 			finish();
     	}else if (msg.what==TIME_OUT){
+    		timerStop();
     		TrackApp.na.reconnThread.interrupt();
     		TrackApp.cna.reconnThread.interrupt();
     		dismissProgressDialog();
        	 	showMessage("网络状况导致数据返回超时");
+       	 	return;
+		}else if (msg.what==NetworkAdapter.MSG_FAIL){
+			dismissProgressDialog();
+			timerStop();
+			
+    		TrackApp.na.reconnThread.interrupt();
+    		TrackApp.cna.reconnThread.interrupt();
+    		TrackApp.login = null;
+    		Bundle b = msg.getData();
+    		String f = (String) b.get("reason");
+    		showMessage(f);
        	 	return;
 		}
 		
